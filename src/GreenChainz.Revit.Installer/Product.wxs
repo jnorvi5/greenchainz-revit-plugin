@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <!-- Product Definition -->
+  <Product Id="*" Name="GreenChainz for Revit 2024" Language="1033" Version="1.0.0.0" Manufacturer="GreenChainz" UpgradeCode="73491093-4260-4985-8822-421712953285">
+    <Package InstallerVersion="200" Compressed="yes" InstallScope="perUser" Platform="x64" />
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <!-- Feature Definition -->
+    <Feature Id="ProductFeature" Title="GreenChainz Revit Plugin" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+      <ComponentRef Id="RevitAddinManifest" />
+      <ComponentRef Id="RegistryEntries" />
+      <ComponentRef Id="ApplicationShortcut" />
+    </Feature>
+
+    <!-- UI Settings -->
+    <UIRef Id="WixUI_Minimal" />
+    <WixVariable Id="WixUILicenseRtf" Value="license.rtf" />
+  </Product>
+
+  <!-- Directory Structure -->
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="AppDataFolder">
+        <Directory Id="AutodeskFolder" Name="Autodesk">
+          <Directory Id="RevitFolder" Name="Revit">
+            <Directory Id="AddinsFolder" Name="Addins">
+              <Directory Id="Revit2024Addins" Name="2024">
+                 <!-- The .addin file goes here -->
+                <Directory Id="INSTALLFOLDER" Name="GreenChainz">
+                   <!-- The DLLs go here -->
+                </Directory>
+              </Directory>
+            </Directory>
+          </Directory>
+        </Directory>
+      </Directory>
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ApplicationProgramsFolder" Name="GreenChainz" />
+      </Directory>
+      <Directory Id="DesktopFolder" Name="Desktop" />
+    </Directory>
+  </Fragment>
+
+  <!-- Components -->
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <Component Id="ProductComponent" Guid="6A045330-8D37-41E1-831C-640186938923" Win64="yes">
+        <!-- Reference to the main output DLL from the project -->
+        <File Id="GreenChainz.Revit.dll" Source="$(var.GreenChainz.Revit.TargetDir)GreenChainz.Revit.dll" KeyPath="yes" />
+
+        <!--
+          NOTE: To automatically include all dependencies, we recommend using the heat.exe tool (WiX harvesting).
+          However, manually listed dependencies can be added here.
+        -->
+        <File Id="GreenChainz.Revit.dll.config" Source="$(var.GreenChainz.Revit.TargetDir)GreenChainz.Revit.dll.config" KeyPath="no" Vital="no" />
+
+        <!-- Remove install folder on uninstall -->
+        <RemoveFolder Id="RemoveInstallFolder" On="uninstall" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <!-- Addin Manifest Component -->
+    <Component Id="RevitAddinManifest" Directory="Revit2024Addins" Guid="1B846931-9257-4581-992C-426189912193" Win64="yes">
+      <File Id="GreenChainz.Revit.addin" Source="GreenChainz.Revit.addin" KeyPath="yes" />
+    </Component>
+  </Fragment>
+
+  <Fragment>
+    <!-- Registry Entries -->
+    <Component Id="RegistryEntries" Directory="INSTALLFOLDER" Guid="5C932185-3342-4560-8812-321589123891" Win64="yes">
+      <RegistryKey Root="HKCU" Key="Software\GreenChainz\RevitPlugin">
+        <RegistryValue Type="string" Name="InstallPath" Value="[INSTALLFOLDER]" KeyPath="yes" />
+        <RegistryValue Type="string" Name="LicenseKey" Value="DEMO-LICENSE-KEY" />
+      </RegistryKey>
+    </Component>
+  </Fragment>
+
+  <Fragment>
+    <!-- Desktop Shortcut (Opens Revit) -->
+    <!-- Search for Revit 2024 Install Path -->
+    <Property Id="REVIT2024PATH">
+       <RegistrySearch Id="Revit2024InstallLocation" Root="HKLM" Key="SOFTWARE\Autodesk\Revit\2024" Name="InstallationLocation" Type="raw" />
+    </Property>
+
+    <DirectoryRef Id="DesktopFolder">
+      <Component Id="ApplicationShortcut" Guid="89123891-1234-5678-9012-345678901234" Win64="yes">
+        <!-- Only create shortcut if we found the Revit path -->
+        <Condition>REVIT2024PATH</Condition>
+        <Shortcut Id="ApplicationStartMenuShortcut"
+                  Name="GreenChainz for Revit 2024"
+                  Description="Launch Revit 2024 with GreenChainz"
+                  Target="[REVIT2024PATH]\Revit.exe" />
+        <RegistryValue Root="HKCU" Key="Software\GreenChainz\RevitPlugin" Name="ShortcutInstalled" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+  </Fragment>
+</Wix>
