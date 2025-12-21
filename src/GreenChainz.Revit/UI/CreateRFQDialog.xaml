@@ -1,0 +1,57 @@
+<Window x:Class="GreenChainz.Revit.UI.CreateRFQDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GreenChainz.Revit.UI"
+        mc:Ignorable="d"
+        Title="Create RFQ" Height="500" Width="400" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Submit Request for Quote" FontSize="16" FontWeight="Bold" Margin="0,0,0,10" Grid.Row="0"/>
+
+        <StackPanel Grid.Row="1" Margin="0,0,0,10">
+            <Label Content="Project Name:"/>
+            <TextBox Name="ProjectNameTextBox" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Margin="0,0,0,10">
+            <Label Content="Project Address:"/>
+            <TextBox Name="ProjectAddressTextBox" />
+        </StackPanel>
+
+        <Label Content="Materials:" Grid.Row="3"/>
+        <DataGrid Name="MaterialsDataGrid" Grid.Row="4" AutoGenerateColumns="False" CanUserAddRows="True" Margin="0,0,0,10">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Material Name" Binding="{Binding MaterialName}" Width="*"/>
+                <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" Width="70"/>
+                <DataGridTextColumn Header="Unit" Binding="{Binding Unit}" Width="50"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <StackPanel Grid.Row="5" Margin="0,0,0,10">
+            <Label Content="Delivery Date:"/>
+            <DatePicker Name="DeliveryDatePicker" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="6" Margin="0,0,0,10">
+            <Label Content="Special Instructions:"/>
+            <TextBox Name="SpecialInstructionsTextBox" Height="60" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="7">
+            <Button Name="SubmitButton" Content="Submit RFQ" Click="SubmitButton_Click" Padding="10,5" Margin="0,0,10,0"/>
+            <Button Name="CancelButton" Content="Cancel" Click="CancelButton_Click" Padding="10,5"/>
+        </StackPanel>
+    </Grid>
+</Window>
