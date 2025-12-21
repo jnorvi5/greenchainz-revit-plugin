@@ -1,7 +1,11 @@
 using System;
+using System.IO;
+using System.Windows.Media.Imaging;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
+using GreenChainz.Revit.Services;
+using GreenChainz.Revit.UI;
 
 namespace GreenChainz.Revit
 {
@@ -40,7 +44,7 @@ namespace GreenChainz.Revit
                                      "sustainable building materials. View detailed specifications, " +
                                      "environmental certifications, and pricing information."
                 };
-                PushButton browseMaterialsButton = panel.AddItem(browseMaterialsButtonData) as PushButton;
+                panel.AddItem(browseMaterialsButtonData);
 
                 // Create Carbon Audit button
                 PushButtonData carbonAuditButtonData = new PushButtonData(
@@ -54,7 +58,7 @@ namespace GreenChainz.Revit
                                      "Get detailed reports on carbon emissions by material category and " +
                                      "identify opportunities to reduce environmental impact."
                 };
-                PushButton carbonAuditButton = panel.AddItem(carbonAuditButtonData) as PushButton;
+                panel.AddItem(carbonAuditButtonData);
 
                 // Create Send RFQ button
                 PushButtonData sendRfqButtonData = new PushButtonData(
@@ -68,7 +72,22 @@ namespace GreenChainz.Revit
                                      "materials in your model. Connect directly with verified sustainable " +
                                      "material suppliers through the GreenChainz platform."
                 };
-                PushButton sendRfqButton = panel.AddItem(sendRfqButtonData) as PushButton;
+                panel.AddItem(sendRfqButtonData);
+
+                // Create About button
+                PushButtonData aboutButtonData = new PushButtonData(
+                    "About",
+                    "About",
+                    assemblyPath,
+                    "GreenChainz.Revit.Commands.AboutCommand")
+                {
+                    ToolTip = "About GreenChainz",
+                    LongDescription = "View information about the GreenChainz plugin and user account."
+                };
+                panel.AddItem(aboutButtonData);
+
+                // Handle Authentication
+                InitializeAuth();
 
                 return Result.Succeeded;
             }
@@ -77,6 +96,31 @@ namespace GreenChainz.Revit
                 TaskDialog.Show("GreenChainz Startup Error",
                     $"Failed to initialize GreenChainz plugin:\n\n{ex.Message}\n\n{ex.StackTrace}");
                 return Result.Failed;
+            }
+        }
+
+        private void InitializeAuth()
+        {
+            // Auto-login
+            if (!AuthService.Instance.AutoLogin())
+            {
+                // Show login dialog if not logged in or token expired
+                // We use Dispatcher to show it on the UI thread, but OnStartup runs on UI thread anyway usually.
+                // Note: Showing modal dialog in OnStartup might block splash screen, but it's requested.
+
+                // We shouldn't block Revit startup entirely if user cancels login.
+                // So we show the dialog, but handle cancellation gracefully.
+
+                // Delaying the dialog show until Revit is fully loaded is hard without events.
+                // Assuming immediate show is fine.
+
+                LoginWindow loginWindow = new LoginWindow();
+                bool? result = loginWindow.ShowDialog();
+
+                if (result != true)
+                {
+                    // User closed without logging in. That's fine, they can login later via About or when using a command.
+                }
             }
         }
 
