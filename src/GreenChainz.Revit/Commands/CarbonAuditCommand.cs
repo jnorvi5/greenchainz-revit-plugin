@@ -5,6 +5,8 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using GreenChainz.Revit.Models;
 using GreenChainz.Revit.Views;
+using GreenChainz.Revit.Services;
+using GreenChainz.Revit.UI;
 
 namespace GreenChainz.Revit.Commands
 {
@@ -21,6 +23,27 @@ namespace GreenChainz.Revit.Commands
         {
             try
             {
+                // Check if user is logged in
+                if (!AuthService.Instance.IsLoggedIn)
+                {
+                    // Prompt login
+                    LoginWindow loginWindow = new LoginWindow();
+                    bool? result = loginWindow.ShowDialog();
+
+                    if (result != true || !AuthService.Instance.IsLoggedIn)
+                    {
+                        message = "You must be logged in to perform a Carbon Audit.";
+                        return Result.Cancelled;
+                    }
+                }
+
+                // Check audit credits
+                if (AuthService.Instance.Credits <= 0)
+                {
+                    TaskDialog.Show("Insufficient Credits", "You do not have enough credits to perform a Carbon Audit. Please contact support or upgrade your plan.");
+                    return Result.Cancelled;
+                }
+
                 // Get the current document
                 UIDocument uidoc = commandData.Application.ActiveUIDocument;
                 Document doc = uidoc.Document;
@@ -58,6 +81,14 @@ namespace GreenChainz.Revit.Commands
                 // Using Revit's window handle as owner is best practice but keeping it simple for now
                 AuditResultsWindow window = new AuditResultsWindow(audit);
                 window.ShowDialog();
+                // TODO: Deduct credit here? Or after successful audit?
+                // Assuming we check first.
+
+                MessageBox.Show(
+                    $"Current Model: {modelName}\n\nCarbon Audit running...\nCredits available: {AuthService.Instance.Credits}",
+                    "GreenChainz - Carbon Audit",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
 
                 return Result.Succeeded;
             }
