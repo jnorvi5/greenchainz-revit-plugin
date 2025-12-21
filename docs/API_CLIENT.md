@@ -51,7 +51,7 @@ var apiClient = new ApiClient(ApiConfig.BASE_URL, authToken);
 var materials = await apiClient.GetMaterialsAsync();
 
 // Filter by category
-var concreteMateirals = await apiClient.GetMaterialsAsync(category: "Concrete");
+var concreteMaterials = await apiClient.GetMaterialsAsync(category: "Concrete");
 
 // Search with text
 var lowCarbonMaterials = await apiClient.GetMaterialsAsync(search: "low carbon");
