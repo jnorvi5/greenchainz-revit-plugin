@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>GreenChainz</Name>
+    <Assembly>GreenChainz\GreenChainz.Revit.dll</Assembly>
+    <FullClassName>GreenChainz.Revit.App</FullClassName>
+    <ClientId>8b3a9f7c-2e4d-4a1b-9c5e-7f8d6e3a2b1c</ClientId>
+    <VendorId>GRNC</VendorId>
+    <VendorDescription>GreenChainz, founder@greenchainz.com</VendorDescription>
+    <VisibilityMode>NotVisibleInFamily</VisibilityMode>
+  </AddIn>
+</RevitAddIns>
