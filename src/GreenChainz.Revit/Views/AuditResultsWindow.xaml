@@ -1,0 +1,41 @@
+<Window x:Class="GreenChainz.Revit.Views.AuditResultsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Carbon Audit Results" Height="600" Width="800">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Text="Carbon Audit Report" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+
+        <!-- Summary -->
+        <StackPanel Grid.Row="1" Margin="0,0,0,20">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <TextBlock Text="Overall Score: " FontSize="18" FontWeight="Bold"/>
+                <TextBlock x:Name="ScoreText" Text="0 kgCO2e" FontSize="18" FontWeight="Bold" Foreground="ForestGreen"/>
+            </StackPanel>
+            <TextBlock x:Name="SummaryText" Text="Summary..." TextWrapping="Wrap" Margin="0,10,0,0"/>
+        </StackPanel>
+
+        <!-- Details -->
+        <DataGrid Grid.Row="2" x:Name="MaterialsGrid" AutoGenerateColumns="False" IsReadOnly="True" Margin="0,0,0,20">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Material" Binding="{Binding MaterialName}" Width="*"/>
+                <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" Width="100"/>
+                <DataGridTextColumn Header="Factor" Binding="{Binding CarbonFactor, StringFormat=N2}" Width="100"/>
+                <DataGridTextColumn Header="Total Carbon" Binding="{Binding TotalCarbon, StringFormat=N0}" Width="120"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button x:Name="ExportButton" Content="Export PDF" Width="100" Height="30" Click="ExportButton_Click" Margin="0,0,10,0"/>
+            <Button x:Name="CloseButton" Content="Close" Width="100" Height="30" Click="CloseButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>
