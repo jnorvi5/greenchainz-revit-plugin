@@ -1,5 +1,4 @@
 using System;
-using System.Windows.Forms;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -19,11 +18,9 @@ namespace GreenChainz.Revit.Commands
         {
             try
             {
-                MessageBox.Show(
-                    "Send RFQ feature coming soon!",
+                TaskDialog.Show(
                     "GreenChainz - Send RFQ",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
+                    "Send RFQ feature coming soon!");
 
                 return Result.Succeeded;
             }

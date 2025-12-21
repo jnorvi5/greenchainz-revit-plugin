@@ -40,7 +40,7 @@ namespace GreenChainz.Revit
                                      "sustainable building materials. View detailed specifications, " +
                                      "environmental certifications, and pricing information."
                 };
-                PushButton browseMaterialsButton = panel.AddItem(browseMaterialsButtonData) as PushButton;
+                panel.AddItem(browseMaterialsButtonData);
 
                 // Create Carbon Audit button
                 PushButtonData carbonAuditButtonData = new PushButtonData(
@@ -54,7 +54,7 @@ namespace GreenChainz.Revit
                                      "Get detailed reports on carbon emissions by material category and " +
                                      "identify opportunities to reduce environmental impact."
                 };
-                PushButton carbonAuditButton = panel.AddItem(carbonAuditButtonData) as PushButton;
+                panel.AddItem(carbonAuditButtonData);
 
                 // Create Send RFQ button
                 PushButtonData sendRfqButtonData = new PushButtonData(
@@ -68,7 +68,7 @@ namespace GreenChainz.Revit
                                      "materials in your model. Connect directly with verified sustainable " +
                                      "material suppliers through the GreenChainz platform."
                 };
-                PushButton sendRfqButton = panel.AddItem(sendRfqButtonData) as PushButton;
+                panel.AddItem(sendRfqButtonData);
 
                 return Result.Succeeded;
             }

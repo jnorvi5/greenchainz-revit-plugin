@@ -1,5 +1,4 @@
 using System;
-using System.Windows.Forms;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -21,14 +20,18 @@ namespace GreenChainz.Revit.Commands
             {
                 // Get the current document
                 UIDocument uidoc = commandData.Application.ActiveUIDocument;
+                if (uidoc == null)
+                {
+                    TaskDialog.Show("Error", "No active document found.");
+                    return Result.Failed;
+                }
+
                 Document doc = uidoc.Document;
                 string modelName = doc.Title;
 
-                MessageBox.Show(
-                    $"Current Model: {modelName}\n\nCarbon Audit feature coming soon!",
+                TaskDialog.Show(
                     "GreenChainz - Carbon Audit",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
+                    $"Current Model: {modelName}\n\nCarbon Audit feature coming soon!");
 
                 return Result.Succeeded;
             }
