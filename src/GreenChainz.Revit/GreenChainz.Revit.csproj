@@ -68,6 +68,11 @@
     <Compile Include="Commands\CarbonAuditCommand.cs" />
     <Compile Include="Commands\ProjectAuditCmd.cs" />
     <Compile Include="Commands\SendRFQCommand.cs" />
+    <Compile Include="Models\RFQRequest.cs" />
+    <Compile Include="Services\ApiClient.cs" />
+    <Compile Include="UI\CreateRFQDialog.xaml.cs">
+      <DependentUpon>CreateRFQDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Models\AuditRequest.cs" />
     <Compile Include="Models\AuditResult.cs" />
     <Compile Include="Models\ProjectMaterial.cs" />
@@ -98,6 +103,12 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\AboutWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="UI\CreateRFQDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
