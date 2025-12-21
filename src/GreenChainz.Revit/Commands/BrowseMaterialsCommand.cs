@@ -1,5 +1,4 @@
 using System;
-using System.Windows.Forms;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -19,11 +18,9 @@ namespace GreenChainz.Revit.Commands
         {
             try
             {
-                MessageBox.Show(
-                    "Browse Materials feature coming soon!",
+                TaskDialog.Show(
                     "GreenChainz - Browse Materials",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
+                    "Browse Materials feature coming soon!");
 
                 return Result.Succeeded;
             }
