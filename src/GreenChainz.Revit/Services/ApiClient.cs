@@ -24,6 +24,17 @@ namespace GreenChainz.Revit.Services
         /// <param name="baseUrl">The base URL of the API.</param>
         /// <param name="authToken">The JWT authentication token.</param>
         public ApiClient(string baseUrl, string authToken)
+            : this(baseUrl, authToken, null)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ApiClient"/> class with a custom HttpClient.
+        /// </summary>
+        /// <param name="baseUrl">The base URL of the API.</param>
+        /// <param name="authToken">The JWT authentication token.</param>
+        /// <param name="httpClient">Optional HttpClient instance for testing.</param>
+        internal ApiClient(string baseUrl, string authToken, HttpClient httpClient)
         {
             if (string.IsNullOrWhiteSpace(baseUrl))
                 throw new ArgumentNullException(nameof(baseUrl));
@@ -32,10 +43,18 @@ namespace GreenChainz.Revit.Services
                 throw new ArgumentNullException(nameof(authToken));
 
             _baseUrl = baseUrl.TrimEnd('/');
-            _httpClient = new HttpClient
+            
+            if (httpClient != null)
             {
-                Timeout = TimeSpan.FromSeconds(ApiConfig.TIMEOUT_SECONDS)
-            };
+                _httpClient = httpClient;
+            }
+            else
+            {
+                _httpClient = new HttpClient
+                {
+                    Timeout = TimeSpan.FromSeconds(ApiConfig.TIMEOUT_SECONDS)
+                };
+            }
 
             // Set default headers
             _httpClient.DefaultRequestHeaders.Accept.Clear();
