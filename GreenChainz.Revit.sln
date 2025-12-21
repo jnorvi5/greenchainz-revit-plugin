@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GreenChainz.Revit", "src\GreenChainz.Revit\GreenChainz.Revit.csproj", "{8B3A9F7C-2E4D-4A1B-9C5E-7F8D6E3A2B1C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GreenChainz.Revit.Tests", "tests\GreenChainz.Revit.Tests\GreenChainz.Revit.Tests.csproj", "{9C4B8F6D-3F5E-4B2C-8D6F-9E8A7C6B5D4E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -15,6 +17,10 @@ Global
 		{8B3A9F7C-2E4D-4A1B-9C5E-7F8D6E3A2B1C}.Debug|x64.Build.0 = Debug|x64
 		{8B3A9F7C-2E4D-4A1B-9C5E-7F8D6E3A2B1C}.Release|x64.ActiveCfg = Release|x64
 		{8B3A9F7C-2E4D-4A1B-9C5E-7F8D6E3A2B1C}.Release|x64.Build.0 = Release|x64
+		{9C4B8F6D-3F5E-4B2C-8D6F-9E8A7C6B5D4E}.Debug|x64.ActiveCfg = Debug|x64
+		{9C4B8F6D-3F5E-4B2C-8D6F-9E8A7C6B5D4E}.Debug|x64.Build.0 = Debug|x64
+		{9C4B8F6D-3F5E-4B2C-8D6F-9E8A7C6B5D4E}.Release|x64.ActiveCfg = Release|x64
+		{9C4B8F6D-3F5E-4B2C-8D6F-9E8A7C6B5D4E}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

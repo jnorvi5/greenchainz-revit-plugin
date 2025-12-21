@@ -1,0 +1,31 @@
+<Window x:Class="GreenChainz.Revit.UI.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="About GreenChainz" Height="250" Width="350"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="GreenChainz Revit Plugin" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
+            <TextBlock Text="User: " FontWeight="Bold"/>
+            <TextBlock x:Name="UserEmailText" Text="Not logged in"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,0,0,20">
+            <TextBlock Text="Credits: " FontWeight="Bold"/>
+            <TextBlock x:Name="CreditsText" Text="0"/>
+        </StackPanel>
+
+        <Button Grid.Row="3" x:Name="LogoutButton" Content="Logout" Height="30" Width="100" Click="LogoutButton_Click" HorizontalAlignment="Center"/>
+
+        <Button Grid.Row="4" Content="Close" Height="30" Width="100" IsCancel="True" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+    </Grid>
+</Window>
