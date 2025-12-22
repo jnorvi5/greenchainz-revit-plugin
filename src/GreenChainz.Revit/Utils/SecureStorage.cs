@@ -1,6 +1,5 @@
 using System;
 using System.Text;
-using System.Security.Cryptography;
 using Microsoft.Win32;
 
 namespace GreenChainz.Revit.Utils
@@ -74,7 +73,7 @@ namespace GreenChainz.Revit.Utils
 
         public static void SaveUserInfo(string email, int credits)
         {
-             using (RegistryKey key = Registry.CurrentUser.CreateSubKey(RegistryKeyPath))
+            using (RegistryKey key = Registry.CurrentUser.CreateSubKey(RegistryKeyPath))
             {
                 if (email != null) key.SetValue(EmailKeyName, email);
                 key.SetValue(CreditsKeyName, credits);
@@ -83,7 +82,7 @@ namespace GreenChainz.Revit.Utils
 
         public static string LoadUserEmail()
         {
-             using (RegistryKey key = Registry.CurrentUser.OpenSubKey(RegistryKeyPath))
+            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(RegistryKeyPath))
             {
                 return key?.GetValue(EmailKeyName) as string;
             }
@@ -91,7 +90,7 @@ namespace GreenChainz.Revit.Utils
 
         public static int LoadUserCredits()
         {
-             using (RegistryKey key = Registry.CurrentUser.OpenSubKey(RegistryKeyPath))
+            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(RegistryKeyPath))
             {
                 object val = key?.GetValue(CreditsKeyName);
                 if (val is int i) return i;

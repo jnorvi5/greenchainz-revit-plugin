@@ -1,6 +1,4 @@
 using System;
-using Autodesk.Revit.UI;
-using Autodesk.Revit.DB;
 using GreenChainz.Revit.Models;
 using GreenChainz.Revit.Services;
 

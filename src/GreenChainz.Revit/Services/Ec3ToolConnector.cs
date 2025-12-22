@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -25,10 +23,10 @@ namespace GreenChainz.Revit.Services
         {
             _apiKey = apiKey;
             _httpClient = new HttpClient();
-            
+
             if (!string.IsNullOrEmpty(_apiKey))
             {
-                _httpClient.DefaultRequestHeaders.Authorization = 
+                _httpClient.DefaultRequestHeaders.Authorization =
                     new AuthenticationHeaderValue("Bearer", _apiKey);
             }
         }

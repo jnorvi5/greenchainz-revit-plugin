@@ -1,5 +1,3 @@
-using System;
-
 namespace GreenChainz.Revit.Models
 {
     public class Recommendation

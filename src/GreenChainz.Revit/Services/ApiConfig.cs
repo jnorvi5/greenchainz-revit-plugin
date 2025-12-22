@@ -1,5 +1,4 @@
 using System;
-using System.Configuration;
 
 namespace GreenChainz.Revit.Services
 {
@@ -26,7 +25,7 @@ namespace GreenChainz.Revit.Services
         {
             // Try to load from environment variable first
             string token = Environment.GetEnvironmentVariable("GREENCHAINZ_AUTH_TOKEN");
-            
+
             if (string.IsNullOrEmpty(token))
             {
                 // Try to load from app configuration
