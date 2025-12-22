@@ -11,13 +11,13 @@ namespace GreenChainz.Revit.Tests
     public class MaterialServiceTests
     {
         [TestMethod]
-        public void TestMaterialDataFetch()
+        public void GetMaterialsAsync_WithMockData_ReturnsExpectedMaterials()
         {
             // Simple test to verify the mock data service
             var service = new MaterialService();
             var task = service.GetMaterialsAsync();
             task.Wait();
-            
+
             var results = task.Result;
             Assert.IsNotNull(results);
             Assert.IsTrue(results.Count > 0);
@@ -25,14 +25,14 @@ namespace GreenChainz.Revit.Tests
         }
 
         [TestMethod]
-        public void TestMaterialModelProperties()
+        public void Material_WhenPropertiesSet_ReturnsCorrectValues()
         {
             var mat = new Material
             {
                 Name = "Test",
                 CarbonScore = 10.5
             };
-            
+
             Assert.AreEqual("Test", mat.Name);
             Assert.AreEqual(10.5, mat.CarbonScore);
         }

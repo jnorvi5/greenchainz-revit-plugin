@@ -18,7 +18,7 @@ namespace GreenChainz.Revit.UI
         private readonly MaterialService _service;
         private ObservableCollection<Material> _allMaterials;
         private ICollectionView _filteredView;
-        
+
         // External Event Handling
         private ExternalEvent _externalEvent;
         private MaterialCreationHandler _handler;
@@ -36,7 +36,7 @@ namespace GreenChainz.Revit.UI
             // Setup External Event
             _handler = new MaterialCreationHandler();
             _externalEvent = ExternalEvent.Create(_handler);
-            
+
             // Setup loading
             this.Loaded += MaterialBrowserPanel_Loaded;
         }
@@ -104,8 +104,8 @@ namespace GreenChainz.Revit.UI
             {
                 // 1. Text Search
                 string searchText = SearchBox.Text?.ToLower() ?? "";
-                bool matchesSearch = string.IsNullOrEmpty(searchText) || 
-                                     material.Name.ToLower().Contains(searchText) || 
+                bool matchesSearch = string.IsNullOrEmpty(searchText) ||
+                                     material.Name.ToLower().Contains(searchText) ||
                                      material.Manufacturer.ToLower().Contains(searchText);
 
                 // 2. Category Filter
@@ -139,7 +139,7 @@ namespace GreenChainz.Revit.UI
             {
                 // Pass data to handler
                 _handler.MaterialToCreate = selectedMaterial;
-                
+
                 // Raise the event to run entirely inside Revit's API context
                 _externalEvent.Raise();
             }
@@ -151,7 +151,7 @@ namespace GreenChainz.Revit.UI
         public async Task RefreshMaterialsAsync()
         {
             _allMaterials.Clear();
-            
+
             try
             {
                 SetLoadingState(true);

@@ -86,4 +86,10 @@
     </Content>
   </ItemGroup>
 
+  <!-- Embedded Resources (Icons) -->
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\icon_16.png" />
+    <EmbeddedResource Include="Resources\icon_32.png" />
+  </ItemGroup>
+
 </Project>

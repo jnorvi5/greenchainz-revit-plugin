@@ -10,13 +10,12 @@ namespace GreenChainz.Revit.Services
 {
     public class SdaConnectorService
     {
-        private readonly HttpClient _httpClient;
+        private static readonly HttpClient _httpClient = new HttpClient();
         private readonly AutodeskAuthService _authService;
         private const string SDA_BASE_URL = "https://developer.api.autodesk.com/carbon/v1";
 
         public SdaConnectorService(AutodeskAuthService authService)
         {
-            _httpClient = new HttpClient();
             _authService = authService;
         }
 

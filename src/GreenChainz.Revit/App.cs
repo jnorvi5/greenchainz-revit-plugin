@@ -37,6 +37,7 @@ namespace GreenChainz.Revit
                 // Create ribbon panel
                 RibbonPanel panel = application.CreateRibbonPanel(tabName, "Sustainable Materials");
 
+<<<<<<< HEAD
                 // Get the assembly path
                 string assemblyPath = Assembly.GetExecutingAssembly().Location;
 
@@ -101,6 +102,22 @@ namespace GreenChainz.Revit
                 // Register Dockable Pane (From Local)
                 MaterialBrowserPanel browserPanel = new MaterialBrowserPanel(MaterialService);
                 DockablePaneId dpid = new DockablePaneId(MaterialBrowserPaneId);
+=======
+            browseBtnData.ToolTip = "Open the Sustainable Material Browser panel.";
+
+            // Set Icons
+            browseBtnData.LargeImage = GetEmbeddedImage("icon_32.png");
+            browseBtnData.Image = GetEmbeddedImage("icon_16.png");
+
+            panel.AddItem(browseBtnData);
+
+            // 3. Register Dockable Pane with injected MaterialService
+            MaterialBrowserPanel browserPanel = new MaterialBrowserPanel(MaterialService);
+            DockablePaneId dpid = new DockablePaneId(MaterialBrowserPaneId);
+
+            try
+            {
+>>>>>>> 7ab4670 (Update Revit plugin UI with branding and service improvements)
                 application.RegisterDockablePane(dpid, "Material Browser", browserPanel);
 
                 // Handle Authentication (From Remote)
@@ -115,8 +132,21 @@ namespace GreenChainz.Revit
                     $"Failed to initialize GreenChainz plugin:\n\n{ex.Message}\n\n{ex.StackTrace}");
                 return Result.Failed;
             }
+<<<<<<< HEAD
         }
+=======
 
+            string clientId = Environment.GetEnvironmentVariable("AUTODESK_CLIENT_ID");
+            string clientSecret = Environment.GetEnvironmentVariable("AUTODESK_CLIENT_SECRET");
+>>>>>>> 7ab4670 (Update Revit plugin UI with branding and service improvements)
+
+            // Log a warning when required credentials are missing or empty
+            if (string.IsNullOrWhiteSpace(clientId) || string.IsNullOrWhiteSpace(clientSecret))
+            {
+                System.Diagnostics.Debug.WriteLine(
+                    "Warning: Autodesk credentials (AUTODESK_CLIENT_ID / AUTODESK_CLIENT_SECRET) are missing or empty. " +
+                    "The plugin will use mock material data instead of live Autodesk services.");
+            }
         private void InitializeServices()
         {
             // Read credentials from environment variables
@@ -138,9 +168,36 @@ namespace GreenChainz.Revit
             }
         }
 
-        public Result OnShutdown(UIControlledApplication application)
+        public Result OnShutdown(UIControlledApplication application) => Result.Succeeded;
+
+        /// <summary>
+        /// Helper to load embedded image resources
+        /// </summary>
+        private BitmapImage GetEmbeddedImage(string name)
         {
-            return Result.Succeeded;
+            try
+            {
+                Assembly assembly = Assembly.GetExecutingAssembly();
+                // Resource name format: Namespace.Folder.Filename
+                // Note: Folders in project become dot-separated in resource name
+                string resourceName = $"GreenChainz.Revit.Resources.{name}";
+
+                using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+                {
+                    if (stream == null) return null;
+
+                    BitmapImage image = new BitmapImage();
+                    image.BeginInit();
+                    image.StreamSource = stream;
+                    image.CacheOption = BitmapCacheOption.OnLoad;
+                    image.EndInit();
+                    return image;
+                }
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         /// <summary>

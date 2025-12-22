@@ -54,7 +54,7 @@ namespace GreenChainz.Revit.Services
 
         public bool HasValidCredentials()
         {
-            return !string.IsNullOrEmpty(_clientId) && 
+            return !string.IsNullOrEmpty(_clientId) &&
                    !string.IsNullOrEmpty(_clientSecret) &&
                    _clientId != "YOUR_CLIENT_ID";
         }
