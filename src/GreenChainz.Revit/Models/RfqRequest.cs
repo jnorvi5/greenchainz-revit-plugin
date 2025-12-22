@@ -3,39 +3,33 @@ using System.Collections.Generic;
 
 namespace GreenChainz.Revit.Models
 {
-    /// <summary>
-    /// Represents a Request for Quotation (RFQ) to be submitted to suppliers.
-    /// </summary>
-    public class RfqRequest
+    public class RFQRequest
     {
-        /// <summary>
-        /// Gets or sets the name of the project.
-        /// </summary>
         public string ProjectName { get; set; }
+        public string ProjectAddress { get; set; }
+        public List<RFQItem> Materials { get; set; }
+        public DateTime DeliveryDate { get; set; }
+        public string SpecialInstructions { get; set; }
 
-        /// <summary>
-        /// Gets or sets the email address of the contact person.
-        /// </summary>
-        public string ContactEmail { get; set; }
+        public RFQRequest()
+        {
+            Materials = new List<RFQItem>();
+        }
+    }
 
-        /// <summary>
-        /// Gets or sets the name of the contact person.
-        /// </summary>
-        public string ContactName { get; set; }
+    public class RFQItem
+    {
+        public string MaterialName { get; set; }
+        public double Quantity { get; set; }
+        public string Unit { get; set; }
 
-        /// <summary>
-        /// Gets or sets the list of items requested in the RFQ.
-        /// </summary>
-        public List<RfqItem> Items { get; set; }
+        public RFQItem() { }
 
-        /// <summary>
-        /// Gets or sets any additional notes or requirements.
-        /// </summary>
-        public string Notes { get; set; }
-
-        /// <summary>
-        /// Gets or sets the date by which the materials are required.
-        /// </summary>
-        public DateTime RequiredDate { get; set; }
+        public RFQItem(string name, double quantity, string unit)
+        {
+            MaterialName = name;
+            Quantity = quantity;
+            Unit = unit;
+        }
     }
 }
