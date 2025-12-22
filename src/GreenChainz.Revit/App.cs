@@ -36,7 +36,7 @@ namespace GreenChainz.Revit
                 // Create ribbon panel
                 RibbonPanel panel = application.CreateRibbonPanel(tabName, "Sustainable Materials");
 
-<<<<<<< HEAD
+
                 // Get the assembly path
                 string assemblyPath = Assembly.GetExecutingAssembly().Location;
 
@@ -131,20 +131,18 @@ namespace GreenChainz.Revit
                     $"Failed to initialize GreenChainz plugin:\n\n{ex.Message}\n\n{ex.StackTrace}");
                 return Result.Failed;
             }
-<<<<<<< HEAD
+
         }
-=======
+
 
             string clientId = Environment.GetEnvironmentVariable("AUTODESK_CLIENT_ID");
             string clientSecret = Environment.GetEnvironmentVariable("AUTODESK_CLIENT_SECRET");
->>>>>>> 7ab4670 (Update Revit plugin UI with branding and service improvements)
 
             // Log a warning when required credentials are missing or empty
             if (string.IsNullOrWhiteSpace(clientId) || string.IsNullOrWhiteSpace(clientSecret))
             {
-                System.Diagnostics.Debug.WriteLine(
-                    "Warning: Autodesk credentials (AUTODESK_CLIENT_ID / AUTODESK_CLIENT_SECRET) are missing or empty. " +
-                    "The plugin will use mock material data instead of live Autodesk services.");
+                LogWarning("Warning: Autodesk credentials (AUTODESK_CLIENT_ID / AUTODESK_CLIENT_SECRET) are missing or empty. " +
+                           "The plugin will use mock material data instead of live Autodesk services.");
             }
         private void InitializeServices()
         {
@@ -168,6 +166,14 @@ namespace GreenChainz.Revit
         }
 
         public Result OnShutdown(UIControlledApplication application) => Result.Succeeded;
+
+        /// <summary>
+        /// Logs a warning message to the debug output.
+        /// </summary>
+        private void LogWarning(string message)
+        {
+            System.Diagnostics.Debug.WriteLine(message);
+        }
 
         /// <summary>
         /// Helper to load embedded image resources
