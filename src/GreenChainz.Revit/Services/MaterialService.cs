@@ -86,13 +86,9 @@ namespace GreenChainz.Revit.Services
                     Manufacturer = sdaMat.Manufacturer ?? "Unknown",
                     Description = !string.IsNullOrEmpty(sdaMat.EpdUrl)
                         ? $"EPD: {sdaMat.EpdUrl}"
-<<<<<<< HEAD
                         : "No EPD available",
                     Unit = "kg", // Default unit
                     IsVerified = true // Assume SDA materials are verified
-=======
-                        : "No EPD available"
->>>>>>> 7ab4670 (Update Revit plugin UI with branding and service improvements)
                 });
             }
 
@@ -211,11 +207,7 @@ namespace GreenChainz.Revit.Services
                 // 4. Set Shared Parameters
                 Parameter carbonParam = revitMaterial.LookupParameter("GC_CarbonScore");
                 if (carbonParam != null && !carbonParam.IsReadOnly)
-<<<<<<< HEAD
                     carbonParam.Set(apiMaterial.EmbodiedCarbon);
-=======
-                    carbonParam.Set(apiMaterial.CarbonScore);
->>>>>>> 7ab4670 (Update Revit plugin UI with branding and service improvements)
 
                 Parameter manufacturerParam = revitMaterial.LookupParameter("GC_Supplier");
                 if (manufacturerParam != null && !manufacturerParam.IsReadOnly)
@@ -223,24 +215,14 @@ namespace GreenChainz.Revit.Services
 
                 Parameter certParam = revitMaterial.LookupParameter("GC_Certifications");
                 if (certParam != null && !certParam.IsReadOnly)
-<<<<<<< HEAD
                     certParam.Set(apiMaterial.Certifications != null
                         ? string.Join(", ", apiMaterial.Certifications)
                         : string.Empty);
-=======
-                    certParam.Set(apiMaterial.Certifications);
->>>>>>> 7ab4670 (Update Revit plugin UI with branding and service improvements)
 
                 Color displayColor = new Color(128, 128, 128); // Grey default
-<<<<<<< HEAD
                 if (apiMaterial.EmbodiedCarbon < 10)
                     displayColor = new Color(0, 200, 0); // Green for very low carbon
                 else if (apiMaterial.EmbodiedCarbon < 50)
-=======
-                if (apiMaterial.CarbonScore < 10)
-                    displayColor = new Color(0, 200, 0); // Green for very low carbon
-                else if (apiMaterial.CarbonScore < 50)
->>>>>>> 7ab4670 (Update Revit plugin UI with branding and service improvements)
                     displayColor = new Color(200, 200, 0); // Yellow for medium carbon
 
                 revitMaterial.Color = displayColor;
