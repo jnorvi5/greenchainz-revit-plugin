@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Windows.Media.Imaging;
 using GreenChainz.Revit.Services;
 using Autodesk.Revit.UI;
+using Autodesk.Revit.Attributes;
 using GreenChainz.Revit.UI;
 
 namespace GreenChainz.Revit
@@ -134,9 +135,6 @@ namespace GreenChainz.Revit
 
         }
 
-
-            string clientId = Environment.GetEnvironmentVariable("AUTODESK_CLIENT_ID");
-            string clientSecret = Environment.GetEnvironmentVariable("AUTODESK_CLIENT_SECRET");
 
             // Log a warning when required credentials are missing or empty
             if (string.IsNullOrWhiteSpace(clientId) || string.IsNullOrWhiteSpace(clientSecret))
