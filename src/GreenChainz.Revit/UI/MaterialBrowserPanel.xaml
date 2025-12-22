@@ -1,0 +1,148 @@
+<UserControl x:Class="GreenChainz.Revit.UI.MaterialBrowserPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:GreenChainz.Revit.UI"
+             mc:Ignorable="d"
+             d:DesignHeight="600"
+        d:DesignWidth="400"
+             Background="White">
+    <UserControl.Resources>
+        <!-- Simple styles -->
+        <Style TargetType="TextBlock"
+                x:Key="HeaderStyle">
+            <Setter Property="FontSize"
+                    Value="14"/>
+            <Setter Property="FontWeight"
+                    Value="Bold"/>
+            <Setter Property="Foreground"
+                    Value="#333"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- Search & Filter -->
+            <RowDefinition Height="*"/>
+            <!-- DataGrid -->
+            <RowDefinition Height="Auto"/>
+            <!-- Details Panel -->
+        </Grid.RowDefinitions>
+
+        <!-- Top Controls -->
+        <StackPanel Grid.Row="0"
+                Margin="0,0,0,10">
+            <TextBlock Text="Search Materials"
+                    FontWeight="SemiBold"
+                    Margin="0,0,0,5"/>
+            <TextBox x:Name="SearchBox"
+                    Height="25"
+                    TextChanged="SearchBox_TextChanged"
+                    Margin="0,0,0,10"
+                    VerticalContentAlignment="Center"/>
+
+            <TextBlock Text="Category"
+                    FontWeight="SemiBold"
+                    Margin="0,0,0,5"/>
+            <ComboBox x:Name="CategoryFilter"
+                    Height="25"
+                    SelectionChanged="CategoryFilter_SelectionChanged">
+                <ComboBoxItem Content="All"
+                        IsSelected="True"/>
+                <ComboBoxItem Content="Concrete"/>
+                <ComboBoxItem Content="Steel"/>
+                <ComboBoxItem Content="Wood"/>
+                <ComboBoxItem Content="Insulation"/>
+                <ComboBoxItem Content="Metal"/>
+            </ComboBox>
+        </StackPanel>
+
+        <!-- Main List -->
+        <DataGrid Grid.Row="1"
+                x:Name="MaterialsGrid"
+                AutoGenerateColumns="False"
+                CanUserAddRows="False"
+                  IsReadOnly="True"
+                SelectionMode="Single"
+                SelectionChanged="MaterialsGrid_SelectionChanged">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Name"
+                        Binding="{Binding Name}"
+                        Width="*"/>
+                <DataGridTextColumn Header="Score"
+                        Binding="{Binding EmbodiedCarbon}"
+                        Width="50"/>
+                <DataGridTextColumn Header="Price"
+                        Binding="{Binding PricePerUnit, StringFormat=C}"
+                        Width="60"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Details Panel (Initially Hidden or shows selected item) -->
+        <Border Grid.Row="2"
+                Margin="0,10,0,0"
+                BorderBrush="#EEE"
+                BorderThickness="1"
+                CornerRadius="4"
+                Padding="10">
+            <StackPanel x:Name="DetailsPanel">
+                <TextBlock Text="Selected Material"
+                        Style="{StaticResource HeaderStyle}"
+                        Margin="0,0,0,10"/>
+
+                <Grid Margin="0,0,0,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Name:"
+                            FontWeight="Bold"
+                            Margin="0,0,10,0"/>
+                    <TextBlock Grid.Column="1"
+                            Text="{Binding SelectedItem.Name, ElementName=MaterialsGrid}"/>
+                </Grid>
+
+                <Grid Margin="0,0,0,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Manufacturer:"
+                            FontWeight="Bold"
+                            Margin="0,0,10,0"/>
+                    <TextBlock Grid.Column="1"
+                            Text="{Binding SelectedItem.Manufacturer, ElementName=MaterialsGrid}"/>
+                </Grid>
+
+                <Grid Margin="0,0,0,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Certifications:"
+                            FontWeight="Bold"
+                            Margin="0,0,10,0"/>
+                    <TextBlock Grid.Column="1"
+                            Text="{Binding SelectedItem.CertificationsDisplay, ElementName=MaterialsGrid}"
+                            TextWrapping="Wrap"/>
+                </Grid>
+
+                <TextBlock Text="{Binding SelectedItem.Description, ElementName=MaterialsGrid}"
+                        TextWrapping="Wrap"
+                        Margin="0,5,0,10"
+                        FontStyle="Italic"/>
+
+                <Button x:Name="AddToProjectBtn"
+                        Content="Add to Project"
+                        Height="30"
+                        Click="AddToProjectBtn_Click"
+                        Background="#007ACC"
+                        Foreground="White"
+                        FontWeight="Bold"
+                        IsEnabled="False"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

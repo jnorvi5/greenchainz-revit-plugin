@@ -48,6 +48,11 @@ namespace GreenChainz.Revit.Models
         public List<string> Certifications { get; set; }
 
         /// <summary>
+        /// Helper property for XAML binding to display certifications as a comma-separated string.
+        /// </summary>
+        public string CertificationsDisplay => Certifications != null ? string.Join(", ", Certifications) : string.Empty;
+
+        /// <summary>
         /// Gets or sets whether the material has been verified by GreenChainz.
         /// </summary>
         public bool IsVerified { get; set; }

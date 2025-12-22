@@ -1,0 +1,46 @@
+﻿using System;
+using Autodesk.Revit.UI;
+using Autodesk.Revit.DB;
+using GreenChainz.Revit.Models;
+using GreenChainz.Revit.Services;
+using GreenChainz.Revit.Utils;
+
+namespace GreenChainz.Revit.UI // Same namespace as UI for easier access
+{
+    public class MaterialCreationHandler : IExternalEventHandler
+    {
+        public Material MaterialToCreate { get; set; }
+        private MaterialService _service;
+
+        public MaterialCreationHandler()
+        {
+            _service = new MaterialService();
+        }
+
+        public void Execute(UIApplication app)
+        {
+            if (MaterialToCreate == null) return;
+
+            UIDocument uidoc = app.ActiveUIDocument;
+            if (uidoc == null) return;
+            Document doc = uidoc.Document;
+
+            try
+            {
+                // Delegate the actual logic to the service
+                _service.CreateRevitMaterial(doc, app.Application, MaterialToCreate);
+                
+                TaskDialog.Show("Success", $"Created material: {MaterialToCreate.Name}");
+            }
+            catch (Exception ex)
+            {
+                TaskDialog.Show("Error", $"Failed to create material: {ex.Message}");
+            }
+        }
+
+        public string GetName()
+        {
+            return "GreenChainz Material Creator";
+        }
+    }
+}

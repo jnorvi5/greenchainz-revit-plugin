@@ -1,0 +1,10 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\src",
+    "\\src\\GreenChainz.Revit",
+    "\\src\\GreenChainz.Revit\\Services"
+  ],
+  "SelectedNode": "\\src\\GreenChainz.Revit\\Services\\IAutodeskToolConnector.cs",
+  "PreviewInSolutionExplorer": false
+}

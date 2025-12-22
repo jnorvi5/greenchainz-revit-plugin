@@ -1,0 +1,63 @@
+﻿using System;
+using System.Reflection;
+using System.Windows.Media.Imaging;
+using Autodesk.Revit.UI;
+using GreenChainz.Revit.Commands;
+using GreenChainz.Revit.UI;
+
+namespace GreenChainz.Revit
+{
+    public class App : IExternalApplication
+    {
+        // Unique GUID for the dockable pane
+        public static readonly Guid MaterialBrowserPaneId = new Guid("A1B2C3D4-E5F6-7890-1234-567890ABCDEF");
+
+        public Result OnStartup(UIControlledApplication application)
+        {
+            // 1. Create Ribbon Tab and Panel
+            string tabName = "GreenChainz";
+            try
+            {
+                application.CreateRibbonTab(tabName);
+            }
+            catch { /* Tab might already exist */ }
+
+            RibbonPanel panel = application.CreateRibbonPanel(tabName, "Sustainable Materials");
+
+            // 2. Add "Browse Materials" Button
+            string assemblyPath = Assembly.GetExecutingAssembly().Location;
+            PushButtonData browseBtnData = new PushButtonData(
+                "cmdBrowseMaterials",
+                "Browse\nMaterials",
+                assemblyPath,
+                "GreenChainz.Revit.Commands.MaterialBrowserCmd");
+
+            // Ideally set an icon here
+            // browseBtnData.LargeImage = new BitmapImage(new Uri("pack://application:,,,/GreenChainz.Revit;component/Resources/icon.png"));
+            browseBtnData.ToolTip = "Open the Sustainable Material Browser panel.";
+
+            panel.AddItem(browseBtnData);
+
+            // 3. Register Dockable Pane
+            MaterialBrowserPanel browserPanel = new MaterialBrowserPanel();
+            DockablePaneId dpid = new DockablePaneId(MaterialBrowserPaneId);
+            
+            try
+            {
+                application.RegisterDockablePane(dpid, "Material Browser", browserPanel);
+            }
+            catch (Exception ex)
+            {
+                // Log failure to register pane
+                // TaskDialog.Show("Error", "Failed to register dockable pane: " + ex.Message);
+            }
+
+            return Result.Succeeded;
+        }
+
+        public Result OnShutdown(UIControlledApplication application)
+        {
+            return Result.Succeeded;
+        }
+    }
+}

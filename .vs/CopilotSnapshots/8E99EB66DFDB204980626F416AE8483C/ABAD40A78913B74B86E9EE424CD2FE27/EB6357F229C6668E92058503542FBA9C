@@ -1,0 +1,90 @@
+﻿using System;
+using System.Reflection;
+using System.Windows.Media.Imaging;
+using Autodesk.Revit.UI;
+using GreenChainz.Revit.Commands;
+using GreenChainz.Revit.Services;
+using GreenChainz.Revit.UI;
+
+namespace GreenChainz.Revit
+{
+    public class App : IExternalApplication
+    {
+        // Unique GUID for the dockable pane
+        public static readonly Guid MaterialBrowserPaneId = new Guid("A1B2C3D4-E5F6-7890-1234-567890ABCDEF");
+
+        // Static services accessible throughout the plugin
+        public static AutodeskAuthService AuthService { get; private set; }
+        public static SdaConnectorService SdaService { get; private set; }
+        public static MaterialService MaterialService { get; private set; }
+
+        public Result OnStartup(UIControlledApplication application)
+        {
+            // Initialize Autodesk Platform Services
+            InitializeServices();
+
+            // 1. Create Ribbon Tab and Panel
+            string tabName = "GreenChainz";
+            try
+            {
+                application.CreateRibbonTab(tabName);
+            }
+            catch { /* Tab might already exist */ }
+
+            RibbonPanel panel = application.CreateRibbonPanel(tabName, "Sustainable Materials");
+
+            // 2. Add "Browse Materials" Button
+            string assemblyPath = Assembly.GetExecutingAssembly().Location;
+            PushButtonData browseBtnData = new PushButtonData(
+                "cmdBrowseMaterials",
+                "Browse\nMaterials",
+                assemblyPath,
+                "GreenChainz.Revit.Commands.MaterialBrowserCmd");
+
+            browseBtnData.ToolTip = "Open the Sustainable Material Browser panel.";
+            panel.AddItem(browseBtnData);
+
+            // 3. Register Dockable Pane with injected MaterialService
+            MaterialBrowserPanel browserPanel = new MaterialBrowserPanel(MaterialService);
+            DockablePaneId dpid = new DockablePaneId(MaterialBrowserPaneId);
+            
+            try
+            {
+                application.RegisterDockablePane(dpid, "Material Browser", browserPanel);
+            }
+            catch (Exception ex)
+            {
+                // Log failure to register pane
+                System.Diagnostics.Debug.WriteLine($"Failed to register dockable pane: {ex.Message}");
+            }
+
+            return Result.Succeeded;
+        }
+
+        private void InitializeServices()
+        {
+            // Read credentials from environment variables
+            string clientId = Environment.GetEnvironmentVariable("AUTODESK_CLIENT_ID") ?? "YOUR_CLIENT_ID";
+            string clientSecret = Environment.GetEnvironmentVariable("AUTODESK_CLIENT_SECRET") ?? "YOUR_CLIENT_SECRET";
+
+            AuthService = new AutodeskAuthService(clientId, clientSecret);
+
+            // Only create SDA connector if valid credentials are provided
+            if (AuthService.HasValidCredentials())
+            {
+                SdaService = new SdaConnectorService(AuthService);
+                MaterialService = new MaterialService(SdaService);
+            }
+            else
+            {
+                // Use mock data when no credentials are available
+                MaterialService = new MaterialService();
+            }
+        }
+
+        public Result OnShutdown(UIControlledApplication application)
+        {
+            return Result.Succeeded;
+        }
+    }
+}
