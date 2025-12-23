@@ -1,23 +1,37 @@
 using System;
 using System.Collections.Generic;
+using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using Autodesk.Revit.Attributes;
+using GreenChainz.Revit.Models;
 using GreenChainz.Revit.Utils;
-using MaterialData = GreenChainz.Revit.Models.Material;
 
 namespace GreenChainz.Revit.Commands
 {
     [Transaction(TransactionMode.Manual)]
     public class MaterialBrowserCmd : IExternalCommand
     {
+        private static MaterialBrowserCmd _instance;
+        private UIApplication _uiApp;
+
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
+            _uiApp = commandData.Application;
+            _instance = this;
             try
             {
+                // Show the UI
                 DockablePaneId dpid = new DockablePaneId(App.MaterialBrowserPaneId);
-                DockablePane dp = commandData.Application.GetDockablePane(dpid);
-                dp.Show();
+                commandData.Application.GetDockablePane(dpid).Show();
+
+                // Init Parameters (The Trojan Horse)
+                var doc = commandData.Application.ActiveUIDocument.Document;
+                using (Transaction t = new Transaction(doc, "Init GreenChainz"))
+                {
+                    t.Start();
+                    SharedParameterHelper.CreateSharedParameters(doc, commandData.Application.Application);
+                    t.Commit();
+                }
                 return Result.Succeeded;
             }
             catch (Exception ex)
@@ -27,83 +41,26 @@ namespace GreenChainz.Revit.Commands
             }
         }
 
-        public static void ApplyMaterialToSelection(MaterialData data, UIDocument uidoc)
+        // Call this from your UI to inject data
+        public void ApplyMaterial(MaterialData data)
         {
-            Document doc = uidoc.Document;
-            var selection = uidoc.Selection.GetElementIds();
-
-            if (selection.Count == 0)
-            {
-                TaskDialog.Show("GreenChainz", "Please select elements to specify material.");
-                return;
-            }
-
-            using (Transaction t = new Transaction(doc, "GreenChainz Specification"))
+            if (_uiApp == null) return;
+            var uidoc = _uiApp.ActiveUIDocument;
+            var doc = uidoc.Document;
+            
+            using (Transaction t = new Transaction(doc, "GreenChainz: Apply Spec"))
             {
                 t.Start();
-
-                try
+                foreach (ElementId id in uidoc.Selection.GetElementIds())
                 {
-                    // 1. Identify Categories from selection
-                    CategorySet categories = doc.Application.Create.NewCategorySet();
-                    foreach (ElementId id in selection)
-                    {
-                        Element elem = doc.GetElement(id);
-                        if (elem != null && elem.Category != null)
-                        {
-                            categories.Insert(elem.Category);
-                        }
-                    }
-
-                    if (categories.IsEmpty)
-                    {
-                        t.RollBack();
-                        return;
-                    }
-
-                    // 2. Ensure "GreenChainz_GWP" parameter exists and is bound to these categories
-                    DefinitionFile sharedParamFile = doc.Application.OpenSharedParameterFile();
-                    if (sharedParamFile == null)
-                    {
-                         // If we can't access shared params, we can't create.
-                         // Try standard helper initialization if needed, but assuming App startup did it.
-                         // But we might need to point to the file again if it wasn't set.
-                         // For now, rely on Utils.
-                         string path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "GreenChainzSharedParams.txt");
-                         if (System.IO.File.Exists(path))
-                             doc.Application.SharedParametersFilename = path;
-
-                         sharedParamFile = doc.Application.OpenSharedParameterFile();
-                    }
-
-                    if (sharedParamFile != null)
-                    {
-                        DefinitionGroup group = sharedParamFile.Groups.get_Item("GreenChainzData");
-                        if (group == null) group = sharedParamFile.Groups.Create("GreenChainzData");
-
-                        // Check/Create "GreenChainz_GWP"
-                        SharedParameterHelper.CreateAndBindParam(doc, doc.Application, group, "GreenChainz_GWP", SpecTypeId.Number, categories);
-                    }
-
-                    // 3. Set the value
-                    foreach (ElementId id in selection)
-                    {
-                        Element elem = doc.GetElement(id);
-                        Parameter param = elem.LookupParameter("GreenChainz_GWP");
-                        if (param != null && !param.IsReadOnly)
-                        {
-                             param.Set(data.EmbodiedCarbon);
-                        }
-                    }
-
-                    t.Commit();
+                    Element e = doc.GetElement(id);
+                    e.LookupParameter("GC_CarbonScore")?.Set(data.GwpValue);
+                    e.LookupParameter("GC_Supplier")?.Set(data.SupplierName);
                 }
-                catch (Exception ex)
-                {
-                    t.RollBack();
-                    TaskDialog.Show("Error", "Failed to apply material: " + ex.Message);
-                }
+                t.Commit();
             }
         }
+        
+        public static MaterialBrowserCmd Instance => _instance;
     }
 }
