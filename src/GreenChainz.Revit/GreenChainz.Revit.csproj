@@ -71,6 +71,14 @@
     <Compile Update="UI\AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
+
+    <Page Include="UI\AuditProgressWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Compile Update="UI\AuditProgressWindow.xaml.cs">
+      <DependentUpon>AuditProgressWindow.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <!-- Embedded Resources (Icons) -->
