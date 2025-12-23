@@ -4,13 +4,9 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
-  const missing = [];
-  if (!supabaseUrl) missing.push('NEXT_PUBLIC_SUPABASE_URL');
-  if (!supabaseKey) missing.push('NEXT_PUBLIC_SUPABASE_ANON_KEY');
-
-  const errorMsg = `Missing Supabase environment variables: ${missing.join(', ')}`;
-  console.error(errorMsg);
-  throw new Error(errorMsg);
+  throw new Error('CRITICAL: Supabase keys missing. Check Vercel Environment Variables.');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: { persistSession: true }
+});
