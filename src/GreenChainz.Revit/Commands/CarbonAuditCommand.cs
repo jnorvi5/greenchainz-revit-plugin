@@ -1,6 +1,10 @@
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Autodesk.Revit.Attributes;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 using GreenChainz.Revit.Models;
-using GreenChainz.Revit.Views;
 using GreenChainz.Revit.Services;
 using GreenChainz.Revit.UI;
 
@@ -12,6 +16,9 @@ namespace GreenChainz.Revit.Commands
     [Transaction(TransactionMode.Manual)]
     public class CarbonAuditCommand : IExternalCommand
     {
+        private AuditCompletedHandler _handler;
+        private ExternalEvent _externalEvent;
+
         /// <summary>
         /// Execute the Carbon Audit command.
         /// </summary>
@@ -19,6 +26,10 @@ namespace GreenChainz.Revit.Commands
         {
             try
             {
+                // Initialize External Event Handler
+                _handler = new AuditCompletedHandler();
+                _externalEvent = ExternalEvent.Create(_handler);
+
                 // Check if user is logged in
                 if (!AuthService.Instance.IsLoggedIn)
                 {
@@ -51,45 +62,42 @@ namespace GreenChainz.Revit.Commands
                 Document doc = uidoc.Document;
                 string modelName = doc.Title;
 
-                // Mock Audit Result
-                // In a real implementation, we would extract data from the model here.
-                var audit = new AuditResult
+                // Initialize Service
+                var auditService = new AuditService();
+
+                // 1. Extract Data (Must be on Main Thread)
+                // We call ExtractMaterials directly here instead of inside ScanProject
+                // so we can pass the data to the background thread.
+                List<ProjectMaterial> materials = auditService.ExtractMaterials(doc);
+
+                AuditRequest request = new AuditRequest
                 {
                     ProjectName = modelName,
-                    Date = DateTime.Now,
-                    OverallScore = 12500,
-                    Summary = "The project shows a moderate carbon footprint. Concrete usage is the primary contributor. Consider using low-carbon concrete alternatives.",
-                    Materials = new List<MaterialBreakdown>
-                    {
-                        new MaterialBreakdown { MaterialName = "Concrete (C30/37)", Quantity = "500 m3", CarbonFactor = 240, TotalCarbon = 120000 },
-                        new MaterialBreakdown { MaterialName = "Steel Reinforcement", Quantity = "20 tons", CarbonFactor = 1.85 * 1000, TotalCarbon = 37000 },
-                        new MaterialBreakdown { MaterialName = "Glass", Quantity = "200 m2", CarbonFactor = 25, TotalCarbon = 5000 },
-                        new MaterialBreakdown { MaterialName = "Timber", Quantity = "50 m3", CarbonFactor = 10, TotalCarbon = 500 }
-                    },
-                    Recommendations = new List<Recommendation>
-                    {
-                        new Recommendation { Description = "Switch to Low-Carbon Concrete", PotentialSavings = 20000 },
-                        new Recommendation { Description = "Use Recycled Steel", PotentialSavings = 10000 },
-                        new Recommendation { Description = "Optimize Glazing Area", PotentialSavings = 1000 }
-                    }
+                    Materials = materials
                 };
 
-                // Calculate total
-                double total = 0;
-                foreach (var m in audit.Materials) total += m.TotalCarbon;
-                audit.OverallScore = total;
+                // 2. Show Loading UI
+                AuditProgressWindow progressWindow = new AuditProgressWindow();
+                progressWindow.Show(); // Modeless
 
-                // Open Results Window
-                // Using Revit's window handle as owner is best practice but keeping it simple for now
-                AuditResultsWindow window = new AuditResultsWindow(audit);
-                window.ShowDialog();
-                // TODO: Deduct credit here? Or after successful audit?
-                // Assuming we check first.
+                // 3. Run API Call in Background
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        AuditResult result = await auditService.SubmitAuditAsync(request);
 
-                MessageBox.Show(
-                    $"Current Model: {modelName}\n\nCarbon Audit running...\nCredits available: {AuthService.Instance.Credits}",
-                    "GreenChainz - Carbon Audit",
-                    $"Current Model: {modelName}\n\nCarbon Audit feature coming soon!");
+                        // 4. Marshal back to UI Thread
+                        _handler.SetData(result, progressWindow);
+                        _externalEvent.Raise();
+                    }
+                    catch (Exception ex)
+                    {
+                        // Marshal exception back to UI Thread
+                        _handler.SetError(ex.Message, progressWindow);
+                        _externalEvent.Raise();
+                    }
+                });
 
                 return Result.Succeeded;
             }

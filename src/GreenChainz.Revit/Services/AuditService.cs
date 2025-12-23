@@ -25,7 +25,12 @@ namespace GreenChainz.Revit.Services
             return _apiClient.SubmitAudit(request);
         }
 
-        private List<ProjectMaterial> ExtractMaterials(Document doc)
+        public async System.Threading.Tasks.Task<AuditResult> SubmitAuditAsync(AuditRequest request)
+        {
+            return await _apiClient.SubmitAuditAsync(request);
+        }
+
+        public List<ProjectMaterial> ExtractMaterials(Document doc)
         {
             // Use a dictionary to aggregate quantities by material name
             Dictionary<string, ProjectMaterial> materialMap = new Dictionary<string, ProjectMaterial>();
