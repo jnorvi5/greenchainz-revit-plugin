@@ -5,27 +5,23 @@ namespace GreenChainz.Revit.Services
 {
     public static class TelemetryService
     {
+        private static readonly string LogPath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GreenChainz", "logs.txt");
+
+        public static void Initialize()
+        {
+            var dir = Path.GetDirectoryName(LogPath);
+            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+        }
+
         public static void LogError(Exception ex, string context)
         {
-            try
-            {
-                string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                string logDir = Path.Combine(appDataPath, "GreenChainz");
+            try { File.AppendAllText(LogPath, $"[{DateTime.Now}] [ERROR] {context}: {ex.Message}\n{ex.StackTrace}\n"); } catch { }
+        }
 
-                if (!Directory.Exists(logDir))
-                {
-                    Directory.CreateDirectory(logDir);
-                }
-
-                string logFilePath = Path.Combine(logDir, "logs.txt");
-                string message = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] [ERROR] Context: {context}\nException: {ex}\n--------------------------------------------------\n";
-
-                File.AppendAllText(logFilePath, message);
-            }
-            catch
-            {
-                // Fail silently if we can't log
-            }
+        public static void LogInfo(string message)
+        {
+            try { File.AppendAllText(LogPath, $"[{DateTime.Now}] [INFO] {message}\n"); } catch { }
         }
     }
 }
