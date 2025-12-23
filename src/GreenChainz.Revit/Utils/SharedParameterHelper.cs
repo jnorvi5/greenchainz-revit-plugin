@@ -24,13 +24,18 @@ namespace GreenChainz.Revit.Utils
                 group = sharedParamFile.Groups.Create("GreenChainzData");
             }
 
+            // Prepare CategorySet for OST_Materials
+            CategorySet catSet = app.Create.NewCategorySet();
+            Category materialCat = doc.Settings.Categories.get_Item(BuiltInCategory.OST_Materials);
+            catSet.Insert(materialCat);
+
             // Create Definitions and Bindings
-            CreateAndBindParam(doc, app, group, "GC_CarbonScore", SpecTypeId.Number);
-            CreateAndBindParam(doc, app, group, "GC_Supplier", SpecTypeId.String.Text); // Updated for 2024+ API syntax (approx) or use built-in types
-            CreateAndBindParam(doc, app, group, "GC_Certifications", SpecTypeId.String.Text);
+            CreateAndBindParam(doc, app, group, "GC_CarbonScore", SpecTypeId.Number, catSet);
+            CreateAndBindParam(doc, app, group, "GC_Supplier", SpecTypeId.String.Text, catSet);
+            CreateAndBindParam(doc, app, group, "GC_Certifications", SpecTypeId.String.Text, catSet);
         }
 
-        private static void CreateAndBindParam(Document doc, Application app, DefinitionGroup group, string paramName, ForgeTypeId paramType)
+        public static void CreateAndBindParam(Document doc, Application app, DefinitionGroup group, string paramName, ForgeTypeId paramType, CategorySet catSet)
         {
             // 1. Check if parameter already exists in project
             // This is a simplified check; reliable check requires iterating BindingMap
@@ -44,18 +49,59 @@ namespace GreenChainz.Revit.Utils
                 definition = group.Definitions.Create(options);
             }
 
-            // 3. Bind to Materials Category
-            CategorySet catSet = app.Create.NewCategorySet();
-            Category materialCat = doc.Settings.Categories.get_Item(BuiltInCategory.OST_Materials);
-            catSet.Insert(materialCat);
-
+            // 3. Create Instance Binding
             InstanceBinding binding = app.Create.NewInstanceBinding(catSet);
 
             // 4. Add Binding if not exists
-            // Note: In a real robust app, we carefully check if it's already bound to avoid errors
             if (!bindingMap.Contains(definition))
             {
                 bindingMap.Insert(definition, binding, BuiltInParameterGroup.PG_GREEN_BUILDING);
+            }
+            else
+            {
+                // If it exists, we might need to update the binding to include new categories
+                // But re-inserting usually fails or requires re-insert.
+                // For simplicity in this task, we check containment.
+                // Advanced: Get existing binding, add categories, re-insert.
+                // Assuming simple case where we don't change existing bindings of other categories drastically.
+
+                // If we need to support adding categories to existing binding:
+                // InstanceBinding existingBinding = bindingMap.get_Item(definition) as InstanceBinding;
+                // if (existingBinding != null) {
+                //    foreach (Category c in catSet) existingBinding.Categories.Insert(c);
+                //    bindingMap.ReInsert(definition, existingBinding, BuiltInParameterGroup.PG_GREEN_BUILDING);
+                // }
+                // However, ReInsert returns bool.
+                // For this task, we'll stick to basic insertion if missing.
+                // But for "One-Click Specify", we might be adding a param to a category that didn't have it.
+                // So let's try to update it.
+
+                try
+                {
+                    InstanceBinding existingBinding = bindingMap.get_Item(definition) as InstanceBinding;
+                    if (existingBinding != null)
+                    {
+                        // Check if all categories are present
+                        bool modificationNeeded = false;
+                        foreach (Category c in catSet)
+                        {
+                            if (!existingBinding.Categories.Contains(c))
+                            {
+                                existingBinding.Categories.Insert(c);
+                                modificationNeeded = true;
+                            }
+                        }
+
+                        if (modificationNeeded)
+                        {
+                             bindingMap.ReInsert(definition, existingBinding, BuiltInParameterGroup.PG_GREEN_BUILDING);
+                        }
+                    }
+                }
+                catch
+                {
+                    // Ignore errors during re-binding to prevent crash
+                }
             }
         }
     }
