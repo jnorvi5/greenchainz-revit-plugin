@@ -20,7 +20,7 @@ namespace GreenChainz.Revit.Services
         // API URLs - tries production first, falls back to local
         private static readonly string[] API_URLS = new[]
         {
-            "https://greenchainz.vercel.app/api",  // Production (Vercel)
+            "https://web-cj3efhrgf-greenchainz-vercel.vercel.app/api",  // Production (Vercel)
             "https://greenchainz-revit-plugin.vercel.app/api",  // Alt production
             "http://localhost:3000/api"  // Local development
         };
