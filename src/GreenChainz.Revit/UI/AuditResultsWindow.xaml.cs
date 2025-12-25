@@ -3,7 +3,9 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
+using Microsoft.Win32;
 using GreenChainz.Revit.Models;
+using GreenChainz.Revit.Services;
 
 namespace GreenChainz.Revit.UI
 {
@@ -50,18 +52,68 @@ namespace GreenChainz.Revit.UI
         {
             if (sender is FrameworkElement element && element.DataContext is MaterialBreakdown item)
             {
-                MessageBox.Show($"Swap requested for: {item.MaterialName}", "Swap Material", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show($"Swap requested for: {item.MaterialName}\n\nThis will open the Material Browser to find low-carbon alternatives.", 
+                    "Swap Material", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 
         private void SendRFQ_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Sending RFQ for flagged materials...", "Send RFQ", MessageBoxButton.OK, MessageBoxImage.Information);
+            var dialog = new CreateRFQDialog(new System.Collections.Generic.List<RFQItem>());
+            
+            // Pre-populate with flagged materials
+            if (_result?.Materials != null)
+            {
+                foreach (var mat in _result.Materials)
+                {
+                    if (mat.TotalCarbon > 10000) // High carbon materials
+                    {
+                        dialog.MaterialsDataGrid.Items.Add(new RFQItem(mat.MaterialName, 1, "unit"));
+                    }
+                }
+            }
+            
+            dialog.ShowDialog();
         }
 
         private void ExportPDF_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Exporting results to PDF...", "Export PDF", MessageBoxButton.OK, MessageBoxImage.Information);
+            if (_result == null)
+            {
+                MessageBox.Show("No audit data to export.", "Export Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            SaveFileDialog saveDialog = new SaveFileDialog
+            {
+                Filter = "PDF Files (*.pdf)|*.pdf",
+                DefaultExt = "pdf",
+                FileName = $"CarbonAudit_{_result.ProjectName}_{DateTime.Now:yyyyMMdd}"
+            };
+
+            if (saveDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    var pdfService = new PdfExportService();
+                    pdfService.GenerateAuditReport(_result, saveDialog.FileName);
+                    
+                    MessageBox.Show($"PDF exported successfully!\n\n{saveDialog.FileName}", 
+                        "Export Complete", MessageBoxButton.OK, MessageBoxImage.Information);
+                    
+                    // Open the PDF
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = saveDialog.FileName,
+                        UseShellExecute = true
+                    });
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Failed to export PDF:\n\n{ex.Message}", 
+                        "Export Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
         }
 
         private void Close_Click(object sender, RoutedEventArgs e)

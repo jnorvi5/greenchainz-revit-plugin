@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using GreenChainz.Revit.Models;
 using GreenChainz.Revit.Services;
@@ -9,89 +11,168 @@ namespace GreenChainz.Revit.UI
 {
     public partial class CreateRFQDialog : Window
     {
-        private readonly ApiClient _apiClient;
+        private readonly RfqService _rfqService;
+        private ObservableCollection<SupplierSelection> _suppliers;
         public RFQRequest RequestPayload { get; private set; }
 
         public CreateRFQDialog(List<RFQItem> initialMaterials)
         {
             InitializeComponent();
-            _apiClient = new ApiClient();
-
-            // Populate materials
+            _rfqService = new RfqService();
+            _suppliers = new ObservableCollection<SupplierSelection>();
+            
             MaterialsDataGrid.ItemsSource = initialMaterials;
+            SuppliersDataGrid.ItemsSource = _suppliers;
+            DeliveryDatePicker.SelectedDate = DateTime.Today.AddDays(14);
 
-            // Set default date to today + 7 days
-            DeliveryDatePicker.SelectedDate = DateTime.Today.AddDays(7);
+            // Auto-find suppliers on load if materials exist
+            if (initialMaterials.Count > 0)
+            {
+                FindSuppliersAsync(initialMaterials);
+            }
+        }
+
+        private async void FindSuppliersButton_Click(object sender, RoutedEventArgs e)
+        {
+            var materials = MaterialsDataGrid.ItemsSource as List<RFQItem>;
+            if (materials == null || !materials.Any())
+            {
+                MessageBox.Show("No materials to search for suppliers.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            await FindSuppliersAsync(materials);
+        }
+
+        private async Task FindSuppliersAsync(List<RFQItem> materials)
+        {
+            try
+            {
+                FindSuppliersButton.IsEnabled = false;
+                StatusText.Text = "Searching for sustainable suppliers...";
+                _suppliers.Clear();
+
+                // Get unique categories from materials
+                var categories = materials
+                    .Select(m => GetMaterialCategory(m.MaterialName))
+                    .Distinct()
+                    .ToList();
+
+                foreach (var category in categories)
+                {
+                    var suppliers = await _rfqService.GetSuppliersAsync(category);
+                    foreach (var supplier in suppliers)
+                    {
+                        if (!_suppliers.Any(s => s.Id == supplier.Id))
+                        {
+                            _suppliers.Add(new SupplierSelection
+                            {
+                                Id = supplier.Id,
+                                Name = supplier.Name,
+                                SustainabilityScore = supplier.SustainabilityScore,
+                                CertificationsDisplay = supplier.CertificationsDisplay,
+                                ContactEmail = supplier.ContactEmail,
+                                Website = supplier.Website,
+                                IsSelected = true
+                            });
+                        }
+                    }
+                }
+
+                StatusText.Text = $"Found {_suppliers.Count} sustainable suppliers for your materials.";
+            }
+            catch (Exception ex)
+            {
+                StatusText.Text = $"Error finding suppliers: {ex.Message}";
+            }
+            finally
+            {
+                FindSuppliersButton.IsEnabled = true;
+            }
+        }
+
+        private string GetMaterialCategory(string materialName)
+        {
+            string name = materialName.ToLower();
+            if (name.Contains("concrete")) return "concrete";
+            if (name.Contains("steel") || name.Contains("metal")) return "steel";
+            if (name.Contains("wood") || name.Contains("timber")) return "wood";
+            if (name.Contains("glass") || name.Contains("glazing")) return "glass";
+            if (name.Contains("insulation")) return "insulation";
+            if (name.Contains("aluminum")) return "aluminum";
+            if (name.Contains("gypsum") || name.Contains("drywall")) return "gypsum";
+            return "general";
         }
 
         private async void SubmitButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                // Validate inputs
+                // Validate
                 if (string.IsNullOrWhiteSpace(ProjectNameTextBox.Text))
                 {
-                    MessageBox.Show("Project Name is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
-                if (string.IsNullOrWhiteSpace(ProjectAddressTextBox.Text))
-                {
-                    MessageBox.Show("Project Address is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
-                if (!DeliveryDatePicker.SelectedDate.HasValue)
-                {
-                    MessageBox.Show("Delivery Date is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show("Project Name is required.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
                 var materials = MaterialsDataGrid.ItemsSource as List<RFQItem>;
-                if (materials == null || !materials.Any())
+                if (materials == null || !materials.Any(m => !string.IsNullOrWhiteSpace(m.MaterialName)))
                 {
-                     // If the user added items via the DataGrid empty row, they might not be in the bound list if it wasn't ObservableCollection.
-                     // But List<T> works if initialized.
-                     // However, DataGrid editing usually requires ObservableCollection for updates to reflect automatically or just reading ItemsSource back.
-                     // Let's rely on what was passed or check Items.
-                     // A better way is to use ObservableCollection.
+                    MessageBox.Show("Please include at least one material.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
                 }
 
-                // Collect data
-                var request = new RFQRequest
+                var selectedSuppliers = _suppliers.Where(s => s.IsSelected).ToList();
+                if (!selectedSuppliers.Any())
                 {
-                    ProjectName = ProjectNameTextBox.Text,
-                    ProjectAddress = ProjectAddressTextBox.Text,
-                    Materials = materials ?? new List<RFQItem>(),
-                    DeliveryDate = DeliveryDatePicker.SelectedDate.Value,
-                    SpecialInstructions = SpecialInstructionsTextBox.Text
-                };
-
-                // Filter out empty materials if any (e.g. user added a row but didn't fill it)
-                request.Materials = request.Materials.Where(m => !string.IsNullOrWhiteSpace(m.MaterialName)).ToList();
-
-                if (request.Materials.Count == 0)
-                {
-                    MessageBox.Show("Please include at least one material.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
+                    var result = MessageBox.Show("No suppliers selected. Submit RFQ anyway?", "Confirm", 
+                        MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    if (result != MessageBoxResult.Yes) return;
                 }
 
                 SubmitButton.IsEnabled = false;
                 SubmitButton.Content = "Submitting...";
+                StatusText.Text = "Submitting RFQ to suppliers...";
 
-                // Submit to API
-                string response = await _apiClient.SubmitRFQ(request);
+                // Create request
+                var request = new RFQRequest
+                {
+                    ProjectName = ProjectNameTextBox.Text,
+                    ProjectAddress = ProjectAddressTextBox.Text,
+                    Materials = materials.Where(m => !string.IsNullOrWhiteSpace(m.MaterialName)).ToList(),
+                    DeliveryDate = DeliveryDatePicker.SelectedDate ?? DateTime.Today.AddDays(14),
+                    SpecialInstructions = SpecialInstructionsTextBox.Text,
+                    SelectedSupplierIds = selectedSuppliers.Select(s => s.Id).ToList()
+                };
 
-                // Success
-                MessageBox.Show($"RFQ Submitted Successfully! Response: {response}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                // Submit
+                var response = await _rfqService.SubmitRfqAsync(request);
 
-                RequestPayload = request;
-                this.DialogResult = true;
-                this.Close();
+                if (response.Success)
+                {
+                    string supplierList = selectedSuppliers.Any() 
+                        ? "\n\nSuppliers notified:\n" + string.Join("\n", selectedSuppliers.Select(s => $"• {s.Name} ({s.ContactEmail})"))
+                        : "";
+
+                    MessageBox.Show(
+                        $"RFQ Submitted Successfully!\n\nRFQ ID: {response.RfqId}\n{response.Message}{supplierList}",
+                        "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    RequestPayload = request;
+                    DialogResult = true;
+                    Close();
+                }
+                else
+                {
+                    MessageBox.Show($"RFQ Submission Issue:\n\n{response.Message}", "Notice", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Failed to submit RFQ: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
                 SubmitButton.IsEnabled = true;
                 SubmitButton.Content = "Submit RFQ";
             }
@@ -99,8 +180,20 @@ namespace GreenChainz.Revit.UI
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
-            this.Close();
+            DialogResult = false;
+            Close();
         }
+    }
+
+    // Helper class for supplier selection
+    public class SupplierSelection
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public int SustainabilityScore { get; set; }
+        public string CertificationsDisplay { get; set; }
+        public string ContactEmail { get; set; }
+        public string Website { get; set; }
+        public bool IsSelected { get; set; }
     }
 }

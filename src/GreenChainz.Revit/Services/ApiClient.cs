@@ -8,28 +8,17 @@ using Newtonsoft.Json;
 
 namespace GreenChainz.Revit.Services
 {
-    /// <summary>
-    /// Client for communicating with the GreenChainz REST API.
-    /// </summary>
     public class ApiClient : IDisposable
     {
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl;
         private bool _disposed;
 
-        /// <summary>
-        /// Initializes a new instance of the ApiClient class with default settings.
-        /// </summary>
         public ApiClient()
             : this("https://api.greenchainz.com", null)
         {
         }
 
-        /// <summary>
-        /// Initializes a new instance of the ApiClient class.
-        /// </summary>
-        /// <param name="baseUrl">The base URL of the API.</param>
-        /// <param name="authToken">Optional JWT authentication token.</param>
         public ApiClient(string baseUrl, string authToken = null)
         {
             _baseUrl = (baseUrl ?? "https://api.greenchainz.com").TrimEnd('/');
@@ -47,9 +36,6 @@ namespace GreenChainz.Revit.Services
             }
         }
 
-        /// <summary>
-        /// Submits an RFQ (Request for Quotation) to suppliers.
-        /// </summary>
         public async Task<string> SubmitRFQ(RFQRequest request)
         {
             if (request == null)
@@ -72,15 +58,9 @@ namespace GreenChainz.Revit.Services
             }
         }
 
-        /// <summary>
-        /// Submits a carbon audit request to the API.
-        /// </summary>
-        public async Task<AuditResult> SubmitAuditAsync(AuditRequest request)
+        public async Task<AuditResult> SubmitAuditAsync(AuditResult request)
         {
-            if (request == null)
-                throw new ArgumentNullException(nameof(request));
-
-            string url = $"{_baseUrl}/api/audit/extract-materials";
+            string url = $"{_baseUrl}/api/audit";
             string json = JsonConvert.SerializeObject(request);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 

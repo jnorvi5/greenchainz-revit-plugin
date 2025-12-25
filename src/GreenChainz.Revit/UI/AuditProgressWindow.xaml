@@ -1,0 +1,12 @@
+<Window x:Class="GreenChainz.Revit.UI.AuditProgressWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Carbon Audit" Height="150" Width="300" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" WindowStyle="ToolWindow">
+    <Grid Margin="20">
+        <StackPanel VerticalAlignment="Center">
+            <TextBlock Text="Performing Carbon Audit..." HorizontalAlignment="Center" Margin="0,0,0,10" FontWeight="Bold"/>
+            <ProgressBar IsIndeterminate="True" Height="20"/>
+            <TextBlock Text="Please wait while we analyze the model and contact the server." TextWrapping="Wrap" HorizontalAlignment="Center" Margin="0,10,0,0" FontSize="10" Foreground="Gray"/>
+        </StackPanel>
+    </Grid>
+</Window>

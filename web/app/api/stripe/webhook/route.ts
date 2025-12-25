@@ -2,19 +2,38 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder', {
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+if (!stripeSecretKey) {
+  // In a real app, you might want to log this but not crash the whole module scope immediately
+  // if this route is imported elsewhere, but for a Next.js API route, this will likely error on build or first request.
+  // We'll throw to be safe and strict as requested.
+  throw new Error('Missing STRIPE_SECRET_KEY environment variable');
+}
+
+const stripe = new Stripe(stripeSecretKey, {
   apiVersion: '2025-12-15.clover' as any,
 });
 
 // Initialize Supabase client
 // Note: In a real app, use the service role key for admin actions like updating user credits directly
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder-key';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl || !supabaseServiceKey) {
+  throw new Error('Missing Supabase environment variables (NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY)');
+}
+
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 export async function POST(req: NextRequest) {
   const payload = await req.text();
   const signature = req.headers.get('stripe-signature');
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!webhookSecret) {
+    console.error('Missing STRIPE_WEBHOOK_SECRET environment variable');
+    return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+  }
 
   let event: Stripe.Event;
 
@@ -23,7 +42,7 @@ export async function POST(req: NextRequest) {
     event = stripe.webhooks.constructEvent(
       payload,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
+      webhookSecret
     );
   } catch (err: any) {
     console.error(`Webhook signature verification failed: ${err.message}`);

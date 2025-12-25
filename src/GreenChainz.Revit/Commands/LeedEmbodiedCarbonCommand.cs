@@ -1,19 +1,18 @@
 using System;
-using System.Collections.Generic;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using GreenChainz.Revit.Models;
 using GreenChainz.Revit.Services;
 using GreenChainz.Revit.UI;
 
 namespace GreenChainz.Revit.Commands
 {
     /// <summary>
-    /// Command to perform carbon audit analysis on the current Revit model.
+    /// LEED v4.1 MRpc132 Pilot Credit Calculator
+    /// Procurement of Low Carbon Construction Materials
     /// </summary>
     [Transaction(TransactionMode.Manual)]
-    public class CarbonAuditCommand : IExternalCommand
+    public class LeedEmbodiedCarbonCommand : IExternalCommand
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
@@ -22,18 +21,18 @@ namespace GreenChainz.Revit.Commands
                 UIDocument uidoc = commandData.Application.ActiveUIDocument;
                 if (uidoc == null)
                 {
-                    TaskDialog.Show("Error", "No active document found.");
+                    TaskDialog.Show("Error", "No active document found. Please open a Revit project.");
                     return Result.Failed;
                 }
 
                 Document doc = uidoc.Document;
 
-                // Run audit
-                var auditService = new AuditService();
-                AuditResult result = auditService.ScanProject(doc);
+                // Calculate using CLF methodology
+                var calculator = new LeedMRpc132Calculator();
+                var result = calculator.CalculateEmbodiedCarbon(doc);
 
                 // Show results
-                AuditResultsWindow window = new AuditResultsWindow(result);
+                var window = new LeedEmbodiedCarbonWindow(result);
                 window.ShowDialog();
 
                 return Result.Succeeded;
@@ -41,6 +40,7 @@ namespace GreenChainz.Revit.Commands
             catch (Exception ex)
             {
                 message = ex.Message;
+                TaskDialog.Show("LEED MRpc132 Error", $"An error occurred:\n\n{ex.Message}");
                 return Result.Failed;
             }
         }

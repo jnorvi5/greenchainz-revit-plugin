@@ -1,19 +1,17 @@
 using System;
-using System.Collections.Generic;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using GreenChainz.Revit.Models;
 using GreenChainz.Revit.Services;
 using GreenChainz.Revit.UI;
 
 namespace GreenChainz.Revit.Commands
 {
     /// <summary>
-    /// Command to perform carbon audit analysis on the current Revit model.
+    /// Command to calculate LEED certification points for the current Revit model.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
-    public class CarbonAuditCommand : IExternalCommand
+    public class LeedCalculatorCommand : IExternalCommand
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
@@ -22,18 +20,18 @@ namespace GreenChainz.Revit.Commands
                 UIDocument uidoc = commandData.Application.ActiveUIDocument;
                 if (uidoc == null)
                 {
-                    TaskDialog.Show("Error", "No active document found.");
+                    TaskDialog.Show("Error", "No active document found. Please open a Revit project.");
                     return Result.Failed;
                 }
 
                 Document doc = uidoc.Document;
 
-                // Run audit
-                var auditService = new AuditService();
-                AuditResult result = auditService.ScanProject(doc);
+                // Calculate LEED score
+                var calculator = new LeedCalculatorService();
+                var result = calculator.CalculateLeedScore(doc);
 
                 // Show results
-                AuditResultsWindow window = new AuditResultsWindow(result);
+                var window = new LeedResultsWindow(result);
                 window.ShowDialog();
 
                 return Result.Succeeded;
@@ -41,6 +39,7 @@ namespace GreenChainz.Revit.Commands
             catch (Exception ex)
             {
                 message = ex.Message;
+                TaskDialog.Show("LEED Calculator Error", $"An error occurred:\n\n{ex.Message}");
                 return Result.Failed;
             }
         }

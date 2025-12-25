@@ -1,19 +1,17 @@
 using System;
-using System.Collections.Generic;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using GreenChainz.Revit.Models;
 using GreenChainz.Revit.Services;
 using GreenChainz.Revit.UI;
 
 namespace GreenChainz.Revit.Commands
 {
     /// <summary>
-    /// Command to perform carbon audit analysis on the current Revit model.
+    /// LEED v5 BD+C Calculator Command
     /// </summary>
     [Transaction(TransactionMode.Manual)]
-    public class CarbonAuditCommand : IExternalCommand
+    public class LeedV5Command : IExternalCommand
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
@@ -22,18 +20,16 @@ namespace GreenChainz.Revit.Commands
                 UIDocument uidoc = commandData.Application.ActiveUIDocument;
                 if (uidoc == null)
                 {
-                    TaskDialog.Show("Error", "No active document found.");
+                    TaskDialog.Show("Error", "No active document found. Please open a Revit project.");
                     return Result.Failed;
                 }
 
                 Document doc = uidoc.Document;
 
-                // Run audit
-                var auditService = new AuditService();
-                AuditResult result = auditService.ScanProject(doc);
+                var calculator = new LeedV5Calculator();
+                var result = calculator.CalculateLeedV5Score(doc);
 
-                // Show results
-                AuditResultsWindow window = new AuditResultsWindow(result);
+                var window = new LeedV5Window(result);
                 window.ShowDialog();
 
                 return Result.Succeeded;
@@ -41,6 +37,7 @@ namespace GreenChainz.Revit.Commands
             catch (Exception ex)
             {
                 message = ex.Message;
+                TaskDialog.Show("LEED v5 Error", $"An error occurred:\n\n{ex.Message}");
                 return Result.Failed;
             }
         }
