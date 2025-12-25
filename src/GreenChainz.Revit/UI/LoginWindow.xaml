@@ -10,6 +10,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -21,8 +22,11 @@
         <TextBlock Grid.Row="3" Text="Password:" Margin="0,0,0,5"/>
         <PasswordBox Grid.Row="4" x:Name="PasswordBox" Height="30" Margin="0,0,0,20"/>
 
-        <Button Grid.Row="5" x:Name="LoginButton" Content="Login" Height="35" Width="100" Click="LoginButton_Click" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button x:Name="LoginButton" Content="Login" Height="35" Width="100" Click="LoginButton_Click" Margin="0,0,10,0"/>
+            <Button Content="Cancel" Height="35" Width="100" Click="CancelButton_Click"/>
+        </StackPanel>
 
-        <TextBlock Grid.Row="5" x:Name="StatusText" Foreground="Red" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,10,0,0" TextWrapping="Wrap"/>
+        <TextBlock Grid.Row="6" x:Name="StatusText" Foreground="Red" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,10,0,0" TextWrapping="Wrap"/>
     </Grid>
 </Window>

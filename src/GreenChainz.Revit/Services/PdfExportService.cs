@@ -1,8 +1,11 @@
 using System;
 using System.IO;
 using GreenChainz.Revit.Models;
-using iTextSharp.text;
-using iTextSharp.text.pdf;
+using iText.Kernel.Pdf;
+using iText.Kernel.Colors;
+using iText.Layout;
+using iText.Layout.Element;
+using iText.Layout.Properties;
 
 namespace GreenChainz.Revit.Services
 {
@@ -10,127 +13,101 @@ namespace GreenChainz.Revit.Services
     {
         public void GenerateAuditReport(AuditResult audit, string outputPath)
         {
-            // 1. Create Document
-            Document doc = new Document(PageSize.A4, 50, 50, 50, 50);
-
             try
             {
-                // 2. Create Writer
-                PdfWriter writer = PdfWriter.GetInstance(doc, new FileStream(outputPath, FileMode.Create));
-
-                // 3. Open Document
-                doc.Open();
-
-                // Fonts
-                var titleFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 24, BaseColor.BLACK);
-                var headerFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 18, BaseColor.DARK_GRAY);
-                var subHeaderFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.GRAY);
-                var normalFont = FontFactory.GetFont(FontFactory.HELVETICA, 12, BaseColor.BLACK);
-                var smallFont = FontFactory.GetFont(FontFactory.HELVETICA, 10, BaseColor.BLACK);
-                var greenFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 36, new BaseColor(34, 139, 34)); // Forest Green
-
-                // Header: Logo (Placeholder text)
-                // If we had a logo image:
-                // Image logo = Image.GetInstance("path/to/logo.png");
-                // logo.ScaleToFit(100f, 100f);
-                // doc.Add(logo);
-                Paragraph logoPlaceholder = new Paragraph("GreenChainz", new Font(FontFactory.HELVETICA_BOLD, 16, new BaseColor(34, 139, 34)));
-                doc.Add(logoPlaceholder);
-
-                // Project Name and Date
-                doc.Add(new Paragraph($"Project: {audit.ProjectName}", headerFont));
-                doc.Add(new Paragraph($"Date: {audit.Date.ToShortDateString()}", subHeaderFont));
-                doc.Add(new Paragraph("\n"));
-
-                // Overall Carbon Score
-                Paragraph scoreTitle = new Paragraph("Overall Carbon Score", subHeaderFont);
-                scoreTitle.Alignment = Element.ALIGN_CENTER;
-                doc.Add(scoreTitle);
-
-                Paragraph scoreValue = new Paragraph($"{audit.OverallScore:N0} kgCO2e", greenFont);
-                scoreValue.Alignment = Element.ALIGN_CENTER;
-                doc.Add(scoreValue);
-                doc.Add(new Paragraph("\n"));
-
-                // Summary
-                doc.Add(new Paragraph("Summary", headerFont));
-                doc.Add(new Paragraph(audit.Summary, normalFont));
-                doc.Add(new Paragraph("\n"));
-
-                // Material Breakdown Table
-                doc.Add(new Paragraph("Material Breakdown", headerFont));
-                doc.Add(new Paragraph("\n"));
-
-                PdfPTable table = new PdfPTable(4);
-                table.WidthPercentage = 100;
-                table.SetWidths(new float[] { 3f, 2f, 2f, 2f });
-
-                // Table Headers
-                AddCell(table, "Material", true);
-                AddCell(table, "Quantity", true);
-                AddCell(table, "Factor (kgCO2e/unit)", true);
-                AddCell(table, "Total (kgCO2e)", true);
-
-                // Table Data
-                foreach (var material in audit.Materials)
+                using (PdfWriter writer = new PdfWriter(outputPath))
+                using (PdfDocument pdf = new PdfDocument(writer))
+                using (Document doc = new Document(pdf))
                 {
-                    AddCell(table, material.MaterialName);
-                    AddCell(table, material.Quantity);
-                    AddCell(table, material.CarbonFactor.ToString("N2"));
-                    AddCell(table, material.TotalCarbon.ToString("N0"));
+                    // Header
+                    doc.Add(new Paragraph("GreenChainz")
+                        .SetFontSize(16)
+                        .SetBold()
+                        .SetFontColor(new DeviceRgb(34, 139, 34)));
+
+                    doc.Add(new Paragraph($"Project: {audit.ProjectName}")
+                        .SetFontSize(18)
+                        .SetBold());
+                    
+                    doc.Add(new Paragraph($"Date: {audit.Date.ToShortDateString()}")
+                        .SetFontSize(14));
+
+                    doc.Add(new Paragraph("\n"));
+
+                    // Carbon Score
+                    doc.Add(new Paragraph("Overall Carbon Score")
+                        .SetFontSize(14)
+                        .SetBold()
+                        .SetTextAlignment(TextAlignment.CENTER));
+                    
+                    doc.Add(new Paragraph($"{audit.OverallScore:N0} kgCO2e")
+                        .SetFontSize(36)
+                        .SetBold()
+                        .SetFontColor(new DeviceRgb(34, 139, 34))
+                        .SetTextAlignment(TextAlignment.CENTER));
+
+                    doc.Add(new Paragraph("\n"));
+
+                    // Summary
+                    doc.Add(new Paragraph("Summary").SetFontSize(18).SetBold());
+                    doc.Add(new Paragraph(audit.Summary ?? "No summary available."));
+                    doc.Add(new Paragraph("\n"));
+
+                    // Material Breakdown Table
+                    doc.Add(new Paragraph("Material Breakdown").SetFontSize(18).SetBold());
+                    
+                    Table table = new Table(4).UseAllAvailableWidth();
+                    
+                    // Headers
+                    table.AddHeaderCell(new Cell().Add(new Paragraph("Material").SetBold()));
+                    table.AddHeaderCell(new Cell().Add(new Paragraph("Quantity").SetBold()));
+                    table.AddHeaderCell(new Cell().Add(new Paragraph("Factor").SetBold()));
+                    table.AddHeaderCell(new Cell().Add(new Paragraph("Total (kgCO2e)").SetBold()));
+
+                    // Data rows
+                    if (audit.Materials != null)
+                    {
+                        foreach (var material in audit.Materials)
+                        {
+                            table.AddCell(material.MaterialName ?? "Unknown");
+                            table.AddCell(material.Quantity ?? "0");
+                            table.AddCell(material.CarbonFactor.ToString("N2"));
+                            table.AddCell(material.TotalCarbon.ToString("N0"));
+                        }
+                    }
+
+                    doc.Add(table);
+                    doc.Add(new Paragraph("\n"));
+
+                    // Recommendations
+                    doc.Add(new Paragraph("Recommendations").SetFontSize(18).SetBold());
+                    
+                    if (audit.Recommendations != null)
+                    {
+                        List list = new List().SetSymbolIndent(12).SetListSymbol("\u2022");
+                        foreach (var rec in audit.Recommendations)
+                        {
+                            list.Add(new ListItem($"{rec.Description} (Potential Savings: {rec.PotentialSavings:N0} kgCO2e)"));
+                        }
+                        doc.Add(list);
+                    }
+
+                    doc.Add(new Paragraph("\n\n"));
+
+                    // Footer
+                    doc.Add(new Paragraph("Generated by GreenChainz.\nDisclaimer: This report is an estimate based on available data.")
+                        .SetFontSize(10)
+                        .SetTextAlignment(TextAlignment.CENTER));
+                    
+                    doc.Add(new Paragraph("Contact: support@greenchainz.com")
+                        .SetFontSize(10)
+                        .SetTextAlignment(TextAlignment.CENTER));
                 }
-
-                doc.Add(table);
-                doc.Add(new Paragraph("\n"));
-
-                // Recommendations
-                doc.Add(new Paragraph("Recommendations", headerFont));
-                doc.Add(new Paragraph("\n"));
-
-                iTextSharp.text.List list = new iTextSharp.text.List(iTextSharp.text.List.UNORDERED);
-                list.SetListSymbol("\u2022"); // Bullet point
-
-                foreach (var rec in audit.Recommendations)
-                {
-                    string text = $"{rec.Description} (Potential Savings: {rec.PotentialSavings:N0} kgCO2e)";
-                    list.Add(new ListItem(text, normalFont));
-                }
-                doc.Add(list);
-
-                // Footer
-                // We can add a footer using page events or just text at the end if it fits
-                doc.Add(new Paragraph("\n\n"));
-                Paragraph footer = new Paragraph("Generated by GreenChainz. \nDisclaimer: This report is an estimate based on available data.", smallFont);
-                footer.Alignment = Element.ALIGN_CENTER;
-                doc.Add(footer);
-
-                // Contact Info
-                Paragraph contact = new Paragraph("Contact: support@greenchainz.com", smallFont);
-                contact.Alignment = Element.ALIGN_CENTER;
-                doc.Add(contact);
-
             }
             catch (Exception ex)
             {
-                throw new Exception("Error generating PDF: " + ex.Message);
+                throw new Exception("Error generating PDF: " + ex.Message, ex);
             }
-            finally
-            {
-                // 4. Close Document
-                doc.Close();
-            }
-        }
-
-        private void AddCell(PdfPTable table, string text, bool isHeader = false)
-        {
-            PdfPCell cell = new PdfPCell(new Phrase(text, isHeader ? FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10) : FontFactory.GetFont(FontFactory.HELVETICA, 10)));
-            cell.HorizontalAlignment = Element.ALIGN_LEFT;
-            cell.Padding = 5;
-            if (isHeader)
-            {
-                cell.BackgroundColor = BaseColor.LIGHT_GRAY;
-            }
-            table.AddCell(cell);
         }
     }
 }

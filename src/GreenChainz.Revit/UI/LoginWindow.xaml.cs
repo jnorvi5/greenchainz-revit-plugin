@@ -1,16 +1,17 @@
 using System.Windows;
-using GreenChainz.Revit.Services;
 
 namespace GreenChainz.Revit.UI
 {
     public partial class LoginWindow : Window
     {
+        public string UserEmail { get; private set; }
+
         public LoginWindow()
         {
             InitializeComponent();
         }
 
-        private async void LoginButton_Click(object sender, RoutedEventArgs e)
+        private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
             string email = EmailTextBox.Text;
             string password = PasswordBox.Password;
@@ -21,21 +22,17 @@ namespace GreenChainz.Revit.UI
                 return;
             }
 
-            LoginButton.IsEnabled = false;
-            StatusText.Text = "Logging in...";
+            // For demo purposes, accept any login
+            // In production, this would validate against an API
+            UserEmail = email;
+            DialogResult = true;
+            Close();
+        }
 
-            bool success = await AuthService.Instance.LoginAsync(email, password);
-
-            if (success)
-            {
-                DialogResult = true;
-                Close();
-            }
-            else
-            {
-                StatusText.Text = "Login failed. Please check your credentials.";
-                LoginButton.IsEnabled = true;
-            }
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = false;
+            Close();
         }
     }
 }

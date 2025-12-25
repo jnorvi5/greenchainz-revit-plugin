@@ -4,7 +4,6 @@ using System.Reflection;
 using System.Windows.Media.Imaging;
 using GreenChainz.Revit.Services;
 using Autodesk.Revit.UI;
-using Autodesk.Revit.Attributes;
 using GreenChainz.Revit.UI;
 
 namespace GreenChainz.Revit
@@ -23,7 +22,7 @@ namespace GreenChainz.Revit
         {
             try
             {
-                // Initialize Services (Local)
+                // Initialize Services
                 InitializeServices();
 
                 // Create ribbon tab
@@ -37,57 +36,58 @@ namespace GreenChainz.Revit
                 // Create ribbon panel
                 RibbonPanel panel = application.CreateRibbonPanel(tabName, "Sustainable Materials");
 
-
                 // Get the assembly path
                 string assemblyPath = Assembly.GetExecutingAssembly().Location;
 
-                // 1. Browse Materials Button (Updated with Icons)
+                // 1. Browse Materials Button
                 PushButtonData browseBtnData = new PushButtonData(
                     "cmdBrowseMaterials",
                     "Browse\nMaterials",
                     assemblyPath,
-                    "GreenChainz.Revit.Commands.MaterialBrowserCmd"); // Using the command that opens the pane
-
-                browseBtnData.ToolTip = "Open the Sustainable Material Browser panel.";
-                browseBtnData.LongDescription = "Open the GreenChainz materials browser to search and filter " +
-                                     "sustainable building materials. View detailed specifications, " +
-                                     "environmental certifications, and pricing information.";
-
-                // Set Icons
-                browseBtnData.LargeImage = GetEmbeddedImage("icon_32.png");
-                browseBtnData.Image = GetEmbeddedImage("icon_16.png");
-
+                    "GreenChainz.Revit.Commands.MaterialBrowserCmd")
+                {
+                    ToolTip = "Open the Sustainable Material Browser panel.",
+                    LongDescription = "Open the GreenChainz materials browser to search and filter " +
+                                      "sustainable building materials. View detailed specifications, " +
+                                      "environmental certifications, and pricing information.",
+                    LargeImage = GetEmbeddedImage("icon_32.png"),
+                    Image = GetEmbeddedImage("icon_16.png")
+                };
                 panel.AddItem(browseBtnData);
 
-                // 2. Carbon Audit Button (From Remote)
+                // 2. Carbon Audit Button
                 PushButtonData carbonAuditButtonData = new PushButtonData(
                     "CarbonAudit",
-                    "Carbon Audit",
+                    "Carbon\nAudit",
                     assemblyPath,
                     "GreenChainz.Revit.Commands.CarbonAuditCommand")
                 {
                     ToolTip = "Analyze the carbon footprint of your Revit model",
                     LongDescription = "Calculate the embodied carbon of materials in your current model. " +
-                                     "Get detailed reports on carbon emissions by material category and " +
-                                     "identify opportunities to reduce environmental impact."
+                                      "Get detailed reports on carbon emissions by material category and " +
+                                      "identify opportunities to reduce environmental impact.",
+                    LargeImage = GetEmbeddedImage("icon_32.png"),
+                    Image = GetEmbeddedImage("icon_16.png")
                 };
                 panel.AddItem(carbonAuditButtonData);
 
-                // 3. Send RFQ Button (From Remote)
+                // 3. Send RFQ Button
                 PushButtonData sendRfqButtonData = new PushButtonData(
                     "SendRFQ",
-                    "Send RFQ",
+                    "Send\nRFQ",
                     assemblyPath,
                     "GreenChainz.Revit.Commands.SendRFQCommand")
                 {
                     ToolTip = "Send Request for Quotation to suppliers",
                     LongDescription = "Generate and send a Request for Quotation (RFQ) based on the " +
-                                     "materials in your model. Connect directly with verified sustainable " +
-                                     "material suppliers through the GreenChainz platform."
+                                      "materials in your model. Connect directly with verified sustainable " +
+                                      "material suppliers through the GreenChainz platform.",
+                    LargeImage = GetEmbeddedImage("icon_32.png"),
+                    Image = GetEmbeddedImage("icon_16.png")
                 };
                 panel.AddItem(sendRfqButtonData);
 
-                // 4. About Button (From Remote)
+                // 4. About Button
                 PushButtonData aboutButtonData = new PushButtonData(
                     "About",
                     "About",
@@ -95,58 +95,40 @@ namespace GreenChainz.Revit
                     "GreenChainz.Revit.Commands.AboutCommand")
                 {
                     ToolTip = "About GreenChainz",
-                    LongDescription = "View information about the GreenChainz plugin and user account."
+                    LongDescription = "View information about the GreenChainz plugin and user account.",
+                    LargeImage = GetEmbeddedImage("icon_32.png"),
+                    Image = GetEmbeddedImage("icon_16.png")
                 };
                 panel.AddItem(aboutButtonData);
 
-                // Register Dockable Pane (From Local)
+                // Register Dockable Pane
                 MaterialBrowserPanel browserPanel = new MaterialBrowserPanel(MaterialService);
                 DockablePaneId dpid = new DockablePaneId(MaterialBrowserPaneId);
-=======
-            browseBtnData.ToolTip = "Open the Sustainable Material Browser panel.";
 
-            // Set Icons
-            browseBtnData.LargeImage = GetEmbeddedImage("icon_32.png");
-            browseBtnData.Image = GetEmbeddedImage("icon_16.png");
-
-            panel.AddItem(browseBtnData);
-
-            // 3. Register Dockable Pane with injected MaterialService
-            MaterialBrowserPanel browserPanel = new MaterialBrowserPanel(MaterialService);
-            DockablePaneId dpid = new DockablePaneId(MaterialBrowserPaneId);
-
-            try
-            {
->>>>>>> 7ab4670 (Update Revit plugin UI with branding and service improvements)
-                application.RegisterDockablePane(dpid, "Material Browser", browserPanel);
-
-                // Handle Authentication (From Remote)
-                // InitializeAuth(); // Commented out for now as AuthService might conflict or need merging. 
-                // Assuming InitializeServices handles what we need for now, or we can add it back if AuthService is available.
+                try
+                {
+                    application.RegisterDockablePane(dpid, "Material Browser", browserPanel);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Failed to register dockable pane: {ex.Message}");
+                }
 
                 return Result.Succeeded;
             }
             catch (Exception ex)
             {
                 TaskDialog.Show("GreenChainz Startup Error",
-                    $"Failed to initialize GreenChainz plugin:\n\n{ex.Message}\n\n{ex.StackTrace}");
+                    $"Failed to initialize GreenChainz plugin:\n\n{ex.Message}");
                 return Result.Failed;
             }
-
         }
 
-
-            // Log a warning when required credentials are missing or empty
-            if (string.IsNullOrWhiteSpace(clientId) || string.IsNullOrWhiteSpace(clientSecret))
-            {
-                LogWarning("Warning: Autodesk credentials (AUTODESK_CLIENT_ID / AUTODESK_CLIENT_SECRET) are missing or empty. " +
-                           "The plugin will use mock material data instead of live Autodesk services.");
-            }
         private void InitializeServices()
         {
             // Read credentials from environment variables
-            string clientId = Environment.GetEnvironmentVariable("AUTODESK_CLIENT_ID") ?? "YOUR_CLIENT_ID";
-            string clientSecret = Environment.GetEnvironmentVariable("AUTODESK_CLIENT_SECRET") ?? "YOUR_CLIENT_SECRET";
+            string clientId = Environment.GetEnvironmentVariable("AUTODESK_CLIENT_ID") ?? "";
+            string clientSecret = Environment.GetEnvironmentVariable("AUTODESK_CLIENT_SECRET") ?? "";
 
             AuthService = new AutodeskAuthService(clientId, clientSecret);
 
@@ -155,22 +137,19 @@ namespace GreenChainz.Revit
             {
                 SdaService = new SdaConnectorService(AuthService);
                 MaterialService = new MaterialService(SdaService);
+                System.Diagnostics.Debug.WriteLine("GreenChainz: Using live SDA service");
             }
             else
             {
                 // Use mock data when no credentials are available
                 MaterialService = new MaterialService();
+                System.Diagnostics.Debug.WriteLine("GreenChainz: Using mock data (no credentials configured)");
             }
         }
 
-        public Result OnShutdown(UIControlledApplication application) => Result.Succeeded;
-
-        /// <summary>
-        /// Logs a warning message to the debug output.
-        /// </summary>
-        private void LogWarning(string message)
+        public Result OnShutdown(UIControlledApplication application)
         {
-            System.Diagnostics.Debug.WriteLine(message);
+            return Result.Succeeded;
         }
 
         /// <summary>
@@ -181,38 +160,6 @@ namespace GreenChainz.Revit
             try
             {
                 Assembly assembly = Assembly.GetExecutingAssembly();
-                // Resource name format: Namespace.Folder.Filename
-                // Note: Folders in project become dot-separated in resource name
-                string resourceName = $"GreenChainz.Revit.Resources.{name}";
-
-                using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-                {
-                    if (stream == null) return null;
-
-                    BitmapImage image = new BitmapImage();
-                    image.BeginInit();
-                    image.StreamSource = stream;
-                    image.CacheOption = BitmapCacheOption.OnLoad;
-                    image.EndInit();
-                    return image;
-                }
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Helper to load embedded image resources
-        /// </summary>
-        private BitmapImage GetEmbeddedImage(string name)
-        {
-            try
-            {
-                Assembly assembly = Assembly.GetExecutingAssembly();
-                // Resource name format: Namespace.Folder.Filename
-                // Note: Folders in project become dot-separated in resource name
                 string resourceName = $"GreenChainz.Revit.Resources.{name}";
 
                 using (Stream stream = assembly.GetManifestResourceStream(resourceName))

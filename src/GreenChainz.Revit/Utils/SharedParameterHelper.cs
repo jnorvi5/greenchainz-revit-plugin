@@ -1,4 +1,6 @@
 using System.IO;
+using Autodesk.Revit.ApplicationServices;
+using Autodesk.Revit.DB;
 
 namespace GreenChainz.Revit.Utils
 {
@@ -55,7 +57,7 @@ namespace GreenChainz.Revit.Utils
             // Note: In a real robust app, we carefully check if it's already bound to avoid errors
             if (!bindingMap.Contains(definition))
             {
-                bindingMap.Insert(definition, binding, BuiltInParameterGroup.PG_GREEN_BUILDING);
+                bindingMap.Insert(definition, binding, GroupTypeId.GreenBuilding);
             }
         }
     }

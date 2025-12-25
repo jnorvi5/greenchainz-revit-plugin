@@ -1,6 +1,6 @@
-using System.Windows;
 using System;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 using GreenChainz.Revit.Models;
@@ -9,10 +9,20 @@ namespace GreenChainz.Revit.UI
 {
     public partial class AuditResultsWindow : Window
     {
+        private readonly AuditResult _result;
+
         public AuditResultsWindow(AuditResult result)
         {
             InitializeComponent();
+            _result = result;
+            DataContext = result;
             DisplayResults(result);
+        }
+
+        // For XAML designer support
+        public AuditResultsWindow()
+        {
+            InitializeComponent();
         }
 
         private void DisplayResults(AuditResult result)
@@ -20,12 +30,15 @@ namespace GreenChainz.Revit.UI
             if (result == null)
             {
                 ScoreText.Text = "Error";
-                RatingText.Text = "N/A";
                 return;
             }
 
-            ScoreText.Text = result.CarbonScore.ToString("F2");
-            RatingText.Text = result.Rating;
+            ScoreText.Text = result.OverallScore.ToString("N0") + " kgCO2e";
+            
+            if (result.Materials != null)
+            {
+                MaterialsDataGrid.ItemsSource = result.Materials;
+            }
 
             if (result.Recommendations != null)
             {
@@ -33,38 +46,21 @@ namespace GreenChainz.Revit.UI
             }
         }
 
-        private void CloseButton_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-            DataContext = result;
-        }
-
-        // For XAML designer support (optional)
-        public AuditResultsWindow()
-        {
-            InitializeComponent();
-        }
-
         private void SwapMaterial_Click(object sender, RoutedEventArgs e)
         {
-            // Placeholder for Swap Material logic
-            // In a real scenario, this would trigger an event or command to open a material browser
-            // and update the AuditResult model.
-            if (sender is FrameworkElement element && element.DataContext is MaterialAuditItem item)
+            if (sender is FrameworkElement element && element.DataContext is MaterialBreakdown item)
             {
-                MessageBox.Show($"Swap requested for: {item.Name}", "Swap Material", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show($"Swap requested for: {item.MaterialName}", "Swap Material", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 
         private void SendRFQ_Click(object sender, RoutedEventArgs e)
         {
-            // Placeholder for Send RFQ logic
             MessageBox.Show("Sending RFQ for flagged materials...", "Send RFQ", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void ExportPDF_Click(object sender, RoutedEventArgs e)
         {
-            // Placeholder for Export PDF logic
             MessageBox.Show("Exporting results to PDF...", "Export PDF", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
@@ -78,12 +74,12 @@ namespace GreenChainz.Revit.UI
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is int score)
+            if (value is double score)
             {
-                if (score > 80)
+                if (score < 1000)
                     return Brushes.Green;
-                else if (score >= 50)
-                    return Brushes.Orange; // Yellow is sometimes hard to read on white
+                else if (score < 10000)
+                    return Brushes.Orange;
                 else
                     return Brushes.Red;
             }

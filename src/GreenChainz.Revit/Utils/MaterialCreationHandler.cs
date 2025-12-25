@@ -1,12 +1,13 @@
 using System;
-using GreenChainz.Revit.Models;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 using GreenChainz.Revit.Services;
 
 namespace GreenChainz.Revit.Utils
 {
     public class MaterialCreationHandler : IExternalEventHandler
     {
-        public Material MaterialToCreate { get; set; }
+        public Models.Material MaterialToCreate { get; set; }
 
         public MaterialCreationHandler()
         {
@@ -22,7 +23,6 @@ namespace GreenChainz.Revit.Utils
 
             try
             {
-                // Use the shared MaterialService from App
                 var service = App.MaterialService ?? new MaterialService();
                 service.CreateRevitMaterial(doc, app.Application, MaterialToCreate);
 

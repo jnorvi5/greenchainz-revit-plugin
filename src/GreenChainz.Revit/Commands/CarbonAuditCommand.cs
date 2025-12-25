@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
+using Autodesk.Revit.Attributes;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 using GreenChainz.Revit.Models;
-using GreenChainz.Revit.Views;
-using GreenChainz.Revit.Services;
 using GreenChainz.Revit.UI;
 
 namespace GreenChainz.Revit.Commands
@@ -19,27 +21,6 @@ namespace GreenChainz.Revit.Commands
         {
             try
             {
-                // Check if user is logged in
-                if (!AuthService.Instance.IsLoggedIn)
-                {
-                    // Prompt login
-                    LoginWindow loginWindow = new LoginWindow();
-                    bool? result = loginWindow.ShowDialog();
-
-                    if (result != true || !AuthService.Instance.IsLoggedIn)
-                    {
-                        message = "You must be logged in to perform a Carbon Audit.";
-                        return Result.Cancelled;
-                    }
-                }
-
-                // Check audit credits
-                if (AuthService.Instance.Credits <= 0)
-                {
-                    TaskDialog.Show("Insufficient Credits", "You do not have enough credits to perform a Carbon Audit. Please contact support or upgrade your plan.");
-                    return Result.Cancelled;
-                }
-
                 // Get the current document
                 UIDocument uidoc = commandData.Application.ActiveUIDocument;
                 if (uidoc == null)
@@ -62,7 +43,7 @@ namespace GreenChainz.Revit.Commands
                     Materials = new List<MaterialBreakdown>
                     {
                         new MaterialBreakdown { MaterialName = "Concrete (C30/37)", Quantity = "500 m3", CarbonFactor = 240, TotalCarbon = 120000 },
-                        new MaterialBreakdown { MaterialName = "Steel Reinforcement", Quantity = "20 tons", CarbonFactor = 1.85 * 1000, TotalCarbon = 37000 },
+                        new MaterialBreakdown { MaterialName = "Steel Reinforcement", Quantity = "20 tons", CarbonFactor = 1850, TotalCarbon = 37000 },
                         new MaterialBreakdown { MaterialName = "Glass", Quantity = "200 m2", CarbonFactor = 25, TotalCarbon = 5000 },
                         new MaterialBreakdown { MaterialName = "Timber", Quantity = "50 m3", CarbonFactor = 10, TotalCarbon = 500 }
                     },
@@ -80,16 +61,8 @@ namespace GreenChainz.Revit.Commands
                 audit.OverallScore = total;
 
                 // Open Results Window
-                // Using Revit's window handle as owner is best practice but keeping it simple for now
                 AuditResultsWindow window = new AuditResultsWindow(audit);
                 window.ShowDialog();
-                // TODO: Deduct credit here? Or after successful audit?
-                // Assuming we check first.
-
-                MessageBox.Show(
-                    $"Current Model: {modelName}\n\nCarbon Audit running...\nCredits available: {AuthService.Instance.Credits}",
-                    "GreenChainz - Carbon Audit",
-                    $"Current Model: {modelName}\n\nCarbon Audit feature coming soon!");
 
                 return Result.Succeeded;
             }

@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using GreenChainz.Revit.Models;
@@ -8,13 +10,14 @@ namespace GreenChainz.Revit.Services
 {
     public class SdaConnectorService
     {
-        private static readonly HttpClient _httpClient = new HttpClient();
+        private readonly HttpClient _httpClient;
         private readonly AutodeskAuthService _authService;
         private const string SDA_BASE_URL = "https://developer.api.autodesk.com/carbon/v1";
 
         public SdaConnectorService(AutodeskAuthService authService)
         {
             _authService = authService;
+            _httpClient = new HttpClient();
         }
 
         public async Task<List<SdaMaterial>> GetMaterialsAsync(string category = null)

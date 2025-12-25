@@ -1,38 +1,38 @@
+using System;
 using System.Collections.Generic;
+using Autodesk.Revit.DB;
 using GreenChainz.Revit.Models;
 
 namespace GreenChainz.Revit.Services
 {
     public class AuditService
     {
-        private readonly ApiClient _apiClient;
-
-        public AuditService()
-        {
-            _apiClient = new ApiClient();
-        }
-
         public AuditResult ScanProject(Document doc)
         {
-            List<ProjectMaterial> materials = ExtractMaterials(doc);
+            List<MaterialBreakdown> materials = ExtractMaterials(doc);
 
-            AuditRequest request = new AuditRequest
+            // Calculate totals
+            double totalCarbon = 0;
+            foreach (var mat in materials)
+            {
+                totalCarbon += mat.TotalCarbon;
+            }
+
+            return new AuditResult
             {
                 ProjectName = doc.Title,
-                Materials = materials
+                Date = DateTime.Now,
+                OverallScore = totalCarbon,
+                Summary = $"Analyzed {materials.Count} materials from your Revit model.",
+                Materials = materials,
+                Recommendations = GenerateRecommendations(materials)
             };
-
-            return _apiClient.SubmitAudit(request);
         }
 
-        private List<ProjectMaterial> ExtractMaterials(Document doc)
+        private List<MaterialBreakdown> ExtractMaterials(Document doc)
         {
-            // Use a dictionary to aggregate quantities by material name
-            Dictionary<string, ProjectMaterial> materialMap = new Dictionary<string, ProjectMaterial>();
+            Dictionary<string, MaterialBreakdown> materialMap = new Dictionary<string, MaterialBreakdown>();
 
-            // Collect all elements that might have materials.
-            // This is a broad collection; we might want to filter by categories like Walls, Floors, Roofs, etc.
-            // For now, let's target common building elements.
             List<BuiltInCategory> categories = new List<BuiltInCategory>
             {
                 BuiltInCategory.OST_Walls,
@@ -46,43 +46,100 @@ namespace GreenChainz.Revit.Services
             };
 
             ElementMulticategoryFilter categoryFilter = new ElementMulticategoryFilter(categories);
-
             FilteredElementCollector collector = new FilteredElementCollector(doc);
             IList<Element> elements = collector.WherePasses(categoryFilter).WhereElementIsNotElementType().ToElements();
 
             foreach (Element elem in elements)
             {
-                // Retrieve materials from the element
                 foreach (ElementId matId in elem.GetMaterialIds(false))
                 {
-                    Material mat = doc.GetElement(matId) as Material;
+                    Autodesk.Revit.DB.Material mat = doc.GetElement(matId) as Autodesk.Revit.DB.Material;
                     if (mat == null) continue;
 
                     string matName = mat.Name;
-                    double volume = elem.GetMaterialVolume(matId); // Cubic feet internal units
+                    double volume = elem.GetMaterialVolume(matId);
 
-                    // We could also get Area if needed, but Volume is often primary for mass calculation.
-                    // double area = elem.GetMaterialArea(matId);
-
-                    if (volume > 0.0001) // Filter out negligible amounts
+                    if (volume > 0.0001)
                     {
                         if (!materialMap.ContainsKey(matName))
                         {
-                            materialMap[matName] = new ProjectMaterial
+                            // Estimate carbon factor based on material name
+                            double carbonFactor = EstimateCarbonFactor(matName);
+                            
+                            materialMap[matName] = new MaterialBreakdown
                             {
-                                Name = matName,
-                                Quantity = 0,
-                                Unit = "cubic ft", // Revit internal unit for volume
-                                Category = elem.Category?.Name ?? "Unknown"
+                                MaterialName = matName,
+                                Quantity = "0 m³",
+                                CarbonFactor = carbonFactor,
+                                TotalCarbon = 0
                             };
                         }
 
-                        materialMap[matName].Quantity += volume;
+                        // Convert cubic feet to cubic meters
+                        double volumeM3 = volume * 0.0283168;
+                        double currentQty = 0;
+                        if (double.TryParse(materialMap[matName].Quantity.Replace(" m³", ""), out currentQty))
+                        {
+                            materialMap[matName].Quantity = $"{(currentQty + volumeM3):F2} m³";
+                        }
+                        materialMap[matName].TotalCarbon += volumeM3 * materialMap[matName].CarbonFactor;
                     }
                 }
             }
 
-            return new List<ProjectMaterial>(materialMap.Values);
+            return new List<MaterialBreakdown>(materialMap.Values);
+        }
+
+        private double EstimateCarbonFactor(string materialName)
+        {
+            string name = materialName.ToLower();
+            
+            if (name.Contains("concrete")) return 240;
+            if (name.Contains("steel")) return 1850;
+            if (name.Contains("aluminum") || name.Contains("aluminium")) return 8000;
+            if (name.Contains("glass")) return 25;
+            if (name.Contains("wood") || name.Contains("timber")) return 10;
+            if (name.Contains("brick")) return 200;
+            if (name.Contains("insulation")) return 50;
+            
+            return 100; // Default estimate
+        }
+
+        private List<Recommendation> GenerateRecommendations(List<MaterialBreakdown> materials)
+        {
+            var recommendations = new List<Recommendation>();
+
+            foreach (var mat in materials)
+            {
+                if (mat.MaterialName.ToLower().Contains("concrete") && mat.TotalCarbon > 10000)
+                {
+                    recommendations.Add(new Recommendation
+                    {
+                        Description = $"Consider low-carbon concrete alternatives for {mat.MaterialName}",
+                        PotentialSavings = mat.TotalCarbon * 0.3
+                    });
+                }
+                
+                if (mat.MaterialName.ToLower().Contains("steel") && mat.TotalCarbon > 5000)
+                {
+                    recommendations.Add(new Recommendation
+                    {
+                        Description = $"Use recycled steel to reduce emissions from {mat.MaterialName}",
+                        PotentialSavings = mat.TotalCarbon * 0.5
+                    });
+                }
+            }
+
+            if (recommendations.Count == 0)
+            {
+                recommendations.Add(new Recommendation
+                {
+                    Description = "Your project has a good carbon profile. Consider EPD-certified materials.",
+                    PotentialSavings = 0
+                });
+            }
+
+            return recommendations;
         }
     }
 }

@@ -1,5 +1,5 @@
+using System.Reflection;
 using System.Windows;
-using GreenChainz.Revit.Services;
 
 namespace GreenChainz.Revit.UI
 {
@@ -8,31 +8,20 @@ namespace GreenChainz.Revit.UI
         public AboutWindow()
         {
             InitializeComponent();
-            LoadUserInfo();
+            LoadInfo();
         }
 
-        private void LoadUserInfo()
+        private void LoadInfo()
         {
-            if (AuthService.Instance.IsLoggedIn)
-            {
-                UserEmailText.Text = AuthService.Instance.UserEmail;
-                CreditsText.Text = AuthService.Instance.Credits.ToString();
-                LogoutButton.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                UserEmailText.Text = "Not logged in";
-                CreditsText.Text = "-";
-                LogoutButton.Visibility = Visibility.Collapsed;
-            }
+            // Get version info from assembly
+            var version = Assembly.GetExecutingAssembly().GetName().Version;
+            UserEmailText.Text = $"Version {version?.Major ?? 1}.{version?.Minor ?? 0}.{version?.Build ?? 0}";
+            CreditsText.Text = "Unlimited (Demo Mode)";
+            LogoutButton.Visibility = Visibility.Collapsed;
         }
 
         private void LogoutButton_Click(object sender, RoutedEventArgs e)
         {
-            AuthService.Instance.Logout();
-            LoadUserInfo();
-            // Optionally close or show login
-            DialogResult = true; // Signal that logout happened
             Close();
         }
     }
