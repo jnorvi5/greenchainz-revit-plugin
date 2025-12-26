@@ -34,52 +34,55 @@ namespace GreenChainz.Revit
                 
                 string assemblyPath = Assembly.GetExecutingAssembly().Location;
 
-                // Panel 1: Carbon Analysis
+                // Panel 1: Scorecard (Main Feature)
+                RibbonPanel scorecardPanel = application.CreateRibbonPanel(tabName, "Scorecard");
+
+                PushButtonData scorecardButtonData = new PushButtonData(
+                    "Scorecard", "Sustainability\nScorecard", assemblyPath,
+                    "GreenChainz.Revit.Commands.ScorecardCommand")
+                { ToolTip = "Generate enterprise-grade sustainability scorecard (EPD, GWP, Verification)" };
+                scorecardPanel.AddItem(scorecardButtonData);
+
+                // Panel 2: Carbon Analysis
                 RibbonPanel carbonPanel = application.CreateRibbonPanel(tabName, "Carbon");
 
                 PushButtonData carbonAuditButtonData = new PushButtonData(
                     "CarbonAudit", "Carbon\nAudit", assemblyPath,
                     "GreenChainz.Revit.Commands.CarbonAuditCommand")
-                { ToolTip = "Analyze carbon footprint using EC3 real data" };
+                { ToolTip = "Detailed carbon footprint analysis" };
                 carbonPanel.AddItem(carbonAuditButtonData);
 
-                // Panel 2: LEED Calculators
+                // Panel 3: LEED Calculators
                 RibbonPanel leedPanel = application.CreateRibbonPanel(tabName, "LEED");
-
-                PushButtonData leedButtonData = new PushButtonData(
-                    "LeedCalculator", "LEED v4.1\nGeneral", assemblyPath,
-                    "GreenChainz.Revit.Commands.LeedCalculatorCommand")
-                { ToolTip = "LEED v4.1 general certification calculator" };
-                leedPanel.AddItem(leedButtonData);
-
-                PushButtonData mrpc132ButtonData = new PushButtonData(
-                    "LeedMRpc132", "MRpc132\nEmbodied C", assemblyPath,
-                    "GreenChainz.Revit.Commands.LeedEmbodiedCarbonCommand")
-                { ToolTip = "LEED v4.1 MRpc132 Pilot Credit - Low Carbon Materials (CLF methodology)" };
-                leedPanel.AddItem(mrpc132ButtonData);
 
                 PushButtonData leedV5ButtonData = new PushButtonData(
                     "LeedV5", "LEED v5\nBD+C", assemblyPath,
                     "GreenChainz.Revit.Commands.LeedV5Command")
-                { ToolTip = "LEED v5 BD+C: New Construction - Full credit analysis" };
+                { ToolTip = "LEED v5 BD+C full credit analysis" };
                 leedPanel.AddItem(leedV5ButtonData);
 
-                // Panel 3: Materials
-                RibbonPanel materialsPanel = application.CreateRibbonPanel(tabName, "Materials");
+                PushButtonData mrpc132ButtonData = new PushButtonData(
+                    "LeedMRpc132", "MRpc132\nEmbodied C", assemblyPath,
+                    "GreenChainz.Revit.Commands.LeedEmbodiedCarbonCommand")
+                { ToolTip = "LEED v4.1 MRpc132 Pilot Credit" };
+                leedPanel.AddItem(mrpc132ButtonData);
 
-                PushButtonData browseBtnData = new PushButtonData(
-                    "cmdBrowseMaterials", "Browse\nMaterials", assemblyPath,
-                    "GreenChainz.Revit.Commands.MaterialBrowserCmd")
-                { ToolTip = "Browse sustainable materials from EC3 database" };
-                materialsPanel.AddItem(browseBtnData);
+                // Panel 4: Procurement
+                RibbonPanel procurementPanel = application.CreateRibbonPanel(tabName, "Procurement");
 
                 PushButtonData sendRfqButtonData = new PushButtonData(
                     "SendRFQ", "Send\nRFQ", assemblyPath,
                     "GreenChainz.Revit.Commands.SendRFQCommand")
-                { ToolTip = "Send Request for Quotation to suppliers" };
-                materialsPanel.AddItem(sendRfqButtonData);
+                { ToolTip = "Send RFQ to sustainable suppliers" };
+                procurementPanel.AddItem(sendRfqButtonData);
 
-                // Panel 4: Help
+                PushButtonData browseBtnData = new PushButtonData(
+                    "cmdBrowseMaterials", "Browse\nMaterials", assemblyPath,
+                    "GreenChainz.Revit.Commands.MaterialBrowserCmd")
+                { ToolTip = "Browse sustainable materials" };
+                procurementPanel.AddItem(browseBtnData);
+
+                // Panel 5: Help
                 RibbonPanel helpPanel = application.CreateRibbonPanel(tabName, "Help");
 
                 PushButtonData aboutButtonData = new PushButtonData(
@@ -98,15 +101,14 @@ namespace GreenChainz.Revit
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine($"Failed to register dockable pane: {ex.Message}");
+                    System.Diagnostics.Debug.WriteLine($"Dockable pane: {ex.Message}");
                 }
 
                 return Result.Succeeded;
             }
             catch (Exception ex)
             {
-                TaskDialog.Show("GreenChainz Startup Error",
-                    $"Failed to initialize GreenChainz plugin:\n\n{ex.Message}\n\n{ex.StackTrace}");
+                TaskDialog.Show("GreenChainz Error", $"Startup failed:\n\n{ex.Message}");
                 return Result.Failed;
             }
         }
