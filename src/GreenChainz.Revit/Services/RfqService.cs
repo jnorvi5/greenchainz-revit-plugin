@@ -25,6 +25,26 @@ namespace GreenChainz.Revit.Services
             "http://localhost:3000/api"  // Local development
         };
 
+        // Supplier location coordinates for distance calculation
+        private static readonly Dictionary<string, (double lat, double lon)> SUPPLIER_LOCATIONS = new Dictionary<string, (double, double)>
+        {
+            { "carboncure", (44.6488, -63.5752) },     // Halifax, NS
+            { "nucor", (35.2271, -80.8431) },          // Charlotte, NC
+            { "ssab", (59.3293, 18.0686) },            // Stockholm (global)
+            { "structurlam", (49.5088, -115.7671) },   // Penticton, BC
+            { "nordic", (45.5017, -73.5673) },         // Montreal, QC
+            { "guardian", (42.2808, -83.7430) },       // Auburn Hills, MI
+            { "rockwool", (43.6532, -79.3832) },       // Toronto area
+            { "novelis", (33.7490, -84.3880) },        // Atlanta, GA
+            { "hydro", (59.9139, 10.7522) },           // Oslo (global)
+            { "usg", (41.8781, -87.6298) },            // Chicago, IL
+            { "certainteed", (40.0796, -75.2901) },    // Malvern, PA
+            { "owenscorning", (41.6528, -83.5379) },   // Toledo, OH
+            { "cmc", (32.7767, -96.7970) },            // Dallas, TX
+            { "vitro", (40.4406, -79.9959) },          // Pittsburgh, PA
+            { "centralconcrete", (37.3382, -121.8863) } // San Jose, CA
+        };
+
         public RfqService(string apiUrl = null)
         {
             _baseUrl = apiUrl ?? Environment.GetEnvironmentVariable("GREENCHAINZ_API_URL") ?? API_URLS[0];
@@ -77,19 +97,20 @@ namespace GreenChainz.Revit.Services
         }
 
         /// <summary>
-        /// Get list of sustainable suppliers by material category
+        /// Get suppliers filtered by category and optionally sorted by distance
         /// </summary>
-        public async Task<List<Supplier>> GetSuppliersAsync(string category = null)
+        public async Task<List<Supplier>> GetSuppliersAsync(string category = null, double? projectLat = null, double? projectLon = null, double? maxDistanceMiles = null)
         {
+            var suppliers = new List<Supplier>();
+
+            // Try API first
             foreach (var baseUrl in API_URLS)
             {
                 try
                 {
                     string url = $"{baseUrl}/suppliers";
                     if (!string.IsNullOrEmpty(category))
-                    {
                         url += $"?category={Uri.EscapeDataString(category)}";
-                    }
 
                     HttpResponseMessage response = await _httpClient.GetAsync(url);
                     
@@ -97,17 +118,67 @@ namespace GreenChainz.Revit.Services
                     {
                         string json = await response.Content.ReadAsStringAsync();
                         var result = JsonConvert.DeserializeObject<SupplierResponse>(json);
-                        return result?.Suppliers ?? new List<Supplier>();
+                        suppliers = result?.Suppliers ?? new List<Supplier>();
+                        break;
                     }
                 }
-                catch
-                {
-                    continue;
-                }
+                catch { continue; }
             }
 
-            return GetFallbackSuppliers(category);
+            // Fallback to local
+            if (suppliers.Count == 0)
+            {
+                suppliers = GetFallbackSuppliers(category);
+            }
+
+            // Calculate distances if project location provided
+            if (projectLat.HasValue && projectLon.HasValue)
+            {
+                foreach (var supplier in suppliers)
+                {
+                    if (SUPPLIER_LOCATIONS.TryGetValue(supplier.Id, out var loc))
+                    {
+                        supplier.DistanceFromProject = CalculateDistance(
+                            projectLat.Value, projectLon.Value, loc.lat, loc.lon);
+                    }
+                }
+
+                // Filter by max distance if specified
+                if (maxDistanceMiles.HasValue)
+                {
+                    suppliers = suppliers.FindAll(s => 
+                        s.DistanceFromProject == 0 || s.DistanceFromProject <= maxDistanceMiles.Value);
+                }
+
+                // Sort by distance
+                suppliers.Sort((a, b) => a.DistanceFromProject.CompareTo(b.DistanceFromProject));
+            }
+
+            return suppliers;
         }
+
+        /// <summary>
+        /// Get suppliers within specified radius (for LEED regional materials credit)
+        /// </summary>
+        public async Task<List<Supplier>> GetRegionalSuppliers(double projectLat, double projectLon, double radiusMiles = 500)
+        {
+            var allSuppliers = await GetSuppliersAsync(null, projectLat, projectLon);
+            return allSuppliers.FindAll(s => s.DistanceFromProject > 0 && s.DistanceFromProject <= radiusMiles);
+        }
+
+        private double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
+        {
+            const double R = 3958.8; // Earth's radius in miles
+            double dLat = ToRadians(lat2 - lat1);
+            double dLon = ToRadians(lon2 - lon1);
+            double a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                       Math.Cos(ToRadians(lat1)) * Math.Cos(ToRadians(lat2)) *
+                       Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+            double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+            return R * c;
+        }
+
+        private double ToRadians(double degrees) => degrees * Math.PI / 180.0;
 
         /// <summary>
         /// Save RFQ locally when API is unavailable
@@ -273,14 +344,35 @@ namespace GreenChainz.Revit.Services
                     SustainabilityScore = 85,
                     ContactEmail = "info@usg.com",
                     Website = "https://www.usg.com"
+                },
+                new Supplier
+                {
+                    Id = "centralconcrete",
+                    Name = "Central Concrete",
+                    Categories = new List<string> { "concrete", "ready-mix" },
+                    Certifications = new List<string> { "EPD", "LEED" },
+                    Region = "California",
+                    SustainabilityScore = 88,
+                    ContactEmail = "sales@centralconcrete.com",
+                    Website = "https://www.centralconcrete.com"
+                },
+                new Supplier
+                {
+                    Id = "cmc",
+                    Name = "Commercial Metals Company",
+                    Categories = new List<string> { "steel", "rebar" },
+                    Certifications = new List<string> { "EPD", "ISO 14001" },
+                    Region = "North America",
+                    SustainabilityScore = 87,
+                    ContactEmail = "sales@cmc.com",
+                    Website = "https://www.cmc.com"
                 }
             };
 
             if (!string.IsNullOrEmpty(category))
             {
                 string cat = category.ToLower();
-                return suppliers.FindAll(s => 
-                    s.Categories.Exists(c => c.ToLower().Contains(cat) || cat.Contains(c.ToLower()))
+                return suppliers.FindAll(s => s.Categories.Exists(c => c.ToLower().Contains(cat) || cat.Contains(c.ToLower()))
                 );
             }
 
@@ -343,8 +435,10 @@ namespace GreenChainz.Revit.Services
 
         [JsonProperty("carbonReduction")]
         public string CarbonReduction { get; set; }
-
+        
+        public double DistanceFromProject { get; set; }
         public string CategoriesDisplay => Categories != null ? string.Join(", ", Categories) : "";
         public string CertificationsDisplay => Certifications != null ? string.Join(", ", Certifications) : "";
+        public string DistanceDisplay => DistanceFromProject > 0 ? $"{DistanceFromProject:N0} mi" : "Global";
     }
 }

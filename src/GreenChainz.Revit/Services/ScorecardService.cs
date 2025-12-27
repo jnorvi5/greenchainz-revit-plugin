@@ -7,24 +7,16 @@ using GreenChainz.Revit.Models;
 namespace GreenChainz.Revit.Services
 {
     /// <summary>
-    /// Calculates enterprise-grade sustainability scorecard
-    /// Focus: EPD Coverage, Embodied Carbon (GWP), Verification Tier
+    /// Calculates enterprise-grade sustainability scorecard with regional adjustments
     /// </summary>
     public class ScorecardService
     {
-        // CLF 2021 Baseline GWP values (kgCO2e per m³ or per unit)
-        private static readonly Dictionary<string, double> GWP_BASELINES = new Dictionary<string, double>
+        private readonly LocationService _locationService;
+
+        public ScorecardService()
         {
-            { "concrete", 340 },      // kgCO2e/m³
-            { "steel", 12740 },       // kgCO2e/m³ (density adjusted)
-            { "aluminum", 34560 },    // kgCO2e/m³
-            { "wood", 110 },          // kgCO2e/m³
-            { "glass", 3750 },        // kgCO2e/m³
-            { "gypsum", 160 },        // kgCO2e/m³
-            { "insulation", 50 },     // kgCO2e/m³
-            { "brick", 200 },         // kgCO2e/m³
-            { "default", 150 }
-        };
+            _locationService = new LocationService();
+        }
 
         public SustainabilityScorecard GenerateScorecard(Document doc)
         {
@@ -34,15 +26,29 @@ namespace GreenChainz.Revit.Services
                 GeneratedDate = DateTime.Now
             };
 
-            // Extract all materials from model
-            var materialScores = ExtractMaterialScores(doc);
+            // Get project location
+            var projectLocation = _locationService.GetProjectLocation(doc);
+            scorecard.Location = new ProjectLocationInfo
+            {
+                Address = projectLocation.Address,
+                State = projectLocation.State,
+                Region = projectLocation.Region,
+                ClimateZone = projectLocation.ClimateZone,
+                Latitude = projectLocation.Latitude,
+                Longitude = projectLocation.Longitude,
+                GridCarbonIntensity = projectLocation.GridCarbonIntensity,
+                RegionalMultiplier = RegionalCarbonFactors.GetRegionalMultiplier(projectLocation.State)
+            };
+
+            // Extract all materials with regional adjustments
+            var materialScores = ExtractMaterialScores(doc, projectLocation);
             scorecard.Materials = materialScores;
 
             // Calculate EPD Coverage
             scorecard.EpdScore = CalculateEpdCoverage(materialScores);
 
-            // Calculate GWP Score
-            scorecard.GwpScore = CalculateGwpScore(materialScores, doc);
+            // Calculate GWP Score with regional adjustments
+            scorecard.GwpScore = CalculateGwpScore(materialScores, doc, projectLocation);
 
             // Calculate Verification Tier
             scorecard.VerificationScore = CalculateVerificationTier(materialScores);
@@ -52,13 +58,22 @@ namespace GreenChainz.Revit.Services
 
             // Compliance checks
             scorecard.LeedCompliant = scorecard.EpdScore.CoveragePercent >= 20;
-            scorecard.BuyCleanCompliant = scorecard.GwpScore.ReductionPercent >= 0;
-            scorecard.EstimatedLeedPoints = EstimateLeedPoints(scorecard);
+            
+            // Buy Clean compliance
+            var buyClean = RegionalCarbonFactors.GetBuyCleanRequirements(projectLocation.State);
+            scorecard.BuyCleanInfo = CalculateBuyCleanCompliance(materialScores, buyClean);
+            scorecard.BuyCleanCompliant = !buyClean.HasRequirements || 
+                (scorecard.BuyCleanInfo.ConcreteCompliant && scorecard.BuyCleanInfo.SteelCompliant);
+
+            // LEED points including regional
+            scorecard.RegionalPriorityCredits = RegionalCarbonFactors.GetRegionalPriorityCredits(projectLocation.State);
+            scorecard.RegionalBonusPoints = Math.Min(4, scorecard.RegionalPriorityCredits.Count);
+            scorecard.EstimatedLeedPoints = EstimateLeedPoints(scorecard) + scorecard.RegionalBonusPoints;
 
             return scorecard;
         }
 
-        private List<MaterialScore> ExtractMaterialScores(Document doc)
+        private List<MaterialScore> ExtractMaterialScores(Document doc, ProjectLocation location)
         {
             var scores = new Dictionary<string, MaterialScore>();
 
@@ -81,16 +96,26 @@ namespace GreenChainz.Revit.Services
                     if (mat == null) continue;
 
                     string name = mat.Name;
-                    double volume = elem.GetMaterialVolume(matId) * 0.0283168; // Convert to m³
+                    double volume = elem.GetMaterialVolume(matId) * 0.0283168;
 
                     if (volume < 0.001) continue;
 
                     if (!scores.ContainsKey(name))
                     {
                         var category = DetermineCategory(name);
+                        var gwp = GetRegionalGwp(name, category, location.State);
                         var baseline = GetBaseline(category);
-                        var gwp = EstimateGwp(name, category);
                         var tier = DetermineVerificationTier(name);
+
+                        // Check Buy Clean compliance
+                        var buyClean = RegionalCarbonFactors.GetBuyCleanRequirements(location.State);
+                        bool meetsBuyClean = !buyClean.HasRequirements;
+                        if (buyClean.HasRequirements)
+                        {
+                            if (category == "Concrete") meetsBuyClean = gwp <= buyClean.ConcreteGwpLimit;
+                            else if (category == "Steel") meetsBuyClean = gwp <= buyClean.SteelGwpLimit;
+                            else meetsBuyClean = true;
+                        }
 
                         scores[name] = new MaterialScore
                         {
@@ -100,9 +125,11 @@ namespace GreenChainz.Revit.Services
                             Unit = "m³",
                             HasEpd = HasEpdAvailable(name),
                             Gwp = gwp,
+                            RegionalGwp = gwp,
                             GwpBaseline = baseline,
                             VerificationTier = tier,
-                            Certifications = GetCertifications(name)
+                            Certifications = GetCertifications(name),
+                            MeetsBuyClean = meetsBuyClean
                         };
                     }
 
@@ -115,6 +142,80 @@ namespace GreenChainz.Revit.Services
             }
 
             return scores.Values.ToList();
+        }
+
+        private double GetRegionalGwp(string name, string category, string state)
+        {
+            string lower = name.ToLower();
+
+            switch (category)
+            {
+                case "Concrete":
+                    string strength = "4000psi";
+                    if (lower.Contains("5000")) strength = "5000psi";
+                    else if (lower.Contains("6000")) strength = "6000psi";
+                    else if (lower.Contains("3000")) strength = "3000psi";
+                    return RegionalCarbonFactors.GetConcreteGwp(state, strength);
+
+                case "Steel":
+                    string steelType = "structural";
+                    if (lower.Contains("rebar")) steelType = "rebar";
+                    else if (lower.Contains("deck")) steelType = "decking";
+                    else if (lower.Contains("plate")) steelType = "plate";
+                    return RegionalCarbonFactors.GetSteelGwp(state, steelType);
+
+                case "Wood":
+                    string woodType = "lumber";
+                    if (lower.Contains("clt") || lower.Contains("cross")) woodType = "clt";
+                    else if (lower.Contains("glulam") || lower.Contains("glue")) woodType = "glulam";
+                    else if (lower.Contains("plywood")) woodType = "plywood";
+                    return RegionalCarbonFactors.GetWoodGwp(state, woodType);
+
+                default:
+                    double baseGwp = GetBaseline(category);
+                    return baseGwp * RegionalCarbonFactors.GetRegionalMultiplier(state);
+            }
+        }
+
+        private BuyCleanComplianceInfo CalculateBuyCleanCompliance(List<MaterialScore> materials, BuyCleanRequirements buyClean)
+        {
+            var info = new BuyCleanComplianceInfo
+            {
+                HasRequirements = buyClean.HasRequirements,
+                PolicyName = buyClean.Name,
+                ConcreteLimit = buyClean.ConcreteGwpLimit,
+                SteelLimit = buyClean.SteelGwpLimit
+            };
+
+            if (!buyClean.HasRequirements) return info;
+
+            // Calculate average GWP for concrete and steel
+            var concrete = materials.Where(m => m.Category == "Concrete").ToList();
+            var steel = materials.Where(m => m.Category == "Steel").ToList();
+
+            if (concrete.Count > 0)
+            {
+                double totalVol = concrete.Sum(m => m.Quantity);
+                info.ActualConcreteGwp = totalVol > 0 ? concrete.Sum(m => m.TotalGwp) / totalVol : 0;
+                info.ConcreteCompliant = info.ActualConcreteGwp <= buyClean.ConcreteGwpLimit;
+            }
+            else
+            {
+                info.ConcreteCompliant = true;
+            }
+
+            if (steel.Count > 0)
+            {
+                double totalVol = steel.Sum(m => m.Quantity);
+                info.ActualSteelGwp = totalVol > 0 ? steel.Sum(m => m.TotalGwp) / totalVol : 0;
+                info.SteelCompliant = info.ActualSteelGwp <= buyClean.SteelGwpLimit;
+            }
+            else
+            {
+                info.SteelCompliant = true;
+            }
+
+            return info;
         }
 
         private EpdCoverage CalculateEpdCoverage(List<MaterialScore> materials)
@@ -139,12 +240,11 @@ namespace GreenChainz.Revit.Services
             };
         }
 
-        private EmbodiedCarbonScore CalculateGwpScore(List<MaterialScore> materials, Document doc)
+        private EmbodiedCarbonScore CalculateGwpScore(List<MaterialScore> materials, Document doc, ProjectLocation location)
         {
             double totalGwp = materials.Sum(m => m.TotalGwp);
             double totalBaseline = materials.Sum(m => m.Quantity * m.GwpBaseline);
 
-            // Get floor area for intensity calculation
             double floorArea = 0;
             var floors = new FilteredElementCollector(doc)
                 .OfCategory(BuiltInCategory.OST_Floors)
@@ -153,7 +253,7 @@ namespace GreenChainz.Revit.Services
             {
                 var areaParam = floor.get_Parameter(BuiltInParameter.HOST_AREA_COMPUTED);
                 if (areaParam != null)
-                    floorArea += areaParam.AsDouble() * 0.0929; // Convert sf to m²
+                    floorArea += areaParam.AsDouble() * 0.0929;
             }
 
             double gwpPerSqM = floorArea > 0 ? totalGwp / floorArea : 0;
@@ -167,6 +267,8 @@ namespace GreenChainz.Revit.Services
             else if (reduction >= -20) grade = "D";
             else grade = "F";
 
+            double regionalMultiplier = RegionalCarbonFactors.GetRegionalMultiplier(location.State);
+
             return new EmbodiedCarbonScore
             {
                 TotalGwp = totalGwp,
@@ -174,7 +276,8 @@ namespace GreenChainz.Revit.Services
                 GwpPerSqFt = gwpPerSqFt,
                 BaselineGwp = totalBaseline,
                 ReductionPercent = reduction,
-                Grade = grade
+                Grade = grade,
+                RegionalAdjustedGwp = totalGwp * regionalMultiplier
             };
         }
 
@@ -187,26 +290,10 @@ namespace GreenChainz.Revit.Services
 
             string tier;
             int score;
-            if (platinum > gold && platinum > silver)
-            {
-                tier = "Platinum";
-                score = 3;
-            }
-            else if (gold >= platinum && gold > silver)
-            {
-                tier = "Gold";
-                score = 2;
-            }
-            else if (silver > 0)
-            {
-                tier = "Silver";
-                score = 1;
-            }
-            else
-            {
-                tier = "Unverified";
-                score = 0;
-            }
+            if (platinum > gold && platinum > silver) { tier = "Platinum"; score = 3; }
+            else if (gold >= platinum && gold > silver) { tier = "Gold"; score = 2; }
+            else if (silver > 0) { tier = "Silver"; score = 1; }
+            else { tier = "Unverified"; score = 0; }
 
             return new VerificationTier
             {
@@ -221,7 +308,6 @@ namespace GreenChainz.Revit.Services
 
         private void CalculateOverallScore(SustainabilityScorecard scorecard)
         {
-            // Weight: EPD 30%, GWP 50%, Verification 20%
             int epdScore = GradeToScore(scorecard.EpdScore.Grade);
             int gwpScore = GradeToScore(scorecard.GwpScore.Grade);
             int verScore = scorecard.VerificationScore.TierScore * 25;
@@ -235,32 +321,20 @@ namespace GreenChainz.Revit.Services
             else scorecard.OverallGrade = "F";
         }
 
-        private int GradeToScore(string grade)
+        private int GradeToScore(string grade) => grade switch
         {
-            switch (grade)
-            {
-                case "A": return 100;
-                case "B": return 85;
-                case "C": return 70;
-                case "D": return 55;
-                default: return 40;
-            }
-        }
+            "A" => 100, "B" => 85, "C" => 70, "D" => 55, _ => 40
+        };
 
         private int EstimateLeedPoints(SustainabilityScorecard scorecard)
         {
             int points = 0;
-
-            // MRc2: Building Product Disclosure (EPD)
             if (scorecard.EpdScore.CoveragePercent >= 20) points += 1;
             if (scorecard.EpdScore.CoveragePercent >= 40) points += 1;
-
-            // MRc2: Embodied Carbon Reduction
             if (scorecard.GwpScore.ReductionPercent >= 5) points += 1;
             if (scorecard.GwpScore.ReductionPercent >= 10) points += 1;
             if (scorecard.GwpScore.ReductionPercent >= 20) points += 1;
             if (scorecard.GwpScore.ReductionPercent >= 30) points += 1;
-
             return points;
         }
 
@@ -278,29 +352,15 @@ namespace GreenChainz.Revit.Services
             return "Other";
         }
 
-        private double GetBaseline(string category)
+        private double GetBaseline(string category) => category switch
         {
-            string key = category.ToLower();
-            return GWP_BASELINES.ContainsKey(key) ? GWP_BASELINES[key] : GWP_BASELINES["default"];
-        }
-
-        private double EstimateGwp(string name, string category)
-        {
-            // Lower GWP for materials with "low carbon", "recycled", "green" in name
-            string lower = name.ToLower();
-            double baseline = GetBaseline(category);
-
-            if (lower.Contains("low carbon") || lower.Contains("low-carbon")) return baseline * 0.7;
-            if (lower.Contains("recycled")) return baseline * 0.6;
-            if (lower.Contains("green") || lower.Contains("eco")) return baseline * 0.8;
-            if (lower.Contains("mass timber") || lower.Contains("clt")) return -500; // Carbon negative
-
-            return baseline;
-        }
+            "Concrete" => 340, "Steel" => 12740, "Aluminum" => 34560,
+            "Wood" => 110, "Glass" => 3750, "Gypsum" => 160,
+            "Insulation" => 50, "Brick" => 200, _ => 150
+        };
 
         private bool HasEpdAvailable(string name)
         {
-            // Common materials with EPDs
             string lower = name.ToLower();
             return lower.Contains("concrete") || lower.Contains("steel") || 
                    lower.Contains("gypsum") || lower.Contains("insulation") ||
@@ -310,19 +370,9 @@ namespace GreenChainz.Revit.Services
         private string DetermineVerificationTier(string name)
         {
             string lower = name.ToLower();
-            
-            // Platinum: Third-party verified + chain of custody (FSC, ISCC, etc.)
-            if (lower.Contains("fsc") || lower.Contains("iscc") || lower.Contains("mass timber"))
-                return "Platinum";
-            
-            // Gold: Has EPD
-            if (HasEpdAvailable(name))
-                return "Gold";
-            
-            // Silver: Self-declared
-            if (lower.Contains("recycled") || lower.Contains("green") || lower.Contains("eco"))
-                return "Silver";
-            
+            if (lower.Contains("fsc") || lower.Contains("iscc") || lower.Contains("mass timber")) return "Platinum";
+            if (HasEpdAvailable(name)) return "Gold";
+            if (lower.Contains("recycled") || lower.Contains("green") || lower.Contains("eco")) return "Silver";
             return "None";
         }
 
@@ -330,13 +380,10 @@ namespace GreenChainz.Revit.Services
         {
             var certs = new List<string>();
             string lower = name.ToLower();
-
             if (HasEpdAvailable(name)) certs.Add("EPD");
             if (lower.Contains("fsc")) certs.Add("FSC");
             if (lower.Contains("leed")) certs.Add("LEED");
             if (lower.Contains("greenguard")) certs.Add("GREENGUARD");
-            if (lower.Contains("iso")) certs.Add("ISO 14001");
-
             return certs;
         }
     }

@@ -12,6 +12,9 @@ namespace GreenChainz.Revit.Models
         public string ProjectName { get; set; }
         public DateTime GeneratedDate { get; set; }
         
+        // Location
+        public ProjectLocationInfo Location { get; set; }
+        
         // Overall Scores
         public string OverallGrade { get; set; }  // A, B, C, D, F
         public int OverallScore { get; set; }      // 0-100
@@ -28,12 +31,49 @@ namespace GreenChainz.Revit.Models
         public bool LeedCompliant { get; set; }
         public bool BuyCleanCompliant { get; set; }
         public int EstimatedLeedPoints { get; set; }
+        public int RegionalBonusPoints { get; set; }
+        public List<string> RegionalPriorityCredits { get; set; }
+        public BuyCleanComplianceInfo BuyCleanInfo { get; set; }
 
         public SustainabilityScorecard()
         {
             Materials = new List<MaterialScore>();
+            RegionalPriorityCredits = new List<string>();
             GeneratedDate = DateTime.Now;
         }
+    }
+
+    /// <summary>
+    /// Project location info for scorecard
+    /// </summary>
+    public class ProjectLocationInfo
+    {
+        public string Address { get; set; } = "";
+        public string State { get; set; } = "Unknown";
+        public string Region { get; set; } = "Unknown";
+        public string ClimateZone { get; set; } = "";
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+        public double GridCarbonIntensity { get; set; }
+        public double RegionalMultiplier { get; set; } = 1.0;
+        
+        public string Display => State != "Unknown" ? $"{State}, {Region}" : "Location Not Set";
+        public string GridDisplay => $"{GridCarbonIntensity:N0} lbs CO2/MWh";
+    }
+
+    /// <summary>
+    /// Buy Clean compliance info
+    /// </summary>
+    public class BuyCleanComplianceInfo
+    {
+        public bool HasRequirements { get; set; }
+        public string PolicyName { get; set; } = "";
+        public bool ConcreteCompliant { get; set; }
+        public bool SteelCompliant { get; set; }
+        public double ConcreteLimit { get; set; }
+        public double SteelLimit { get; set; }
+        public double ActualConcreteGwp { get; set; }
+        public double ActualSteelGwp { get; set; }
     }
 
     /// <summary>
@@ -61,6 +101,7 @@ namespace GreenChainz.Revit.Models
         public double BaselineGwp { get; set; }        // Industry baseline
         public double ReductionPercent { get; set; }   // % below baseline
         public string Grade { get; set; }
+        public double RegionalAdjustedGwp { get; set; }   
         
         public string Display => $"{TotalGwp:N0} kgCO2e";
         public string IntensityDisplay => $"{GwpPerSqM:F1} kgCO2e/m²";
@@ -83,7 +124,7 @@ namespace GreenChainz.Revit.Models
         public int UnverifiedCount { get; set; } // No verification
         
         public string Display => $"{Tier} Verification";
-        public string Breakdown => $"Platinum: {PlatinumCount} | Gold: {GoldCount} | Silver: {SilverCount} | None: {UnverifiedCount}";
+        public string Breakdown => $"P:{PlatinumCount} | G:{GoldCount} | S:{SilverCount} | N:{UnverifiedCount}";
     }
 
     /// <summary>
@@ -106,16 +147,22 @@ namespace GreenChainz.Revit.Models
         public double TotalGwp { get; set; }      // Total for this material
         public double GwpBaseline { get; set; }   // Industry baseline
         public double GwpReduction { get; set; } // % vs baseline
+        public double RegionalGwp { get; set; }     // Adjusted for regional factors
         
         // Verification
         public string VerificationTier { get; set; }  // Platinum, Gold, Silver, None
         public List<string> Certifications { get; set; }
+        
+        // Regional
+        public bool MeetsBuyClean { get; set; }   // Compliance with Buy Clean standards
+        public double DistanceFromProject { get; set; }  // Transport distance impact
         
         // Display
         public string GwpDisplay => $"{Gwp:F1} kgCO2e/{Unit}";
         public string TotalGwpDisplay => $"{TotalGwp:N0} kgCO2e";
         public string TierDisplay => VerificationTier;
         public string EpdStatus => HasEpd ? "EPD Available" : "No EPD";
+        public string DistanceDisplay => DistanceFromProject > 0 ? $"{DistanceFromProject:N0} mi" : "-";
 
         public MaterialScore()
         {

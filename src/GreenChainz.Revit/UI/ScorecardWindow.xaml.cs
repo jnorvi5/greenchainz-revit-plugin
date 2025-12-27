@@ -25,6 +25,14 @@ namespace GreenChainz.Revit.UI
             // Header
             ProjectNameText.Text = $"{_scorecard.ProjectName} | {_scorecard.GeneratedDate:MMM dd, yyyy}";
 
+            // Location
+            if (_scorecard.Location != null)
+            {
+                LocationText.Text = _scorecard.Location.Display;
+                GridIntensityText.Text = _scorecard.Location.GridDisplay;
+                ClimateZoneText.Text = _scorecard.Location.ClimateZone;
+            }
+
             // Overall Grade
             OverallGradeText.Text = _scorecard.OverallGrade;
             OverallScoreText.Text = $"Score: {_scorecard.OverallScore}/100";
@@ -54,14 +62,53 @@ namespace GreenChainz.Revit.UI
             // Verification Tier
             TierText.Text = _scorecard.VerificationScore.Tier.ToUpper();
             TierBreakdownText.Text = GetTierDescription(_scorecard.VerificationScore.Tier);
-            TierDetailText.Text = $"P:{_scorecard.VerificationScore.PlatinumCount} | G:{_scorecard.VerificationScore.GoldCount} | S:{_scorecard.VerificationScore.SilverCount} | N:{_scorecard.VerificationScore.UnverifiedCount}";
+            TierDetailText.Text = _scorecard.VerificationScore.Breakdown;
             SetTierColor(TierText, _scorecard.VerificationScore.Tier);
+
+            // Buy Clean Compliance Panel
+            if (_scorecard.BuyCleanInfo?.HasRequirements == true)
+            {
+                BuyCleanPanel.Visibility = Visibility.Visible;
+                BuyCleanTitleText.Text = _scorecard.BuyCleanInfo.PolicyName;
+                
+                bool compliant = _scorecard.BuyCleanInfo.ConcreteCompliant && _scorecard.BuyCleanInfo.SteelCompliant;
+                BuyCleanStatusText.Text = compliant ? "COMPLIANT" : "NON-COMPLIANT";
+                BuyCleanStatusText.Foreground = compliant 
+                    ? new SolidColorBrush(Color.FromRgb(76, 175, 80))
+                    : new SolidColorBrush(Color.FromRgb(244, 67, 54));
+
+                ConcreteGwpText.Text = $"{_scorecard.BuyCleanInfo.ActualConcreteGwp:N0} / {_scorecard.BuyCleanInfo.ConcreteLimit:N0} kgCO2e/m³";
+                ConcreteGwpText.Foreground = _scorecard.BuyCleanInfo.ConcreteCompliant
+                    ? new SolidColorBrush(Color.FromRgb(76, 175, 80))
+                    : new SolidColorBrush(Color.FromRgb(244, 67, 54));
+
+                SteelGwpText.Text = $"{_scorecard.BuyCleanInfo.ActualSteelGwp:N0} / {_scorecard.BuyCleanInfo.SteelLimit:N0} kgCO2e/ton";
+                SteelGwpText.Foreground = _scorecard.BuyCleanInfo.SteelCompliant
+                    ? new SolidColorBrush(Color.FromRgb(76, 175, 80))
+                    : new SolidColorBrush(Color.FromRgb(244, 67, 54));
+            }
+            else
+            {
+                BuyCleanPanel.Visibility = Visibility.Collapsed;
+            }
 
             // Materials
             MaterialsDataGrid.ItemsSource = _scorecard.Materials;
 
             // Footer
-            LeedPointsText.Text = $"Est. LEED Points: {_scorecard.EstimatedLeedPoints}";
+            int basePoints = _scorecard.EstimatedLeedPoints - _scorecard.RegionalBonusPoints;
+            LeedPointsText.Text = $"Est. LEED Points: {basePoints}";
+            
+            if (_scorecard.RegionalBonusPoints > 0)
+            {
+                RegionalPointsBorder.Visibility = Visibility.Visible;
+                RegionalPointsText.Text = $"Regional Bonus: +{_scorecard.RegionalBonusPoints}";
+            }
+            else
+            {
+                RegionalPointsBorder.Visibility = Visibility.Collapsed;
+            }
+
             BuyCleanText.Text = _scorecard.BuyCleanCompliant ? "Buy Clean: Compliant" : "Buy Clean: Non-Compliant";
             BuyCleanBorder.Background = _scorecard.BuyCleanCompliant
                 ? new SolidColorBrush(Color.FromRgb(232, 245, 233))
@@ -73,77 +120,46 @@ namespace GreenChainz.Revit.UI
 
         private void SetGradeColor(System.Windows.Controls.TextBlock textBlock, string grade)
         {
-            switch (grade)
+            textBlock.Foreground = grade switch
             {
-                case "A":
-                    textBlock.Foreground = new SolidColorBrush(Color.FromRgb(76, 175, 80)); // Green
-                    break;
-                case "B":
-                    textBlock.Foreground = new SolidColorBrush(Color.FromRgb(139, 195, 74)); // Light Green
-                    break;
-                case "C":
-                    textBlock.Foreground = new SolidColorBrush(Color.FromRgb(255, 193, 7)); // Amber
-                    break;
-                case "D":
-                    textBlock.Foreground = new SolidColorBrush(Color.FromRgb(255, 152, 0)); // Orange
-                    break;
-                default:
-                    textBlock.Foreground = new SolidColorBrush(Color.FromRgb(244, 67, 54)); // Red
-                    break;
-            }
+                "A" => new SolidColorBrush(Color.FromRgb(76, 175, 80)),
+                "B" => new SolidColorBrush(Color.FromRgb(139, 195, 74)),
+                "C" => new SolidColorBrush(Color.FromRgb(255, 193, 7)),
+                "D" => new SolidColorBrush(Color.FromRgb(255, 152, 0)),
+                _ => new SolidColorBrush(Color.FromRgb(244, 67, 54))
+            };
         }
 
         private void SetGradeBorderColor(System.Windows.Controls.Border border, string grade)
         {
-            switch (grade)
+            border.Background = grade switch
             {
-                case "A":
-                    border.Background = new SolidColorBrush(Color.FromRgb(232, 245, 233)); // Light Green
-                    break;
-                case "B":
-                    border.Background = new SolidColorBrush(Color.FromRgb(241, 248, 233)); // Lighter Green
-                    break;
-                case "C":
-                    border.Background = new SolidColorBrush(Color.FromRgb(255, 248, 225)); // Light Amber
-                    break;
-                case "D":
-                    border.Background = new SolidColorBrush(Color.FromRgb(255, 243, 224)); // Light Orange
-                    break;
-                default:
-                    border.Background = new SolidColorBrush(Color.FromRgb(255, 235, 238)); // Light Red
-                    break;
-            }
+                "A" => new SolidColorBrush(Color.FromRgb(232, 245, 233)),
+                "B" => new SolidColorBrush(Color.FromRgb(241, 248, 233)),
+                "C" => new SolidColorBrush(Color.FromRgb(255, 248, 225)),
+                "D" => new SolidColorBrush(Color.FromRgb(255, 243, 224)),
+                _ => new SolidColorBrush(Color.FromRgb(255, 235, 238))
+            };
         }
 
         private void SetTierColor(System.Windows.Controls.TextBlock textBlock, string tier)
         {
-            switch (tier)
+            textBlock.Foreground = tier switch
             {
-                case "Platinum":
-                    textBlock.Foreground = new SolidColorBrush(Color.FromRgb(96, 125, 139)); // Blue Grey
-                    break;
-                case "Gold":
-                    textBlock.Foreground = new SolidColorBrush(Color.FromRgb(255, 193, 7)); // Gold
-                    break;
-                case "Silver":
-                    textBlock.Foreground = new SolidColorBrush(Color.FromRgb(158, 158, 158)); // Silver
-                    break;
-                default:
-                    textBlock.Foreground = new SolidColorBrush(Color.FromRgb(117, 117, 117)); // Grey
-                    break;
-            }
+                "Platinum" => new SolidColorBrush(Color.FromRgb(96, 125, 139)),
+                "Gold" => new SolidColorBrush(Color.FromRgb(255, 193, 7)),
+                "Silver" => new SolidColorBrush(Color.FromRgb(158, 158, 158)),
+                _ => new SolidColorBrush(Color.FromRgb(117, 117, 117))
+            };
         }
 
-        private string GetTierDescription(string tier)
+        private string GetTierDescription(string tier) => tier switch
         {
-            switch (tier)
-            {
-                case "Platinum": return "Third-Party Verified + CoC";
-                case "Gold": return "EPD Available";
-                case "Silver": return "Self-Declared Claims";
-                default: return "No Verification";
-            }
-        }
+            "Platinum" => "Third-Party Verified + CoC",
+            "Gold" => "EPD Available",
+            "Silver" => "Self-Declared Claims",
+            _ => "No Verification"
+        };
 
         private void ExportPdf_Click(object sender, RoutedEventArgs e)
         {

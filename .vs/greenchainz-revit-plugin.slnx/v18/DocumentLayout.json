@@ -3,15 +3,18 @@
   "WorkspaceRootPath": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\jnorv\\AppData\\Local\\Temp\\VisualStudio\\copilot-vs\\plan-66eb998e-dbdf-4920-8062-6f416ae8483c.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\jnorv\\AppData\\Local\\Temp\\CopilotBaseline\\Deleted\\2024654222\\Ec3ToolConnector.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Utils\\MaterialCreationHandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\GreenChainz.Revit\\Utils\\MaterialCreationHandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\BUILD.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:BUILD.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\jnorv\\AppData\\Local\\Temp\\VisualStudio\\copilot-vs\\plan-66eb998e-dbdf-4920-8062-6f416ae8483c.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\IAutodeskToolConnector.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -165,6 +168,140 @@
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\jnorv\\AppData\\Local\\Temp\\CopilotBaseline\\Deleted\\-1472187131\\SharedParameterHelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\LeedResultsWindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\GreenChainz.Revit\\UI\\LeedResultsWindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\LeedPdfExportService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\GreenChainz.Revit\\Services\\LeedPdfExportService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\LeedMRpc132Calculator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\GreenChainz.Revit\\Services\\LeedMRpc132Calculator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Models\\LeedEmbodiedCarbonResult.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\GreenChainz.Revit\\Models\\LeedEmbodiedCarbonResult.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Commands\\LeedEmbodiedCarbonCommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\GreenChainz.Revit\\Commands\\LeedEmbodiedCarbonCommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\LeedEmbodiedCarbonWindow.xaml||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\GreenChainz.Revit\\UI\\LeedEmbodiedCarbonWindow.xaml||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\LeedEmbodiedCarbonWindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\GreenChainz.Revit\\UI\\LeedEmbodiedCarbonWindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\LeedV5Calculator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\GreenChainz.Revit\\Services\\LeedV5Calculator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Models\\LeedV5Result.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\GreenChainz.Revit\\Models\\LeedV5Result.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Commands\\LeedV5Command.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\GreenChainz.Revit\\Commands\\LeedV5Command.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\LeedV5Window.xaml||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\GreenChainz.Revit\\UI\\LeedV5Window.xaml||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\LeedV5Window.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\GreenChainz.Revit\\UI\\LeedV5Window.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\Ec3ApiService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\GreenChainz.Revit\\Services\\Ec3ApiService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Models\\MaterialBreakdown.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\GreenChainz.Revit\\Models\\MaterialBreakdown.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\jnorv\\AppData\\Local\\Temp\\CopilotBaseline\\Deleted\\-1539157932\\MaterialBreakdown.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Models\\Recommendation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\GreenChainz.Revit\\Models\\Recommendation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\jnorv\\AppData\\Local\\Temp\\CopilotBaseline\\Deleted\\-1539157932\\Recommendation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\web\\app\\api\\rfq\\route.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:web\\app\\api\\rfq\\route.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\web\\app\\api\\suppliers\\route.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:web\\app\\api\\suppliers\\route.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\RfqService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\GreenChainz.Revit\\Services\\RfqService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\CreateRFQDialog.xaml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\GreenChainz.Revit\\UI\\CreateRFQDialog.xaml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\CreateRFQDialog.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\GreenChainz.Revit\\UI\\CreateRFQDialog.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Models\\RFQRequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\GreenChainz.Revit\\Models\\RFQRequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\web\\.env.example||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:web\\.env.example||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\README.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:README.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\web\\utils\\supabase.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:web\\utils\\supabase.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\web\\app\\api\\stripe\\webhook\\route.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:web\\app\\api\\stripe\\webhook\\route.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\AboutWindow.xaml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\GreenChainz.Revit\\UI\\AboutWindow.xaml||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Models\\SustainabilityScorecard.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\GreenChainz.Revit\\Models\\SustainabilityScorecard.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\ScorecardService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\GreenChainz.Revit\\Services\\ScorecardService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\ScorecardWindow.xaml||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\GreenChainz.Revit\\UI\\ScorecardWindow.xaml||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\ScorecardWindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\GreenChainz.Revit\\UI\\ScorecardWindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\ScorecardPdfService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\GreenChainz.Revit\\Services\\ScorecardPdfService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Commands\\ScorecardCommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\GreenChainz.Revit\\Commands\\ScorecardCommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -181,100 +318,255 @@
               "Name": "ST:128:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 41,
-              "Title": "SharedParameterHelper.cs",
-              "DocumentMoniker": "C:\\Users\\jnorv\\AppData\\Local\\Temp\\CopilotBaseline\\Deleted\\-1472187131\\SharedParameterHelper.cs",
-              "ToolTip": "C:\\Users\\jnorv\\AppData\\Local\\Temp\\CopilotBaseline\\Deleted\\-1472187131\\SharedParameterHelper.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-25T10:42:50.556Z"
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 35,
-              "Title": "MaterialUsage.cs",
-              "DocumentMoniker": "C:\\Users\\jnorv\\AppData\\Local\\Temp\\CopilotBaseline\\Deleted\\-1539157932\\MaterialUsage.cs",
-              "ToolTip": "C:\\Users\\jnorv\\AppData\\Local\\Temp\\CopilotBaseline\\Deleted\\-1539157932\\MaterialUsage.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 65,
+              "Title": "RFQRequest.cs",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Models\\RFQRequest.cs",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Models\\RFQRequest.cs",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Models\\RFQRequest.cs",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\Models\\RFQRequest.cs",
+              "ViewState": "AgIAADMAAAAAAAAAAABRwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-25T08:09:22Z"
+              "WhenOpened": "2025-12-25T18:36:34.789Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 34,
-              "Title": "MaterialUsage.cs",
-              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Models\\MaterialUsage.cs",
-              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Models\\MaterialUsage.cs",
-              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Models\\MaterialUsage.cs",
-              "RelativeToolTip": "src\\GreenChainz.Revit\\Models\\MaterialUsage.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 64,
+              "Title": "CreateRFQDialog.xaml.cs",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\CreateRFQDialog.xaml.cs",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\UI\\CreateRFQDialog.xaml.cs",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\CreateRFQDialog.xaml.cs",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\UI\\CreateRFQDialog.xaml.cs",
+              "ViewState": "AgIAANwAAAAAAAAAAEBVwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-25T08:09:21.615Z"
+              "WhenOpened": "2025-12-25T18:36:05.366Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 33,
-              "Title": "AuditService.cs",
-              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\AuditService.cs",
-              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Services\\AuditService.cs",
-              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\AuditService.cs",
-              "RelativeToolTip": "src\\GreenChainz.Revit\\Services\\AuditService.cs",
-              "ViewState": "AgIAAIgAAAAAAAAAAMBdwAoAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-25T08:08:53.089Z"
+              "DocumentIndex": 63,
+              "Title": "CreateRFQDialog.xaml",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\CreateRFQDialog.xaml",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\UI\\CreateRFQDialog.xaml",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\CreateRFQDialog.xaml",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\UI\\CreateRFQDialog.xaml",
+              "ViewState": "AgIAAEoAAAAAAAAAAABBwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-12-25T18:35:34.674Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 32,
-              "Title": "ProjectAuditCmd.cs",
-              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Commands\\ProjectAuditCmd.cs",
-              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Commands\\ProjectAuditCmd.cs",
-              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Commands\\ProjectAuditCmd.cs",
-              "RelativeToolTip": "src\\GreenChainz.Revit\\Commands\\ProjectAuditCmd.cs",
-              "ViewState": "AgIAAC4AAAAAAAAAAABRwAAAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 62,
+              "Title": "RfqService.cs",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\RfqService.cs",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Services\\RfqService.cs",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\RfqService.cs",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\Services\\RfqService.cs",
+              "ViewState": "AgIAAF0BAAAAAAAAAABBwF4BAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-25T08:08:29.262Z"
+              "WhenOpened": "2025-12-25T18:35:10.2Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 31,
-              "Title": "BrowseMaterialsCommand.cs",
-              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Commands\\BrowseMaterialsCommand.cs",
-              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Commands\\BrowseMaterialsCommand.cs",
-              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Commands\\BrowseMaterialsCommand.cs",
-              "RelativeToolTip": "src\\GreenChainz.Revit\\Commands\\BrowseMaterialsCommand.cs",
-              "ViewState": "AgIAAB8AAAAAAAAAAABRwAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-25T08:08:16.337Z"
+              "DocumentIndex": 61,
+              "Title": "route.ts",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\web\\app\\api\\suppliers\\route.ts",
+              "RelativeDocumentMoniker": "web\\app\\api\\suppliers\\route.ts",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\web\\app\\api\\suppliers\\route.ts",
+              "RelativeToolTip": "web\\app\\api\\suppliers\\route.ts",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAGABAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2025-12-25T18:34:17.509Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 60,
+              "Title": "route.ts",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\web\\app\\api\\rfq\\route.ts",
+              "RelativeDocumentMoniker": "web\\app\\api\\rfq\\route.ts",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\web\\app\\api\\rfq\\route.ts",
+              "RelativeToolTip": "web\\app\\api\\rfq\\route.ts",
+              "ViewState": "AgIAAE8BAAAAAAAAAIBJwFEBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2025-12-25T18:33:18.931Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "BUILD.md",
-              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\BUILD.md",
-              "RelativeDocumentMoniker": "BUILD.md",
-              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\BUILD.md",
-              "RelativeToolTip": "BUILD.md",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAAAF0AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
-              "WhenOpened": "2025-12-24T00:33:17.395Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 40,
-              "Title": "ApiConfig.cs",
-              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\ApiConfig.cs",
-              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Services\\ApiConfig.cs",
-              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\ApiConfig.cs",
-              "RelativeToolTip": "src\\GreenChainz.Revit\\Services\\ApiConfig.cs",
-              "ViewState": "AgIAACwAAAAAAAAAAABRwAAAAAAAAAAAAAAAAA==",
+              "Title": "Ec3ToolConnector.cs",
+              "DocumentMoniker": "C:\\Users\\jnorv\\AppData\\Local\\Temp\\CopilotBaseline\\Deleted\\2024654222\\Ec3ToolConnector.cs",
+              "ToolTip": "C:\\Users\\jnorv\\AppData\\Local\\Temp\\CopilotBaseline\\Deleted\\2024654222\\Ec3ToolConnector.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-25T08:11:41.882Z"
+              "WhenOpened": "2025-12-25T16:11:06.733Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "plan-66eb998e-dbdf-4920-8062-6f416ae8483c.md",
+              "DocumentMoniker": "C:\\Users\\jnorv\\AppData\\Local\\Temp\\VisualStudio\\copilot-vs\\plan-66eb998e-dbdf-4920-8062-6f416ae8483c.md",
+              "ToolTip": "C:\\Users\\jnorv\\AppData\\Local\\Temp\\VisualStudio\\copilot-vs\\plan-66eb998e-dbdf-4920-8062-6f416ae8483c.md [Read Only]",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAWwA0AAAAYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
+              "WhenOpened": "2025-12-23T23:57:57.98Z",
+              "EditorCaption": " [Read Only]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 66,
+              "Title": ".env.example",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\web\\.env.example",
+              "RelativeDocumentMoniker": "web\\.env.example",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\web\\.env.example",
+              "RelativeToolTip": "web\\.env.example",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-12-25T18:48:18.905Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 76,
+              "Title": "ScorecardCommand.cs",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Commands\\ScorecardCommand.cs",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Commands\\ScorecardCommand.cs",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Commands\\ScorecardCommand.cs",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\Commands\\ScorecardCommand.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-26T02:19:18.066Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 75,
+              "Title": "ScorecardPdfService.cs",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\ScorecardPdfService.cs",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Services\\ScorecardPdfService.cs",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\ScorecardPdfService.cs",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\Services\\ScorecardPdfService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAJsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-26T02:19:06.04Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 74,
+              "Title": "ScorecardWindow.xaml.cs",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\ScorecardWindow.xaml.cs",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\UI\\ScorecardWindow.xaml.cs",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\ScorecardWindow.xaml.cs",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\UI\\ScorecardWindow.xaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAALoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-26T02:18:43.057Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 73,
+              "Title": "ScorecardWindow.xaml",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\ScorecardWindow.xaml",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\UI\\ScorecardWindow.xaml",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\ScorecardWindow.xaml",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\UI\\ScorecardWindow.xaml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAJoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-12-26T02:18:15.416Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 72,
+              "Title": "ScorecardService.cs",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\ScorecardService.cs",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Services\\ScorecardService.cs",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\ScorecardService.cs",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\Services\\ScorecardService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAFcBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-26T02:17:37.333Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 71,
+              "Title": "SustainabilityScorecard.cs",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Models\\SustainabilityScorecard.cs",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Models\\SustainabilityScorecard.cs",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Models\\SustainabilityScorecard.cs",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\Models\\SustainabilityScorecard.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAH0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-26T02:15:57.988Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 70,
+              "Title": "AboutWindow.xaml",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\AboutWindow.xaml",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\UI\\AboutWindow.xaml",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\AboutWindow.xaml",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\UI\\AboutWindow.xaml",
+              "ViewState": "AgIAADUAAAAAAAAAAABBwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-12-26T01:24:31.008Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 69,
+              "Title": "route.ts",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\web\\app\\api\\stripe\\webhook\\route.ts",
+              "RelativeDocumentMoniker": "web\\app\\api\\stripe\\webhook\\route.ts",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\web\\app\\api\\stripe\\webhook\\route.ts",
+              "RelativeToolTip": "web\\app\\api\\stripe\\webhook\\route.ts",
+              "ViewState": "AgIAAF0AAAAAAAAAAABRwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2025-12-25T18:51:33.722Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 68,
+              "Title": "supabase.ts",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\web\\utils\\supabase.ts",
+              "RelativeDocumentMoniker": "web\\utils\\supabase.ts",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\web\\utils\\supabase.ts",
+              "RelativeToolTip": "web\\utils\\supabase.ts",
+              "ViewState": "AgIAAA0AAAAAAAAAAIBJwAEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2025-12-25T18:51:15.398Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 67,
+              "Title": "README.md",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\README.md",
+              "RelativeDocumentMoniker": "README.md",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\README.md",
+              "RelativeToolTip": "README.md",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAFwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
+              "WhenOpened": "2025-12-25T18:49:46.247Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "MaterialCreationHandler.cs",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Utils\\MaterialCreationHandler.cs",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Utils\\MaterialCreationHandler.cs",
@@ -287,7 +579,224 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 36,
+              "DocumentIndex": 43,
+              "Title": "LeedResultsWindow.xaml.cs",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\LeedResultsWindow.xaml.cs",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\UI\\LeedResultsWindow.xaml.cs",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\LeedResultsWindow.xaml.cs",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\UI\\LeedResultsWindow.xaml.cs",
+              "ViewState": "AgIAAG4AAAAAAAAAAEBVwCsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T13:34:09.104Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 44,
+              "Title": "LeedPdfExportService.cs",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\LeedPdfExportService.cs",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Services\\LeedPdfExportService.cs",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\LeedPdfExportService.cs",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\Services\\LeedPdfExportService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAJAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T13:34:34.624Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 45,
+              "Title": "LeedMRpc132Calculator.cs",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\LeedMRpc132Calculator.cs",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Services\\LeedMRpc132Calculator.cs",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\LeedMRpc132Calculator.cs",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\Services\\LeedMRpc132Calculator.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEsBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T14:15:33.249Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 46,
+              "Title": "LeedEmbodiedCarbonResult.cs",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Models\\LeedEmbodiedCarbonResult.cs",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Models\\LeedEmbodiedCarbonResult.cs",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Models\\LeedEmbodiedCarbonResult.cs",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\Models\\LeedEmbodiedCarbonResult.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAGUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T14:15:51.026Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 47,
+              "Title": "LeedEmbodiedCarbonCommand.cs",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Commands\\LeedEmbodiedCarbonCommand.cs",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Commands\\LeedEmbodiedCarbonCommand.cs",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Commands\\LeedEmbodiedCarbonCommand.cs",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\Commands\\LeedEmbodiedCarbonCommand.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T14:16:01.205Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 59,
+              "Title": "Recommendation.cs",
+              "DocumentMoniker": "C:\\Users\\jnorv\\AppData\\Local\\Temp\\CopilotBaseline\\Deleted\\-1539157932\\Recommendation.cs",
+              "ToolTip": "C:\\Users\\jnorv\\AppData\\Local\\Temp\\CopilotBaseline\\Deleted\\-1539157932\\Recommendation.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T16:10:53.155Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 58,
+              "Title": "Recommendation.cs",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Models\\Recommendation.cs",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Models\\Recommendation.cs",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Models\\Recommendation.cs",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\Models\\Recommendation.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T16:10:52.989Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 57,
+              "Title": "MaterialBreakdown.cs",
+              "DocumentMoniker": "C:\\Users\\jnorv\\AppData\\Local\\Temp\\CopilotBaseline\\Deleted\\-1539157932\\MaterialBreakdown.cs",
+              "ToolTip": "C:\\Users\\jnorv\\AppData\\Local\\Temp\\CopilotBaseline\\Deleted\\-1539157932\\MaterialBreakdown.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T16:10:46.016Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 56,
+              "Title": "MaterialBreakdown.cs",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Models\\MaterialBreakdown.cs",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Models\\MaterialBreakdown.cs",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Models\\MaterialBreakdown.cs",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\Models\\MaterialBreakdown.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T16:10:45.849Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 55,
+              "Title": "Ec3ApiService.cs",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\Ec3ApiService.cs",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Services\\Ec3ApiService.cs",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\Ec3ApiService.cs",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\Services\\Ec3ApiService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEQBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T16:08:33.587Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 54,
+              "Title": "LeedV5Window.xaml.cs",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\LeedV5Window.xaml.cs",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\UI\\LeedV5Window.xaml.cs",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\LeedV5Window.xaml.cs",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\UI\\LeedV5Window.xaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAJgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T14:22:29.122Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 53,
+              "Title": "LeedV5Window.xaml",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\LeedV5Window.xaml",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\UI\\LeedV5Window.xaml",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\LeedV5Window.xaml",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\UI\\LeedV5Window.xaml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAK4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-12-25T14:22:08.297Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 52,
+              "Title": "LeedV5Command.cs",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Commands\\LeedV5Command.cs",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Commands\\LeedV5Command.cs",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Commands\\LeedV5Command.cs",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\Commands\\LeedV5Command.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAC0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T14:21:37.58Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 51,
+              "Title": "LeedV5Result.cs",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Models\\LeedV5Result.cs",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Models\\LeedV5Result.cs",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Models\\LeedV5Result.cs",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\Models\\LeedV5Result.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAE4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T14:21:28.109Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 50,
+              "Title": "LeedV5Calculator.cs",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\LeedV5Calculator.cs",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Services\\LeedV5Calculator.cs",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\LeedV5Calculator.cs",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\Services\\LeedV5Calculator.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAM4BAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T14:21:13.116Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 49,
+              "Title": "LeedEmbodiedCarbonWindow.xaml.cs",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\LeedEmbodiedCarbonWindow.xaml.cs",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\UI\\LeedEmbodiedCarbonWindow.xaml.cs",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\LeedEmbodiedCarbonWindow.xaml.cs",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\UI\\LeedEmbodiedCarbonWindow.xaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAM8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T14:16:59.897Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 48,
+              "Title": "LeedEmbodiedCarbonWindow.xaml",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\LeedEmbodiedCarbonWindow.xaml",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\UI\\LeedEmbodiedCarbonWindow.xaml",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\LeedEmbodiedCarbonWindow.xaml",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\UI\\LeedEmbodiedCarbonWindow.xaml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAI4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-12-25T14:16:28.964Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 37,
               "Title": "AuditRequest.cs",
               "DocumentMoniker": "C:\\Users\\jnorv\\AppData\\Local\\Temp\\CopilotBaseline\\Deleted\\-1539157932\\AuditRequest.cs",
               "ToolTip": "C:\\Users\\jnorv\\AppData\\Local\\Temp\\CopilotBaseline\\Deleted\\-1539157932\\AuditRequest.cs",
@@ -297,7 +806,100 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 37,
+              "DocumentIndex": 41,
+              "Title": "ApiConfig.cs",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\ApiConfig.cs",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Services\\ApiConfig.cs",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\ApiConfig.cs",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\Services\\ApiConfig.cs",
+              "ViewState": "AgIAACwAAAAAAAAAAABRwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T08:11:41.882Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "BUILD.md",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\BUILD.md",
+              "RelativeDocumentMoniker": "BUILD.md",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\BUILD.md",
+              "RelativeToolTip": "BUILD.md",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAF0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
+              "WhenOpened": "2025-12-24T00:33:17.395Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 32,
+              "Title": "BrowseMaterialsCommand.cs",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Commands\\BrowseMaterialsCommand.cs",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Commands\\BrowseMaterialsCommand.cs",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Commands\\BrowseMaterialsCommand.cs",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\Commands\\BrowseMaterialsCommand.cs",
+              "ViewState": "AgIAAB8AAAAAAAAAAABRwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T08:08:16.337Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 33,
+              "Title": "ProjectAuditCmd.cs",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Commands\\ProjectAuditCmd.cs",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Commands\\ProjectAuditCmd.cs",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Commands\\ProjectAuditCmd.cs",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\Commands\\ProjectAuditCmd.cs",
+              "ViewState": "AgIAAC4AAAAAAAAAAABRwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T08:08:29.262Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 34,
+              "Title": "AuditService.cs",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\AuditService.cs",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Services\\AuditService.cs",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\AuditService.cs",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\Services\\AuditService.cs",
+              "ViewState": "AgIAAOAAAAAAAAAAAIBZwAwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T08:08:53.089Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 35,
+              "Title": "MaterialUsage.cs",
+              "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Models\\MaterialUsage.cs",
+              "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Models\\MaterialUsage.cs",
+              "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Models\\MaterialUsage.cs",
+              "RelativeToolTip": "src\\GreenChainz.Revit\\Models\\MaterialUsage.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T08:09:21.615Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 36,
+              "Title": "MaterialUsage.cs",
+              "DocumentMoniker": "C:\\Users\\jnorv\\AppData\\Local\\Temp\\CopilotBaseline\\Deleted\\-1539157932\\MaterialUsage.cs",
+              "ToolTip": "C:\\Users\\jnorv\\AppData\\Local\\Temp\\CopilotBaseline\\Deleted\\-1539157932\\MaterialUsage.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T08:09:22Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 42,
+              "Title": "SharedParameterHelper.cs",
+              "DocumentMoniker": "C:\\Users\\jnorv\\AppData\\Local\\Temp\\CopilotBaseline\\Deleted\\-1472187131\\SharedParameterHelper.cs",
+              "ToolTip": "C:\\Users\\jnorv\\AppData\\Local\\Temp\\CopilotBaseline\\Deleted\\-1472187131\\SharedParameterHelper.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-25T10:42:50.556Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 38,
               "Title": "SharedParameterHelper.cs",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Utils\\SharedParameterHelper.cs",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Utils\\SharedParameterHelper.cs",
@@ -309,7 +911,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 39,
+              "DocumentIndex": 40,
               "Title": "SecureStorage.cs",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Utils\\SecureStorage.cs",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Utils\\SecureStorage.cs",
@@ -321,7 +923,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 38,
+              "DocumentIndex": 39,
               "Title": "PdfExportService.cs",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\PdfExportService.cs",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Services\\PdfExportService.cs",
@@ -333,7 +935,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 30,
+              "DocumentIndex": 31,
               "Title": "AuthService.cs",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\AuthService.cs",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Services\\AuthService.cs",
@@ -344,12 +946,8 @@
               "WhenOpened": "2025-12-24T00:07:57.934Z"
             },
             {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
-            },
-            {
               "$type": "Document",
-              "DocumentIndex": 22,
+              "DocumentIndex": 23,
               "Title": "ApiClient.cs",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\ApiClient.cs",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Services\\ApiClient.cs",
@@ -361,7 +959,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 21,
+              "DocumentIndex": 22,
               "Title": "deploy.bat",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\deploy.bat",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\deploy.bat",
@@ -373,7 +971,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
+              "DocumentIndex": 21,
               "Title": "README.md",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Resources\\README.md",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Resources\\README.md",
@@ -385,7 +983,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 20,
               "Title": "AboutCommand.cs",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Commands\\AboutCommand.cs",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Commands\\AboutCommand.cs",
@@ -397,7 +995,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 19,
               "Title": "SendRFQCommand.cs",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Commands\\SendRFQCommand.cs",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Commands\\SendRFQCommand.cs",
@@ -409,7 +1007,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 18,
               "Title": "CarbonAuditCommand.cs",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Commands\\CarbonAuditCommand.cs",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Commands\\CarbonAuditCommand.cs",
@@ -421,7 +1019,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 17,
               "Title": "MaterialBrowserCmd.cs",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Commands\\MaterialBrowserCmd.cs",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Commands\\MaterialBrowserCmd.cs",
@@ -433,18 +1031,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "plan-66eb998e-dbdf-4920-8062-6f416ae8483c.md",
-              "DocumentMoniker": "C:\\Users\\jnorv\\AppData\\Local\\Temp\\VisualStudio\\copilot-vs\\plan-66eb998e-dbdf-4920-8062-6f416ae8483c.md",
-              "ToolTip": "C:\\Users\\jnorv\\AppData\\Local\\Temp\\VisualStudio\\copilot-vs\\plan-66eb998e-dbdf-4920-8062-6f416ae8483c.md [Read Only]",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
-              "WhenOpened": "2025-12-23T23:57:57.98Z",
-              "EditorCaption": " [Read Only]"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 29,
+              "DocumentIndex": 30,
               "Title": "AuditRequest.cs",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Models\\AuditRequest.cs",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Models\\AuditRequest.cs",
@@ -456,7 +1043,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 28,
+              "DocumentIndex": 29,
               "Title": "LoginWindow.xaml",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\LoginWindow.xaml",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\UI\\LoginWindow.xaml",
@@ -468,7 +1055,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 27,
+              "DocumentIndex": 28,
               "Title": "LoginWindow.xaml.cs",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\LoginWindow.xaml.cs",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\UI\\LoginWindow.xaml.cs",
@@ -480,19 +1067,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 26,
+              "DocumentIndex": 27,
               "Title": "AboutWindow.xaml.cs",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\AboutWindow.xaml.cs",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\UI\\AboutWindow.xaml.cs",
               "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\AboutWindow.xaml.cs",
               "RelativeToolTip": "src\\GreenChainz.Revit\\UI\\AboutWindow.xaml.cs",
-              "ViewState": "AgIAABcAAAAAAAAAAIBZwAIAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAADwAAAAAAAAAAABRwAIAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T00:05:42.741Z"
+              "WhenOpened": "2025-12-24T00:05:42.741Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 25,
+              "DocumentIndex": 26,
               "Title": "AuditResultsWindow.xaml",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\AuditResultsWindow.xaml",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\UI\\AuditResultsWindow.xaml",
@@ -504,43 +1092,46 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 24,
+              "DocumentIndex": 25,
               "Title": "AuditResultsWindow.xaml.cs",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\AuditResultsWindow.xaml.cs",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\UI\\AuditResultsWindow.xaml.cs",
               "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\AuditResultsWindow.xaml.cs",
               "RelativeToolTip": "src\\GreenChainz.Revit\\UI\\AuditResultsWindow.xaml.cs",
-              "ViewState": "AgIAAFgAAAAAAAAAAMBdwAMAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAI0AAAAAAAAAAIBZwAMAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T00:05:00.009Z"
+              "WhenOpened": "2025-12-24T00:05:00.009Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 23,
+              "DocumentIndex": 24,
               "Title": "AuditResult.cs",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Models\\AuditResult.cs",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Models\\AuditResult.cs",
               "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Models\\AuditResult.cs",
               "RelativeToolTip": "src\\GreenChainz.Revit\\Models\\AuditResult.cs",
-              "ViewState": "AgIAAC8AAAAAAAAAAEBVwAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAFAAAAAAAAAAAABRwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-24T00:04:38.303Z"
+              "WhenOpened": "2025-12-24T00:04:38.303Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "MaterialService.cs",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\MaterialService.cs",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Services\\MaterialService.cs",
               "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\MaterialService.cs",
               "RelativeToolTip": "src\\GreenChainz.Revit\\Services\\MaterialService.cs",
-              "ViewState": "AgIAAOYAAAAAAAAAAEBVwAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAADEBAAAAAAAAAEBVwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-21T20:58:07.795Z"
+              "WhenOpened": "2025-12-21T20:58:07.795Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "SdaToolConnector.cs",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\SdaToolConnector.cs",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Services\\SdaToolConnector.cs",
@@ -552,7 +1143,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "IAutodeskToolConnector.cs",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\IAutodeskToolConnector.cs",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Services\\IAutodeskToolConnector.cs",
@@ -564,7 +1155,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "SdaConnectorService.cs",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\SdaConnectorService.cs",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Services\\SdaConnectorService.cs",
@@ -576,7 +1167,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 11,
               "Title": "MaterialBrowserPanel.xaml.cs",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\MaterialBrowserPanel.xaml.cs",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\UI\\MaterialBrowserPanel.xaml.cs",
@@ -588,7 +1179,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 16,
               "Title": "MaterialBrowserPanel.xaml",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\UI\\MaterialBrowserPanel.xaml",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\UI\\MaterialBrowserPanel.xaml",
@@ -600,7 +1191,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 15,
               "Title": "GreenChainz.Revit.sln",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\GreenChainz.Revit.sln",
               "RelativeDocumentMoniker": "GreenChainz.Revit.sln",
@@ -612,7 +1203,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 14,
               "Title": "GreenChainz.Revit.csproj",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\GreenChainz.Revit.csproj",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\GreenChainz.Revit.csproj",
@@ -624,19 +1215,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 13,
               "Title": "Ec3ToolConnector.cs",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\Ec3ToolConnector.cs",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Services\\Ec3ToolConnector.cs",
               "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\Ec3ToolConnector.cs",
               "RelativeToolTip": "src\\GreenChainz.Revit\\Services\\Ec3ToolConnector.cs",
-              "ViewState": "AgIAAH8AAAAAAAAAAIBZwIQAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAHwAAAAAAAAAACBjwIQAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-21T20:59:41.731Z"
+              "WhenOpened": "2025-12-21T20:59:41.731Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 12,
               "Title": "ToolConnectorRegistry.cs",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\ToolConnectorRegistry.cs",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Services\\ToolConnectorRegistry.cs",
@@ -648,7 +1240,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "SdaMaterial.cs",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Models\\SdaMaterial.cs",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Models\\SdaMaterial.cs",
@@ -660,7 +1252,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "AutodeskAuthService.cs",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\Services\\AutodeskAuthService.cs",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\Services\\AutodeskAuthService.cs",
@@ -672,15 +1264,16 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 10,
               "Title": "App.cs",
               "DocumentMoniker": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\App.cs",
               "RelativeDocumentMoniker": "src\\GreenChainz.Revit\\App.cs",
               "ToolTip": "D:\\perplexitydownloads\\greenchainz-revit-plugin\\src\\GreenChainz.Revit\\App.cs",
               "RelativeToolTip": "src\\GreenChainz.Revit\\App.cs",
-              "ViewState": "AgIAAJEAAAAAAAAAAIBZwAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAKIAAAAAAAAAAEBVwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-21T20:58:32.867Z"
+              "WhenOpened": "2025-12-21T20:58:32.867Z",
+              "EditorCaption": ""
             }
           ]
         }

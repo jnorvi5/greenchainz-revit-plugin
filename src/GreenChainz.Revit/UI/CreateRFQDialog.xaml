@@ -39,11 +39,11 @@
         </StackPanel>
 
         <Label Content="Materials from Model:" Grid.Row="3" FontWeight="Bold"/>
-        <DataGrid Name="MaterialsDataGrid" Grid.Row="4" AutoGenerateColumns="False" CanUserAddRows="True" 
+        <DataGrid Name="MaterialsDataGrid" Grid.Row="4" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"
                   Margin="0,0,0,10" AlternatingRowBackground="#F5F5F5">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Material Name" Binding="{Binding MaterialName}" Width="*"/>
-                <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" Width="70"/>
+                <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity, StringFormat=N2}" Width="70"/>
                 <DataGridTextColumn Header="Unit" Binding="{Binding Unit}" Width="60"/>
             </DataGrid.Columns>
         </DataGrid>
@@ -54,13 +54,13 @@
         </StackPanel>
 
         <Label Content="Matched Sustainable Suppliers:" Grid.Row="6" FontWeight="Bold"/>
-        <DataGrid Name="SuppliersDataGrid" Grid.Row="7" AutoGenerateColumns="False" IsReadOnly="True" 
+        <DataGrid Name="SuppliersDataGrid" Grid.Row="7" AutoGenerateColumns="False" CanUserAddRows="False" 
                   Height="120" Margin="0,0,0,10" AlternatingRowBackground="#E8F5E9">
             <DataGrid.Columns>
-                <DataGridCheckBoxColumn Header="" Binding="{Binding IsSelected}" Width="30"/>
-                <DataGridTextColumn Header="Supplier" Binding="{Binding Name}" Width="150"/>
-                <DataGridTextColumn Header="Score" Binding="{Binding SustainabilityScore}" Width="50"/>
-                <DataGridTextColumn Header="Certifications" Binding="{Binding CertificationsDisplay}" Width="*"/>
+                <DataGridCheckBoxColumn Header="" Binding="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="30"/>
+                <DataGridTextColumn Header="Supplier" Binding="{Binding Name}" Width="150" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Score" Binding="{Binding SustainabilityScore}" Width="50" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Certifications" Binding="{Binding CertificationsDisplay}" Width="*" IsReadOnly="True"/>
             </DataGrid.Columns>
         </DataGrid>
 

@@ -3,9 +3,11 @@
     "",
     "\\src",
     "\\src\\GreenChainz.Revit",
+    "\\src\\GreenChainz.Revit\\Models",
     "\\src\\GreenChainz.Revit\\Services",
+    "\\src\\GreenChainz.Revit\\UI",
     "\\src\\GreenChainz.Revit\\Utils"
   ],
-  "SelectedNode": "\\src\\GreenChainz.Revit\\Utils\\MaterialCreationHandler.cs",
+  "SelectedNode": "\\src\\GreenChainz.Revit\\Services\\MaterialService.cs",
   "PreviewInSolutionExplorer": false
 }
