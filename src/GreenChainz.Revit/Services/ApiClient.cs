@@ -16,7 +16,7 @@ namespace GreenChainz.Revit.Services
         private bool _disposed;
 
         public ApiClient()
-            : this("https://api.greenchainz.com", null)
+            : this(ApiConfig.BASE_URL, ApiConfig.LoadAuthToken())
         {
         }
 
@@ -24,9 +24,10 @@ namespace GreenChainz.Revit.Services
         {
             _baseUrl = (baseUrl ?? "https://api.greenchainz.com").TrimEnd('/');
             _logger = logger ?? new TelemetryLogger();
+            _baseUrl = (baseUrl ?? ApiConfig.BASE_URL).TrimEnd('/');
             _httpClient = new HttpClient
             {
-                Timeout = TimeSpan.FromSeconds(30)
+                Timeout = TimeSpan.FromSeconds(ApiConfig.TIMEOUT_SECONDS)
             };
 
             _httpClient.DefaultRequestHeaders.Accept.Clear();
@@ -43,7 +44,7 @@ namespace GreenChainz.Revit.Services
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
 
-            string url = $"{_baseUrl}/api/rfqs";
+            string url = $"{_baseUrl}/api/rfq";
             string json = JsonConvert.SerializeObject(request);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
