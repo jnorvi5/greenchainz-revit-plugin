@@ -10,8 +10,9 @@ namespace GreenChainz.Revit.Services
     {
         /// <summary>
         /// The base URL for the GreenChainz API.
+        /// Defaults to the production API.
         /// </summary>
-        public const string BASE_URL = "https://greenchainz.com/api";
+        public const string BASE_URL = "https://greenchainz.com";
 
         /// <summary>
         /// The default timeout for API requests in seconds.
