@@ -20,9 +20,10 @@ namespace GreenChainz.Revit.Services
         // API URLs - tries production first, falls back to local
         private static readonly string[] API_URLS = new[]
         {
-            "https://web-cj3efhrgf-greenchainz-vercel.vercel.app/api",  // Production (Vercel)
-            "https://greenchainz-revit-plugin.vercel.app/api",  // Alt production
-            "http://localhost:3000/api"  // Local development
+            ApiConfig.BASE_URL,
+            "https://web-cj3efhrgf-greenchainz-vercel.vercel.app",
+            "https://greenchainz-revit-plugin.vercel.app",
+            "http://localhost:3000"
         };
 
         // Supplier location coordinates for distance calculation
@@ -47,11 +48,11 @@ namespace GreenChainz.Revit.Services
 
         public RfqService(string apiUrl = null)
         {
-            _baseUrl = apiUrl ?? Environment.GetEnvironmentVariable("GREENCHAINZ_API_URL") ?? API_URLS[0];
+            _baseUrl = apiUrl ?? Environment.GetEnvironmentVariable("GREENCHAINZ_API_URL") ?? ApiConfig.BASE_URL;
             
             _httpClient = new HttpClient
             {
-                Timeout = TimeSpan.FromSeconds(30)
+                Timeout = TimeSpan.FromSeconds(ApiConfig.TIMEOUT_SECONDS)
             };
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
@@ -66,7 +67,7 @@ namespace GreenChainz.Revit.Services
             {
                 try
                 {
-                    string url = $"{baseUrl}/rfq";
+                    string url = $"{baseUrl.TrimEnd('/')}/api/rfq";
                     string json = JsonConvert.SerializeObject(request);
                     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -108,7 +109,7 @@ namespace GreenChainz.Revit.Services
             {
                 try
                 {
-                    string url = $"{baseUrl}/suppliers";
+                    string url = $"{baseUrl.TrimEnd('/')}/api/suppliers";
                     if (!string.IsNullOrEmpty(category))
                         url += $"?category={Uri.EscapeDataString(category)}";
 
