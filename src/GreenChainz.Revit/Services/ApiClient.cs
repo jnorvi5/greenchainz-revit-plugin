@@ -12,16 +12,18 @@ namespace GreenChainz.Revit.Services
     {
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl;
+        private readonly ILogger _logger;
         private bool _disposed;
 
-        public ApiClient()
-            : this("https://api.greenchainz.com", null)
+        public ApiClient(ILogger logger = null)
+            : this("https://api.greenchainz.com", null, logger)
         {
         }
 
-        public ApiClient(string baseUrl, string authToken = null)
+        public ApiClient(string baseUrl, string authToken = null, ILogger logger = null)
         {
             _baseUrl = (baseUrl ?? "https://api.greenchainz.com").TrimEnd('/');
+            _logger = logger ?? new TelemetryLogger();
             _httpClient = new HttpClient
             {
                 Timeout = TimeSpan.FromSeconds(30)
@@ -40,6 +42,8 @@ namespace GreenChainz.Revit.Services
         {
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
+
+            _logger.LogInformation($"Submitting RFQ for project: {request.ProjectName}");
 
             string url = $"{_baseUrl}/api/rfqs";
             string json = JsonConvert.SerializeObject(request);
