@@ -12,6 +12,7 @@ namespace GreenChainz.Revit.Services
     {
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl;
+        private readonly ILogger _logger;
         private bool _disposed;
 
         public ApiClient()
@@ -19,9 +20,10 @@ namespace GreenChainz.Revit.Services
         {
         }
 
-        public ApiClient(string baseUrl, string authToken = null)
+        public ApiClient(string baseUrl, string authToken = null, ILogger logger = null)
         {
             _baseUrl = (baseUrl ?? "https://api.greenchainz.com").TrimEnd('/');
+            _logger = logger ?? new TelemetryLogger();
             _httpClient = new HttpClient
             {
                 Timeout = TimeSpan.FromSeconds(30)
@@ -45,7 +47,21 @@ namespace GreenChainz.Revit.Services
             string json = JsonConvert.SerializeObject(request);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            HttpResponseMessage response = await _httpClient.PostAsync(url, content);
+            // Refactored to use SendRequestAsync
+            // Note: SendRequestAsync handles the sending, but we need to construct the request message first if we want to reuse it fully.
+            // However, SendRequestAsync usually takes a RequestMessage or parameters.
+            // Let's implement SendRequestAsync to take method, url, and content.
+
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, url)
+            {
+                Content = content
+            };
+
+            // Log request body as per instructions (moved into SendRequestAsync logic effectively by checking content)
+            // But we need to pass the body string if we want to log it before creating StringContent,
+            // or read it from Content in SendRequestAsync. Reading from Content is better for encapsulation.
+
+            HttpResponseMessage response = await SendRequestAsync(httpRequest, json); // Pass json string for logging convenience
 
             if (response.IsSuccessStatusCode)
             {
@@ -64,7 +80,12 @@ namespace GreenChainz.Revit.Services
             string json = JsonConvert.SerializeObject(request);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            HttpResponseMessage response = await _httpClient.PostAsync(url, content);
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, url)
+            {
+                Content = content
+            };
+
+            HttpResponseMessage response = await SendRequestAsync(httpRequest, json);
 
             if (response.IsSuccessStatusCode)
             {
@@ -79,6 +100,27 @@ namespace GreenChainz.Revit.Services
                     Summary = "API Error: " + response.ReasonPhrase
                 };
             }
+        }
+
+        /// <summary>
+        /// Sends the HTTP request with logging.
+        /// </summary>
+        /// <param name="request">The HTTP request message.</param>
+        /// <param name="jsonBody">Optional JSON body string for logging purposes.</param>
+        /// <returns>The HTTP response.</returns>
+        private async Task<HttpResponseMessage> SendRequestAsync(HttpRequestMessage request, string jsonBody = null)
+        {
+            string method = request.Method.ToString();
+            string url = request.RequestUri.ToString();
+
+            if (!string.IsNullOrEmpty(jsonBody))
+            {
+                _logger.LogDebug($"Request body: {jsonBody}");
+            }
+
+            _logger.LogDebug($"Sending {method} request to {url}");
+
+            return await _httpClient.SendAsync(request);
         }
 
         public void Dispose()
