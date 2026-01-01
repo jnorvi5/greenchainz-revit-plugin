@@ -16,6 +16,11 @@ namespace GreenChainz.Revit.Services
         private bool _disposed;
         private readonly bool _shouldDisposeHttpClient;
 
+        public ApiClient(ILogger logger = null)
+            : this("https://api.greenchainz.com", null, logger)
+        {
+        }
+
         public ApiClient()
             : this("https://api.greenchainz.com", null, new FileLogger())
             : this("https://api.greenchainz.com", null, new TelemetryLogger())
@@ -107,6 +112,8 @@ namespace GreenChainz.Revit.Services
         {
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
+
+            _logger.LogInformation($"Submitting RFQ for project: {request.ProjectName}");
 
             string url = $"{_baseUrl}/api/rfqs";
             HttpResponseMessage response = await SendRequestAsync(HttpMethod.Post, url, request);
