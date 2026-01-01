@@ -4,6 +4,8 @@ namespace GreenChainz.Revit.Services
 {
     public interface ILogger
     {
+        void LogError(Exception ex, string message);
+        void LogInfo(string message);
         void LogInformation(string message);
         void LogError(string message, Exception ex = null);
     }
@@ -17,6 +19,9 @@ namespace GreenChainz.Revit.Services
 
     public class TelemetryLogger : ILogger
     {
+        public void LogError(Exception ex, string message)
+        {
+            TelemetryService.LogError(ex, message);
         public void LogDebug(string message)
         {
             // TelemetryService doesn't have LogDebug, map to LogInfo or ignore.
