@@ -12,16 +12,23 @@ namespace GreenChainz.Revit.Services
     {
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl;
+        private readonly ILogger _logger;
         private bool _disposed;
 
         public ApiClient()
-            : this("https://api.greenchainz.com", null)
+            : this("https://api.greenchainz.com", null, new TelemetryLogger())
         {
         }
 
         public ApiClient(string baseUrl, string authToken = null)
+             : this(baseUrl, authToken, new TelemetryLogger())
+        {
+        }
+
+        public ApiClient(string baseUrl, string authToken, ILogger logger)
         {
             _baseUrl = (baseUrl ?? "https://api.greenchainz.com").TrimEnd('/');
+            _logger = logger ?? new TelemetryLogger();
             _httpClient = new HttpClient
             {
                 Timeout = TimeSpan.FromSeconds(30)
@@ -36,6 +43,19 @@ namespace GreenChainz.Revit.Services
             }
         }
 
+        private async Task<HttpResponseMessage> SendRequestAsync(HttpRequestMessage request)
+        {
+            try
+            {
+                return await _httpClient.SendAsync(request);
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request failed");
+                throw;
+            }
+        }
+
         public async Task<string> SubmitRFQ(RFQRequest request)
         {
             if (request == null)
@@ -45,7 +65,12 @@ namespace GreenChainz.Revit.Services
             string json = JsonConvert.SerializeObject(request);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            HttpResponseMessage response = await _httpClient.PostAsync(url, content);
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, url)
+            {
+                Content = content
+            };
+
+            HttpResponseMessage response = await SendRequestAsync(httpRequest);
 
             if (response.IsSuccessStatusCode)
             {
@@ -64,7 +89,12 @@ namespace GreenChainz.Revit.Services
             string json = JsonConvert.SerializeObject(request);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            HttpResponseMessage response = await _httpClient.PostAsync(url, content);
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, url)
+            {
+                Content = content
+            };
+
+            HttpResponseMessage response = await SendRequestAsync(httpRequest);
 
             if (response.IsSuccessStatusCode)
             {
