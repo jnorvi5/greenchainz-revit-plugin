@@ -6,11 +6,12 @@ import Link from 'next/link';
 // Mock data fetcher
 const fetchUserData = async () => {
   // In a real app, this would fetch from your API or Supabase
-  return new Promise<{ plan: string; credits: number }>((resolve) => {
+  return new Promise<{ plan: string; credits: number; maxCredits: number }>((resolve) => {
     setTimeout(() => {
       resolve({
         plan: 'Pro',
         credits: 150,
+        maxCredits: 500, // Added maxCredits for progress bar context
       });
     }, 1500); // Increased delay to show off the skeleton
   });
@@ -35,7 +36,11 @@ function DashboardSkeleton() {
           <div className="bg-white p-6 rounded-lg shadow">
             <div className="h-5 w-40 bg-gray-200 rounded animate-pulse mb-3"></div>
             <div className="h-10 w-24 bg-green-100 rounded animate-pulse mt-2"></div>
-            <div className="h-4 w-32 bg-gray-100 rounded animate-pulse mt-5"></div>
+            {/* Progress bar skeleton */}
+            <div className="w-full bg-gray-200 rounded-full h-2.5 mt-4">
+              <div className="bg-gray-300 h-2.5 rounded-full animate-pulse" style={{ width: '45%' }}></div>
+            </div>
+            <div className="h-4 w-32 bg-gray-100 rounded animate-pulse mt-2"></div>
           </div>
         </div>
       </div>
@@ -44,7 +49,7 @@ function DashboardSkeleton() {
 }
 
 export default function DashboardPage() {
-  const [userData, setUserData] = useState<{ plan: string; credits: number } | null>(null);
+  const [userData, setUserData] = useState<{ plan: string; credits: number; maxCredits: number } | null>(null);
 
   useEffect(() => {
     fetchUserData().then(setUserData);
@@ -53,6 +58,9 @@ export default function DashboardPage() {
   if (!userData) {
     return <DashboardSkeleton />;
   }
+
+  // Calculate percentage for progress bar
+  const percentage = Math.min(100, Math.max(0, (userData.credits / userData.maxCredits) * 100));
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
@@ -69,9 +77,29 @@ export default function DashboardPage() {
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-lg font-semibold text-gray-700">Credits Remaining</h2>
+            <div className="flex justify-between items-baseline">
+              <h2 className="text-lg font-semibold text-gray-700">Credits Remaining</h2>
+              <span className="text-sm text-gray-500">{userData.credits} / {userData.maxCredits}</span>
+            </div>
+
             <p className="text-3xl font-bold text-green-600 mt-2">{userData.credits}</p>
-            <p className="text-sm text-gray-500 mt-1">Used for audits</p>
+
+            {/* Accessible Progress Bar */}
+            <div
+              className="w-full bg-gray-200 rounded-full h-2.5 mt-4 mb-1"
+              role="progressbar"
+              aria-valuenow={userData.credits}
+              aria-valuemin={0}
+              aria-valuemax={userData.maxCredits}
+              aria-label="Credits usage"
+            >
+              <div
+                className="bg-green-600 h-2.5 rounded-full transition-all duration-500 ease-out"
+                style={{ width: `${percentage}%` }}
+              ></div>
+            </div>
+
+            <p className="text-sm text-gray-500">Used for audits</p>
           </div>
         </div>
       </div>
