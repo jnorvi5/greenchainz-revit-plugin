@@ -16,6 +16,19 @@ namespace GreenChainz.Revit.Services
         private bool _disposed;
 
         public ApiClient()
+            : this("https://api.greenchainz.com", null, new TelemetryLogger())
+        {
+        }
+
+        public ApiClient(string baseUrl, string authToken = null)
+             : this(baseUrl, authToken, new TelemetryLogger())
+        {
+        }
+
+        public ApiClient(string baseUrl, string authToken, ILogger logger)
+        {
+            _baseUrl = (baseUrl ?? "https://api.greenchainz.com").TrimEnd('/');
+            _logger = logger ?? new TelemetryLogger();
             : this(ApiConfig.BASE_URL, ApiConfig.LoadAuthToken())
         {
         }
@@ -39,6 +52,19 @@ namespace GreenChainz.Revit.Services
             }
         }
 
+        private async Task<HttpResponseMessage> SendRequestAsync(HttpRequestMessage request)
+        {
+            try
+            {
+                return await _httpClient.SendAsync(request);
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request failed");
+                throw;
+            }
+        }
+
         public async Task<string> SubmitRFQ(RFQRequest request)
         {
             if (request == null)
@@ -58,6 +84,7 @@ namespace GreenChainz.Revit.Services
                 Content = content
             };
 
+            HttpResponseMessage response = await SendRequestAsync(httpRequest);
             // Log request body as per instructions (moved into SendRequestAsync logic effectively by checking content)
             // But we need to pass the body string if we want to log it before creating StringContent,
             // or read it from Content in SendRequestAsync. Reading from Content is better for encapsulation.
@@ -86,6 +113,7 @@ namespace GreenChainz.Revit.Services
                 Content = content
             };
 
+            HttpResponseMessage response = await SendRequestAsync(httpRequest);
             HttpResponseMessage response = await SendRequestAsync(httpRequest, json);
 
             if (response.IsSuccessStatusCode)
