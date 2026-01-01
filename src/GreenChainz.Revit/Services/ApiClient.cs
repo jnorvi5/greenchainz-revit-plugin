@@ -17,16 +17,21 @@ namespace GreenChainz.Revit.Services
         private readonly bool _shouldDisposeHttpClient;
 
         public ApiClient()
+            : this("https://api.greenchainz.com", null, new FileLogger())
             : this("https://api.greenchainz.com", null, new TelemetryLogger())
         {
         }
 
         public ApiClient(string baseUrl, string authToken = null)
+            : this(baseUrl, authToken, new FileLogger())
              : this(baseUrl, authToken, new TelemetryLogger())
         {
         }
 
         public ApiClient(string baseUrl, string authToken, ILogger logger)
+        {
+            _baseUrl = (baseUrl ?? "https://api.greenchainz.com").TrimEnd('/');
+            _logger = logger ?? new FileLogger();
         {
             _baseUrl = (baseUrl ?? "https://api.greenchainz.com").TrimEnd('/');
             _logger = logger ?? new TelemetryLogger();
@@ -88,6 +93,16 @@ namespace GreenChainz.Revit.Services
             }
         }
 
+        private async Task<HttpResponseMessage> SendRequestAsync(HttpRequestMessage request)
+        {
+            HttpResponseMessage response = await _httpClient.SendAsync(request);
+            string responseContent = await response.Content.ReadAsStringAsync();
+
+            _logger.LogDebug($"Response status: {response.StatusCode}, body: {responseContent}");
+
+            return response;
+        }
+
         public async Task<string> SubmitRFQ(RFQRequest request)
         {
             if (request == null)
@@ -116,20 +131,28 @@ namespace GreenChainz.Revit.Services
 
             HttpResponseMessage response = await SendRequestAsync(httpRequest, json); // Pass json string for logging convenience
 
-            if (response.IsSuccessStatusCode)
+            using (var message = new HttpRequestMessage(HttpMethod.Post, url))
             {
-                return await response.Content.ReadAsStringAsync();
-            }
-            else
-            {
-                string errorBody = await response.Content.ReadAsStringAsync();
-                throw new Exception($"RFQ submission failed ({response.StatusCode}): {errorBody}");
+                message.Content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = await SendRequestAsync(message);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadAsStringAsync();
+                }
+                else
+                {
+                    string errorBody = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"RFQ submission failed ({response.StatusCode}): {errorBody}");
+                }
             }
         }
 
         public async Task<AuditResult> SubmitAuditAsync(AuditResult request)
         {
             string url = $"{_baseUrl}/api/audit";
+            string json = JsonConvert.SerializeObject(request);
 
             HttpResponseMessage response = await SendRequestAsync(HttpMethod.Post, url, request);
             var httpRequest = new HttpRequestMessage(HttpMethod.Post, url)
@@ -140,18 +163,25 @@ namespace GreenChainz.Revit.Services
             HttpResponseMessage response = await SendRequestAsync(httpRequest);
             HttpResponseMessage response = await SendRequestAsync(httpRequest, json);
 
-            if (response.IsSuccessStatusCode)
+            using (var message = new HttpRequestMessage(HttpMethod.Post, url))
             {
-                string responseString = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<AuditResult>(responseString);
-            }
-            else
-            {
-                return new AuditResult
+                message.Content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = await SendRequestAsync(message);
+
+                if (response.IsSuccessStatusCode)
                 {
-                    OverallScore = -1,
-                    Summary = "API Error: " + response.ReasonPhrase
-                };
+                    string responseString = await response.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<AuditResult>(responseString);
+                }
+                else
+                {
+                    return new AuditResult
+                    {
+                        OverallScore = -1,
+                        Summary = "API Error: " + response.ReasonPhrase
+                    };
+                }
             }
         }
 

@@ -6,6 +6,8 @@ namespace GreenChainz.Revit.Services
     {
         void LogDebug(string message);
         void LogInfo(string message);
+        void LogError(string message, Exception ex = null);
+    }
         void LogError(Exception ex, string message);
         void LogError(string message, Exception ex = null);
     }
