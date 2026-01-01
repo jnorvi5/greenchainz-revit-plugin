@@ -14,6 +14,7 @@ namespace GreenChainz.Revit.Services
         private readonly string _baseUrl;
         private readonly ILogger _logger;
         private bool _disposed;
+        private readonly bool _shouldDisposeHttpClient;
 
         public ApiClient()
             : this("https://api.greenchainz.com", null, new TelemetryLogger())
@@ -37,18 +38,40 @@ namespace GreenChainz.Revit.Services
         {
             _baseUrl = (baseUrl ?? "https://api.greenchainz.com").TrimEnd('/');
             _logger = logger ?? new TelemetryLogger();
+
             _baseUrl = (baseUrl ?? ApiConfig.BASE_URL).TrimEnd('/');
             _httpClient = new HttpClient
             {
                 Timeout = TimeSpan.FromSeconds(ApiConfig.TIMEOUT_SECONDS)
             };
+            _shouldDisposeHttpClient = true;
 
+            ConfigureHttpClient(authToken);
+        }
+
+        // Constructor for testing / dependency injection of HttpClient
+        public ApiClient(string baseUrl, string authToken, HttpClient httpClient, ILogger logger = null)
+        {
+            _baseUrl = (baseUrl ?? "https://api.greenchainz.com").TrimEnd('/');
+            _logger = logger ?? new TelemetryLogger();
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            _shouldDisposeHttpClient = false; // Don't dispose injected client
+
+            ConfigureHttpClient(authToken);
+        }
+
+        private void ConfigureHttpClient(string authToken)
+        {
             _httpClient.DefaultRequestHeaders.Accept.Clear();
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             if (!string.IsNullOrEmpty(authToken))
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+                // Check if header already exists (relevant when reusing HttpClient)
+                if (_httpClient.DefaultRequestHeaders.Authorization == null)
+                {
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+                }
             }
         }
 
@@ -70,6 +93,8 @@ namespace GreenChainz.Revit.Services
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
 
+            string url = $"{_baseUrl}/api/rfqs";
+            HttpResponseMessage response = await SendRequestAsync(HttpMethod.Post, url, request);
             string url = $"{_baseUrl}/api/rfq";
             string json = JsonConvert.SerializeObject(request);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -105,9 +130,8 @@ namespace GreenChainz.Revit.Services
         public async Task<AuditResult> SubmitAuditAsync(AuditResult request)
         {
             string url = $"{_baseUrl}/api/audit";
-            string json = JsonConvert.SerializeObject(request);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
 
+            HttpResponseMessage response = await SendRequestAsync(HttpMethod.Post, url, request);
             var httpRequest = new HttpRequestMessage(HttpMethod.Post, url)
             {
                 Content = content
@@ -130,6 +154,19 @@ namespace GreenChainz.Revit.Services
                 };
             }
         }
+
+        private async Task<HttpResponseMessage> SendRequestAsync(HttpMethod method, string url, object body)
+        {
+            var request = new HttpRequestMessage(method, url);
+
+            if (body != null)
+            {
+                string json = JsonConvert.SerializeObject(body);
+                request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                // Logging request body using injected logger
+                _logger.LogDebug($"Request body: {json}");
+            }
 
         /// <summary>
         /// Sends the HTTP request with logging.
@@ -164,9 +201,32 @@ namespace GreenChainz.Revit.Services
             {
                 if (disposing)
                 {
-                    _httpClient?.Dispose();
+                    if (_shouldDisposeHttpClient)
+                    {
+                        _httpClient?.Dispose();
+                    }
                 }
                 _disposed = true;
+            }
+        }
+
+        // Default logger implementation using TelemetryService
+        private class TelemetryLogger : ILogger
+        {
+            public void LogDebug(string message)
+            {
+                // TelemetryService only has LogInfo, so we map Debug to Info with a prefix
+                TelemetryService.LogInfo($"[DEBUG] {message}");
+            }
+
+            public void LogInfo(string message)
+            {
+                TelemetryService.LogInfo(message);
+            }
+
+            public void LogError(Exception ex, string message)
+            {
+                TelemetryService.LogError(ex, message);
             }
         }
     }
