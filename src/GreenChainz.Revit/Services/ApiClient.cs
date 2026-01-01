@@ -17,7 +17,20 @@ namespace GreenChainz.Revit.Services
         private readonly bool _shouldDisposeHttpClient;
 
         public ApiClient()
-            : this("https://api.greenchainz.com", null)
+            : this("https://api.greenchainz.com", null, new TelemetryLogger())
+        {
+        }
+
+        public ApiClient(string baseUrl, string authToken = null)
+             : this(baseUrl, authToken, new TelemetryLogger())
+        {
+        }
+
+        public ApiClient(string baseUrl, string authToken, ILogger logger)
+        {
+            _baseUrl = (baseUrl ?? "https://api.greenchainz.com").TrimEnd('/');
+            _logger = logger ?? new TelemetryLogger();
+            : this(ApiConfig.BASE_URL, ApiConfig.LoadAuthToken())
         {
         }
 
@@ -26,9 +39,10 @@ namespace GreenChainz.Revit.Services
             _baseUrl = (baseUrl ?? "https://api.greenchainz.com").TrimEnd('/');
             _logger = logger ?? new TelemetryLogger();
 
+            _baseUrl = (baseUrl ?? ApiConfig.BASE_URL).TrimEnd('/');
             _httpClient = new HttpClient
             {
-                Timeout = TimeSpan.FromSeconds(30)
+                Timeout = TimeSpan.FromSeconds(ApiConfig.TIMEOUT_SECONDS)
             };
             _shouldDisposeHttpClient = true;
 
@@ -61,6 +75,19 @@ namespace GreenChainz.Revit.Services
             }
         }
 
+        private async Task<HttpResponseMessage> SendRequestAsync(HttpRequestMessage request)
+        {
+            try
+            {
+                return await _httpClient.SendAsync(request);
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request failed");
+                throw;
+            }
+        }
+
         public async Task<string> SubmitRFQ(RFQRequest request)
         {
             if (request == null)
@@ -68,6 +95,26 @@ namespace GreenChainz.Revit.Services
 
             string url = $"{_baseUrl}/api/rfqs";
             HttpResponseMessage response = await SendRequestAsync(HttpMethod.Post, url, request);
+            string url = $"{_baseUrl}/api/rfq";
+            string json = JsonConvert.SerializeObject(request);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            // Refactored to use SendRequestAsync
+            // Note: SendRequestAsync handles the sending, but we need to construct the request message first if we want to reuse it fully.
+            // However, SendRequestAsync usually takes a RequestMessage or parameters.
+            // Let's implement SendRequestAsync to take method, url, and content.
+
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, url)
+            {
+                Content = content
+            };
+
+            HttpResponseMessage response = await SendRequestAsync(httpRequest);
+            // Log request body as per instructions (moved into SendRequestAsync logic effectively by checking content)
+            // But we need to pass the body string if we want to log it before creating StringContent,
+            // or read it from Content in SendRequestAsync. Reading from Content is better for encapsulation.
+
+            HttpResponseMessage response = await SendRequestAsync(httpRequest, json); // Pass json string for logging convenience
 
             if (response.IsSuccessStatusCode)
             {
@@ -85,6 +132,13 @@ namespace GreenChainz.Revit.Services
             string url = $"{_baseUrl}/api/audit";
 
             HttpResponseMessage response = await SendRequestAsync(HttpMethod.Post, url, request);
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, url)
+            {
+                Content = content
+            };
+
+            HttpResponseMessage response = await SendRequestAsync(httpRequest);
+            HttpResponseMessage response = await SendRequestAsync(httpRequest, json);
 
             if (response.IsSuccessStatusCode)
             {
@@ -113,6 +167,24 @@ namespace GreenChainz.Revit.Services
                 // Logging request body using injected logger
                 _logger.LogDebug($"Request body: {json}");
             }
+
+        /// <summary>
+        /// Sends the HTTP request with logging.
+        /// </summary>
+        /// <param name="request">The HTTP request message.</param>
+        /// <param name="jsonBody">Optional JSON body string for logging purposes.</param>
+        /// <returns>The HTTP response.</returns>
+        private async Task<HttpResponseMessage> SendRequestAsync(HttpRequestMessage request, string jsonBody = null)
+        {
+            string method = request.Method.ToString();
+            string url = request.RequestUri.ToString();
+
+            if (!string.IsNullOrEmpty(jsonBody))
+            {
+                _logger.LogDebug($"Request body: {jsonBody}");
+            }
+
+            _logger.LogDebug($"Sending {method} request to {url}");
 
             return await _httpClient.SendAsync(request);
         }
