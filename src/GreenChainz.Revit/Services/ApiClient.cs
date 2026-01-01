@@ -12,16 +12,18 @@ namespace GreenChainz.Revit.Services
     {
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl;
+        private readonly ILogger _logger;
         private bool _disposed;
 
-        public ApiClient()
-            : this("https://api.greenchainz.com", null)
+        public ApiClient(ILogger logger = null)
+            : this("https://api.greenchainz.com", null, logger)
         {
         }
 
-        public ApiClient(string baseUrl, string authToken = null)
+        public ApiClient(string baseUrl, string authToken = null, ILogger logger = null)
         {
             _baseUrl = (baseUrl ?? "https://api.greenchainz.com").TrimEnd('/');
+            _logger = logger ?? new TelemetryLogger();
             _httpClient = new HttpClient
             {
                 Timeout = TimeSpan.FromSeconds(30)
@@ -33,6 +35,34 @@ namespace GreenChainz.Revit.Services
             if (!string.IsNullOrEmpty(authToken))
             {
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+            }
+        }
+
+        public async Task<T> SendRequestAsync<T>(HttpRequestMessage request)
+        {
+            try
+            {
+                HttpResponseMessage response = await _httpClient.SendAsync(request);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string json = await response.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<T>(json);
+                }
+                else
+                {
+                    string errorBody = await response.Content.ReadAsStringAsync();
+                    throw new ApiException($"Request failed ({response.StatusCode}): {errorBody}", (int)response.StatusCode, errorBody);
+                }
+            }
+            catch (ApiException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error");
+                throw new ApiException($"Unexpected error: {ex.Message}", ex);
             }
         }
 
