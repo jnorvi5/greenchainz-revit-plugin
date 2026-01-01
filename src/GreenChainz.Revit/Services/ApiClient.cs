@@ -4,6 +4,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using GreenChainz.Revit.Models;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace GreenChainz.Revit.Services
@@ -12,20 +13,36 @@ namespace GreenChainz.Revit.Services
     {
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl;
+        private readonly ILogger<ApiClient> _logger;
         private bool _disposed;
 
         public ApiClient()
-            : this("https://api.greenchainz.com", null)
+            : this("https://api.greenchainz.com", null, null, null)
         {
         }
 
-        public ApiClient(string baseUrl, string authToken = null)
+        // Constructor with logger injection
+        public ApiClient(ILogger<ApiClient> logger)
+            : this("https://api.greenchainz.com", null, null, logger)
+        {
+        }
+
+        public ApiClient(string baseUrl, string authToken = null, HttpClient httpClient = null, ILogger<ApiClient> logger = null)
         {
             _baseUrl = (baseUrl ?? "https://api.greenchainz.com").TrimEnd('/');
-            _httpClient = new HttpClient
+            _logger = logger;
+
+            if (httpClient != null)
             {
-                Timeout = TimeSpan.FromSeconds(30)
-            };
+                _httpClient = httpClient;
+            }
+            else
+            {
+                _httpClient = new HttpClient
+                {
+                    Timeout = TimeSpan.FromSeconds(30)
+                };
+            }
 
             _httpClient.DefaultRequestHeaders.Accept.Clear();
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -58,9 +75,15 @@ namespace GreenChainz.Revit.Services
             }
         }
 
-        public async Task<AuditResult> SubmitAuditAsync(AuditResult request)
+        public async Task<AuditResponse> SubmitAuditAsync(AuditRequest request)
         {
-            string url = $"{_baseUrl}/api/audit";
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+
+            // Logging added as requested
+            _logger?.LogInformation($"Submitting audit for project: {request.ProjectName}");
+
+            string url = $"{_baseUrl}/audit/extract-materials";
             string json = JsonConvert.SerializeObject(request);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -69,15 +92,12 @@ namespace GreenChainz.Revit.Services
             if (response.IsSuccessStatusCode)
             {
                 string responseString = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<AuditResult>(responseString);
+                return JsonConvert.DeserializeObject<AuditResponse>(responseString);
             }
             else
             {
-                return new AuditResult
-                {
-                    OverallScore = -1,
-                    Summary = "API Error: " + response.ReasonPhrase
-                };
+                string errorBody = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Audit submission failed ({response.StatusCode}): {errorBody}");
             }
         }
 
