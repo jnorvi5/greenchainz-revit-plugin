@@ -6,9 +6,41 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 
+// Use a secure environment variable for the expected token
+// In production, this MUST be set.
+const EXPECTED_AUTH_TOKEN = process.env.GREENCHAINZ_API_SECRET;
+
 // Audit API Endpoint - Receives Carbon Audit results from Revit plugin
 export async function POST(request: NextRequest) {
   try {
+    // 🔒 Security Check: Validate Authorization Token
+    const authHeader = request.headers.get('authorization');
+
+    if (!EXPECTED_AUTH_TOKEN) {
+      console.error('SERVER CONFIG ERROR: GREENCHAINZ_API_SECRET is not set.');
+      return NextResponse.json(
+        { error: 'Server configuration error' },
+        { status: 500 }
+      );
+    }
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: 'Missing or invalid Authorization header' },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    // Validate token
+    if (token !== EXPECTED_AUTH_TOKEN) {
+      return NextResponse.json(
+        { error: 'Unauthorized: Invalid token' },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
 
     // Validate request based on AuditResult model in plugin
