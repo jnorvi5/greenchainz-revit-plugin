@@ -166,7 +166,7 @@ export default function BillingPage() {
                 </button>
               </div>
               <div className="pt-6 pb-8 px-6">
-                <h4 className="text-sm font-medium text-gray-900 tracking-wide uppercase">What's included</h4>
+                <h4 className="text-sm font-medium text-gray-900 tracking-wide uppercase">What&apos;s included</h4>
                 <ul className="mt-6 space-y-4">
                   {tier.features.map((feature) => (
                     <li key={feature} className="flex space-x-3">
