@@ -16,49 +16,34 @@ namespace GreenChainz.Revit.Services
         private bool _disposed;
         private readonly bool _shouldDisposeHttpClient;
 
-        public ApiClient(ILogger logger = null)
-            : this("https://api.greenchainz.com", null, logger)
-        {
-        }
-
+        // Default constructor uses production URL and TelemetryLogger
         public ApiClient()
-            : this("https://api.greenchainz.com", null, new FileLogger())
-            : this("https://api.greenchainz.com", null, new TelemetryLogger())
+            : this(ApiConfig.BASE_URL, null, new TelemetryLogger())
         {
         }
 
-        public ApiClient(string baseUrl, string authToken = null)
-            : this(baseUrl, authToken, new HttpClient { Timeout = TimeSpan.FromSeconds(30) })
+        // Constructor with logger injection
+        public ApiClient(ILogger logger)
+            : this(ApiConfig.BASE_URL, null, logger)
         {
         }
 
-        public ApiClient(string baseUrl, string authToken, HttpClient httpClient, ILogger logger = null)
-        {
-            _baseUrl = (baseUrl ?? "https://api.greenchainz.com").TrimEnd('/');
-            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-            _logger = logger ?? new TelemetryLogger();
-            : this(baseUrl, authToken, new FileLogger())
-             : this(baseUrl, authToken, new TelemetryLogger())
-        {
-        }
-
-        public ApiClient(string baseUrl, string authToken, ILogger logger)
-        {
-            _baseUrl = (baseUrl ?? "https://api.greenchainz.com").TrimEnd('/');
-            _logger = logger ?? new FileLogger();
-        {
-            _baseUrl = (baseUrl ?? "https://api.greenchainz.com").TrimEnd('/');
-            _logger = logger ?? new TelemetryLogger();
-            : this(ApiConfig.BASE_URL, ApiConfig.LoadAuthToken())
-        {
-        }
-
+        // Constructor with URL and Auth Token (creates own HttpClient)
         public ApiClient(string baseUrl, string authToken = null, ILogger logger = null)
         {
-            _baseUrl = (baseUrl ?? "https://api.greenchainz.com").TrimEnd('/');
+            _baseUrl = (baseUrl ?? ApiConfig.BASE_URL).TrimEnd('/');
             _logger = logger ?? new TelemetryLogger();
 
-            _baseUrl = (baseUrl ?? ApiConfig.BASE_URL).TrimEnd('/');
+            // Security: Enforce HTTPS for non-localhost
+            if (!_baseUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase) &&
+                !_baseUrl.Contains("localhost") &&
+                !_baseUrl.Contains("127.0.0.1"))
+            {
+                _logger.LogInfo($"[SECURITY WARNING] Using insecure connection to {_baseUrl}");
+                // In a stricter environment, we would throw:
+                // throw new ArgumentException("HTTPS is required for remote connections.");
+            }
+
             _httpClient = new HttpClient
             {
                 Timeout = TimeSpan.FromSeconds(ApiConfig.TIMEOUT_SECONDS)
@@ -71,12 +56,18 @@ namespace GreenChainz.Revit.Services
         // Constructor for testing / dependency injection of HttpClient
         public ApiClient(string baseUrl, string authToken, HttpClient httpClient, ILogger logger = null)
         {
-            _baseUrl = (baseUrl ?? "https://api.greenchainz.com").TrimEnd('/');
+            _baseUrl = (baseUrl ?? ApiConfig.BASE_URL).TrimEnd('/');
             _logger = logger ?? new TelemetryLogger();
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             _shouldDisposeHttpClient = false; // Don't dispose injected client
 
             ConfigureHttpClient(authToken);
+        }
+
+        // Backward compatibility
+        public ApiClient(string baseUrl, string authToken, HttpClient httpClient)
+            : this(baseUrl, authToken, httpClient, null)
+        {
         }
 
         private void ConfigureHttpClient(string authToken)
@@ -94,27 +85,13 @@ namespace GreenChainz.Revit.Services
             }
         }
 
-        private async Task<HttpResponseMessage> SendRequestAsync(HttpRequestMessage request)
-        {
-            try
-            {
-                return await _httpClient.SendAsync(request);
-            }
-            catch (HttpRequestException ex)
-            {
-                _logger.LogError(ex, "HTTP request failed");
-                throw;
-            }
-        }
-
-        // Overload to maintain backward compatibility for tests/existing code that calls (baseUrl, authToken, httpClient)
-        public ApiClient(string baseUrl, string authToken, HttpClient httpClient)
-            : this(baseUrl, authToken, httpClient, null)
-        {
-        }
-
         private async Task<T> SendRequestAsync<T>(HttpRequestMessage request)
         {
+            string method = request.Method.ToString();
+            string url = request.RequestUri.ToString();
+
+            _logger.LogDebug($"Sending {method} request to {url}");
+
             try
             {
                 HttpResponseMessage response = await _httpClient.SendAsync(request);
@@ -134,7 +111,12 @@ namespace GreenChainz.Revit.Services
                 else
                 {
                     string errorBody = await response.Content.ReadAsStringAsync();
-                    throw new ApiException($"API request failed with status code {response.StatusCode}: {errorBody}", (int)response.StatusCode, errorBody);
+                    // Sanitize log: don't log full error body if it contains secrets, but usually error bodies are safe-ish.
+                    // We'll log the status code.
+                    _logger.LogError(new Exception($"API Error {response.StatusCode}"), $"Request to {url} failed with status {response.StatusCode}");
+
+                    // The exception message contains the error body for the caller to handle, but not logged blindly
+                    throw new ApiException($"API request failed with status code {response.StatusCode}", (int)response.StatusCode, errorBody);
                 }
             }
             catch (JsonException ex)
@@ -142,14 +124,11 @@ namespace GreenChainz.Revit.Services
                 _logger.LogError(ex, "Failed to deserialize response");
                 throw new ApiException($"Failed to parse API response: {ex.Message}", ex);
             }
-        private async Task<HttpResponseMessage> SendRequestAsync(HttpRequestMessage request)
-        {
-            HttpResponseMessage response = await _httpClient.SendAsync(request);
-            string responseContent = await response.Content.ReadAsStringAsync();
-
-            _logger.LogDebug($"Response status: {response.StatusCode}, body: {responseContent}");
-
-            return response;
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request failed");
+                throw;
+            }
         }
 
         public async Task<string> SubmitRFQ(RFQRequest request)
@@ -157,64 +136,27 @@ namespace GreenChainz.Revit.Services
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
 
-            _logger.LogInformation($"Submitting RFQ for project: {request.ProjectName}");
+            // Security: Avoid logging full PII/proprietary info. Log generic info.
+            _logger.LogInfo($"Submitting RFQ for project: {request.ProjectName}");
 
-            string url = $"{_baseUrl}/api/rfqs";
-            HttpResponseMessage response = await SendRequestAsync(HttpMethod.Post, url, request);
             string url = $"{_baseUrl}/api/rfq";
             string json = JsonConvert.SerializeObject(request);
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, url)
+
+            using (var requestMessage = new HttpRequestMessage(HttpMethod.Post, url))
             {
-                Content = new StringContent(json, Encoding.UTF8, "application/json")
-            };
+                requestMessage.Content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            try
-            {
-                return await SendRequestAsync<string>(requestMessage);
-            }
-            catch (ApiException ex)
-            {
-                 // Preserve original behavior: throw Exception with specific message format
-                 // Original: throw new Exception($"RFQ submission failed ({response.StatusCode}): {errorBody}");
-                 // SendRequestAsync throws ApiException with similar message but we wrap it to ensure Exception type matches
-                 throw new Exception($"RFQ submission failed: {ex.Message}", ex);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"RFQ submission failed: {ex.Message}", ex);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+                // Security: Do NOT log the full JSON body here as it might contain sensitive project data.
+                // Previous corrupted version had explicit logging of the body. We removed it.
 
-            // Refactored to use SendRequestAsync
-            // Note: SendRequestAsync handles the sending, but we need to construct the request message first if we want to reuse it fully.
-            // However, SendRequestAsync usually takes a RequestMessage or parameters.
-            // Let's implement SendRequestAsync to take method, url, and content.
-
-            var httpRequest = new HttpRequestMessage(HttpMethod.Post, url)
-            {
-                Content = content
-            };
-
-            HttpResponseMessage response = await SendRequestAsync(httpRequest);
-            // Log request body as per instructions (moved into SendRequestAsync logic effectively by checking content)
-            // But we need to pass the body string if we want to log it before creating StringContent,
-            // or read it from Content in SendRequestAsync. Reading from Content is better for encapsulation.
-
-            HttpResponseMessage response = await SendRequestAsync(httpRequest, json); // Pass json string for logging convenience
-
-            using (var message = new HttpRequestMessage(HttpMethod.Post, url))
-            {
-                message.Content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                HttpResponseMessage response = await SendRequestAsync(message);
-
-                if (response.IsSuccessStatusCode)
+                try
                 {
-                    return await response.Content.ReadAsStringAsync();
+                    return await SendRequestAsync<string>(requestMessage);
                 }
-                else
+                catch (ApiException ex)
                 {
-                    string errorBody = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"RFQ submission failed ({response.StatusCode}): {errorBody}");
+                     // Maintain API contract for callers expecting generic Exception
+                     throw new Exception($"RFQ submission failed: {ex.Message}", ex);
                 }
             }
         }
@@ -224,97 +166,39 @@ namespace GreenChainz.Revit.Services
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
 
+            _logger.LogInfo($"Submitting audit for project: {request.ProjectName}");
+
             string url = $"{_baseUrl}/api/audit";
             string json = JsonConvert.SerializeObject(request);
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, url)
-            {
-                Content = new StringContent(json, Encoding.UTF8, "application/json")
-            };
 
-            try
+            using (var requestMessage = new HttpRequestMessage(HttpMethod.Post, url))
             {
-                return await SendRequestAsync<AuditResult>(requestMessage);
-            }
-            catch (ApiException ex)
-            {
-                // Preserve original behavior: return error object instead of throwing
-                return new AuditResult
+                requestMessage.Content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                try
                 {
-                    OverallScore = -1,
-                    Summary = "API Error: " + (ex.ResponseBody ?? ex.Message)
-                };
-            }
-            catch (Exception ex)
-            {
-                 return new AuditResult
-                {
-                    OverallScore = -1,
-                    Summary = "API Error: " + ex.Message
-                };
-
-            HttpResponseMessage response = await SendRequestAsync(HttpMethod.Post, url, request);
-            var httpRequest = new HttpRequestMessage(HttpMethod.Post, url)
-            {
-                Content = content
-            };
-
-            HttpResponseMessage response = await SendRequestAsync(httpRequest);
-            HttpResponseMessage response = await SendRequestAsync(httpRequest, json);
-
-            using (var message = new HttpRequestMessage(HttpMethod.Post, url))
-            {
-                message.Content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                HttpResponseMessage response = await SendRequestAsync(message);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    string responseString = await response.Content.ReadAsStringAsync();
-                    return JsonConvert.DeserializeObject<AuditResult>(responseString);
+                    return await SendRequestAsync<AuditResult>(requestMessage);
                 }
-                else
+                catch (ApiException ex)
                 {
+                    // Fallback behavior as per original intent
+                    _logger.LogError(ex, "Audit submission failed");
                     return new AuditResult
                     {
                         OverallScore = -1,
-                        Summary = "API Error: " + response.ReasonPhrase
+                        Summary = "API Error: " + (ex.ResponseBody ?? ex.Message)
+                    };
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Audit submission failed unexpectedly");
+                    return new AuditResult
+                    {
+                        OverallScore = -1,
+                        Summary = "API Error: " + ex.Message
                     };
                 }
             }
-        }
-
-        private async Task<HttpResponseMessage> SendRequestAsync(HttpMethod method, string url, object body)
-        {
-            var request = new HttpRequestMessage(method, url);
-
-            if (body != null)
-            {
-                string json = JsonConvert.SerializeObject(body);
-                request.Content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                // Logging request body using injected logger
-                _logger.LogDebug($"Request body: {json}");
-            }
-
-        /// <summary>
-        /// Sends the HTTP request with logging.
-        /// </summary>
-        /// <param name="request">The HTTP request message.</param>
-        /// <param name="jsonBody">Optional JSON body string for logging purposes.</param>
-        /// <returns>The HTTP response.</returns>
-        private async Task<HttpResponseMessage> SendRequestAsync(HttpRequestMessage request, string jsonBody = null)
-        {
-            string method = request.Method.ToString();
-            string url = request.RequestUri.ToString();
-
-            if (!string.IsNullOrEmpty(jsonBody))
-            {
-                _logger.LogDebug($"Request body: {jsonBody}");
-            }
-
-            _logger.LogDebug($"Sending {method} request to {url}");
-
-            return await _httpClient.SendAsync(request);
         }
 
         public void Dispose()
@@ -355,6 +239,14 @@ namespace GreenChainz.Revit.Services
             public void LogError(Exception ex, string message)
             {
                 TelemetryService.LogError(ex, message);
+            }
+
+            public void LogError(string message, Exception ex = null)
+            {
+                if (ex != null)
+                    TelemetryService.LogError(ex, message);
+                else
+                    TelemetryService.LogInfo($"[ERROR] {message}");
             }
         }
     }
