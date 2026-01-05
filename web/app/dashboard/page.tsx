@@ -15,47 +15,6 @@ const fetchUserData = async () => {
   });
 };
 
-function DashboardSkeleton() {
-  return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-4xl mx-auto">
-        {/* Title Skeleton */}
-        <div className="h-8 w-48 bg-gray-200 rounded animate-pulse mb-6"></div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Card 1 Skeleton */}
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="h-5 w-32 bg-gray-200 rounded animate-pulse mb-3"></div>
-            <div className="h-10 w-24 bg-indigo-100 rounded animate-pulse mt-2"></div>
-            <div className="h-4 w-28 bg-gray-100 rounded animate-pulse mt-5"></div>
-          </div>
-
-          {/* Card 2 Skeleton */}
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="h-5 w-40 bg-gray-200 rounded animate-pulse mb-3"></div>
-            <div className="h-10 w-24 bg-green-100 rounded animate-pulse mt-2"></div>
-            {/* Progress bar skeleton */}
-            <div className="w-full bg-gray-200 rounded-full h-2.5 mt-4">
-              <div className="bg-gray-300 h-2.5 rounded-full animate-pulse" style={{ width: '45%' }}></div>
-            </div>
-            <div className="h-4 w-32 bg-gray-100 rounded animate-pulse mt-2"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export default function DashboardPage() {
-  const [userData, setUserData] = useState<{ plan: string; credits: number; maxCredits: number } | null>(null);
-
-  useEffect(() => {
-    fetchUserData().then(setUserData);
-  }, []);
-
-  if (!userData) {
-    return <DashboardSkeleton />;
-  }
 export default async function DashboardPage() {
   const userData = await fetchUserData();
 
@@ -71,8 +30,12 @@ export default async function DashboardPage() {
           <div className="bg-white p-6 rounded-lg shadow">
             <h2 className="text-lg font-semibold text-gray-700">Current Plan</h2>
             <p className="text-3xl font-bold text-indigo-600 mt-2">{userData.plan}</p>
-            <Link href="/billing" className="text-sm text-gray-500 mt-4 block hover:underline hover:text-indigo-600 transition-colors">
-              Change Plan
+            <Link
+              href="/billing"
+              className="mt-4 inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 rounded-md"
+              aria-label="Change current plan"
+            >
+              Change Plan <span aria-hidden="true" className="ml-1">→</span>
             </Link>
           </div>
 
