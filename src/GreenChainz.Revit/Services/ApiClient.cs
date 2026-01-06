@@ -307,10 +307,11 @@ namespace GreenChainz.Revit.Services
             string method = request.Method.ToString();
             string url = request.RequestUri.ToString();
 
-            if (!string.IsNullOrEmpty(jsonBody))
-            {
-                _logger.LogDebug($"Request body: {jsonBody}");
-            }
+            // Sentinel: Suppressed request body logging to prevent PII/sensitive data leakage in logs
+            // if (!string.IsNullOrEmpty(jsonBody))
+            // {
+            //     _logger.LogDebug($"Request body: {jsonBody}");
+            // }
 
             _logger.LogDebug($"Sending {method} request to {url}");
 
