@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import crypto from 'crypto';
 
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -9,6 +10,42 @@ const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabase
 // Audit API Endpoint - Receives Carbon Audit results from Revit plugin
 export async function POST(request: NextRequest) {
   try {
+    // 🛡️ SECURITY: Verify Authorization header
+    // This prevents unauthorized users from submitting fake audit data
+    const authHeader = request.headers.get('authorization');
+    const apiSecret = process.env.GREENCHAINZ_API_SECRET;
+
+    if (!apiSecret) {
+      console.warn('⚠️ GREENCHAINZ_API_SECRET is not set in environment. API is vulnerable!');
+      // Sentinel: Fail securely if configuration is missing
+      return NextResponse.json(
+        { error: 'Server configuration error' },
+        { status: 500 }
+      );
+    }
+
+    let isAuthorized = false;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const providedToken = authHeader.split(' ')[1];
+
+      // Use constant-time comparison to prevent timing attacks
+      // Both buffers must be of the same length for timingSafeEqual
+      const bufferSecret = Buffer.from(apiSecret);
+      const bufferProvided = Buffer.from(providedToken);
+
+      if (bufferSecret.length === bufferProvided.length) {
+        isAuthorized = crypto.timingSafeEqual(bufferSecret, bufferProvided);
+      }
+    }
+
+    if (!isAuthorized) {
+      console.warn('Unauthorized access attempt to /api/audit');
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
 
     // Validate request based on AuditResult model in plugin
@@ -49,7 +86,7 @@ export async function POST(request: NextRequest) {
         } else if (error) {
           console.error('Supabase DB Error:', error);
         }
-      } catch (dbError) {
+      } catch (_dbError) {
         console.log('Supabase not configured or error connecting, continuing without DB');
       }
     }
