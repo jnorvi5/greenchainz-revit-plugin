@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 // Mock data fetcher
@@ -56,8 +58,6 @@ export default function DashboardPage() {
   if (!userData) {
     return <DashboardSkeleton />;
   }
-export default async function DashboardPage() {
-  const userData = await fetchUserData();
 
   // Calculate percentage for progress bar
   const percentage = Math.min(100, Math.max(0, (userData.credits / userData.maxCredits) * 100));
@@ -71,8 +71,21 @@ export default async function DashboardPage() {
           <div className="bg-white p-6 rounded-lg shadow">
             <h2 className="text-lg font-semibold text-gray-700">Current Plan</h2>
             <p className="text-3xl font-bold text-indigo-600 mt-2">{userData.plan}</p>
-            <Link href="/billing" className="text-sm text-gray-500 mt-4 block hover:underline hover:text-indigo-600 transition-colors">
+            <Link
+              href="/billing"
+              className="group inline-flex items-center text-sm text-gray-500 mt-4 hover:text-indigo-600 transition-colors"
+              aria-label="Change subscription plan"
+            >
               Change Plan
+              <svg
+                className="ml-1 w-4 h-4 transition-transform group-hover:translate-x-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
             </Link>
           </div>
 
