@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 // Mock data fetcher
@@ -56,8 +58,6 @@ export default function DashboardPage() {
   if (!userData) {
     return <DashboardSkeleton />;
   }
-export default async function DashboardPage() {
-  const userData = await fetchUserData();
 
   // Calculate percentage for progress bar
   const percentage = Math.min(100, Math.max(0, (userData.credits / userData.maxCredits) * 100));
