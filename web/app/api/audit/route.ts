@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import crypto from 'crypto';
 
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -9,6 +10,28 @@ const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabase
 // Audit API Endpoint - Receives Carbon Audit results from Revit plugin
 export async function POST(request: NextRequest) {
   try {
+    // 🛡️ Sentinel: Authenticate request
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const token = authHeader.split(' ')[1];
+    const secret = process.env.GREENCHAINZ_API_SECRET;
+
+    if (!secret) {
+      console.error('GREENCHAINZ_API_SECRET is not configured');
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+    }
+
+    // Secure constant-time comparison
+    const tokenBuffer = Buffer.from(token);
+    const secretBuffer = Buffer.from(secret);
+
+    if (tokenBuffer.length !== secretBuffer.length || !crypto.timingSafeEqual(tokenBuffer, secretBuffer)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json();
 
     // Validate request based on AuditResult model in plugin
@@ -49,7 +72,7 @@ export async function POST(request: NextRequest) {
         } else if (error) {
           console.error('Supabase DB Error:', error);
         }
-      } catch (dbError) {
+      } catch (_) {
         console.log('Supabase not configured or error connecting, continuing without DB');
       }
     }
