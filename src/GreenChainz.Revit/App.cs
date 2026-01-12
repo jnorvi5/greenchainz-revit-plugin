@@ -19,9 +19,9 @@ namespace GreenChainz.Revit
         public static Ec3ApiService Ec3Service { get; private set; }
 
         // API Keys (can be overridden by environment variables)
-        private const string DEFAULT_EC3_API_KEY = "xIz4fqhAv5xEPMxKHxF5TnywFXha1t";
-        private const string DEFAULT_AUTODESK_CLIENT_ID = "a98gDGIomX5ArzWWwA2um3EPNMtW2PdXrc4tpNdMuBjeG0B9";
-        private const string DEFAULT_AUTODESK_SECRET = "Kn4Res0PC5hx5XvnGflIu3pe4GNNGUdG1cn4rPbB1gwS60XXPBsAVF7uOxFIhwDL";
+        private const string DEFAULT_EC3_API_KEY = ""; // Set via env var EC3_API_KEY
+        private const string DEFAULT_AUTODESK_CLIENT_ID = ""; // Set via env var AUTODESK_CLIENT_ID
+        private const string DEFAULT_AUTODESK_SECRET = ""; // Set via env var AUTODESK_CLIENT_SECRET
 
         public Result OnStartup(UIControlledApplication application)
         {
