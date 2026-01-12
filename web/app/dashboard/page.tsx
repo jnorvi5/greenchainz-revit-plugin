@@ -1,5 +1,8 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import DashboardSkeleton from './loading';
 
 // Mock data fetcher
 const fetchUserData = async () => {
@@ -17,6 +20,16 @@ const fetchUserData = async () => {
 
 export default async function DashboardPage() {
   const userData = await fetchUserData();
+export default function DashboardPage() {
+  const [userData, setUserData] = useState<{ plan: string; credits: number; maxCredits: number } | null>(null);
+
+  useEffect(() => {
+    fetchUserData().then(setUserData);
+  }, []);
+
+  if (!userData) {
+    return <DashboardSkeleton />;
+  }
 
   // Calculate percentage for progress bar
   const percentage = Math.min(100, Math.max(0, (userData.credits / userData.maxCredits) * 100));

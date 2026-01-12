@@ -30,6 +30,36 @@ export async function POST(request: NextRequest) {
 
     if (tokenBuffer.length !== secretBuffer.length || !crypto.timingSafeEqual(tokenBuffer, secretBuffer)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // 1. Security Check: Validate Authorization Header
+    const authHeader = request.headers.get('authorization');
+    const apiSecret = process.env.GREENCHAINZ_API_SECRET;
+
+    if (!apiSecret) {
+      console.error('GREENCHAINZ_API_SECRET is not configured on the server.');
+      return NextResponse.json(
+        { error: 'Server misconfiguration' },
+        { status: 500 }
+      );
+    }
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: 'Unauthorized: Missing or invalid Authorization header' },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    // Use constant-time comparison to prevent timing attacks
+    const tokenBuffer = Buffer.from(token);
+    const secretBuffer = Buffer.from(apiSecret);
+
+    if (tokenBuffer.length !== secretBuffer.length || !crypto.timingSafeEqual(tokenBuffer, secretBuffer)) {
+      return NextResponse.json(
+        { error: 'Unauthorized: Invalid token' },
+        { status: 401 }
+      );
     }
 
     const body = await request.json();
