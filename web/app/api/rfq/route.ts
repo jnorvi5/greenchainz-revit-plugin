@@ -21,6 +21,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Security: Limit number of materials to prevent DoS
+    if (Array.isArray(materials) && materials.length > 100) {
+      return NextResponse.json(
+        { error: 'Too many materials. Maximum allowed is 100.' },
+        { status: 400 }
+      );
+    }
+
     // Create RFQ record
     const rfqId = `RFQ-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     
@@ -77,7 +85,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('RFQ API Error:', error);
     return NextResponse.json(
-      { error: 'Failed to process RFQ', details: String(error) },
+      { error: 'Failed to process RFQ' }, // Do not leak error details
       { status: 500 }
     );
   }

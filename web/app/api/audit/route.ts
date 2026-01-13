@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Audit API Error:', error);
     return NextResponse.json(
-      { error: 'Failed to process Audit', details: String(error) },
+      { error: 'Failed to process Audit' }, // Do not leak error details
       { status: 500 }
     );
   }
