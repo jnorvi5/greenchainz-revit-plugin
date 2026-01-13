@@ -153,7 +153,7 @@ export default function BillingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <main id="main-content" className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center">
           <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
@@ -216,7 +216,7 @@ export default function BillingPage() {
                 </button>
               </div>
               <div className="pt-6 pb-8 px-6">
-                <h4 className="text-sm font-medium text-gray-900 tracking-wide uppercase">What's included</h4>
+                <h4 className="text-sm font-medium text-gray-900 tracking-wide uppercase">What&apos;s included</h4>
                 <ul className="mt-6 space-y-4">
                   {tier.features.map((feature) => (
                     <li key={feature} className="flex space-x-3">
@@ -242,6 +242,6 @@ export default function BillingPage() {
           )})}
         </div>
       </div>
-    </div>
+    </main>
   );
 }

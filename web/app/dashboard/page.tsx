@@ -33,7 +33,7 @@ export default function DashboardPage() {
   const percentage = Math.min(100, Math.max(0, (userData.credits / userData.maxCredits) * 100));
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <main id="main-content" className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
 
@@ -73,6 +73,6 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
