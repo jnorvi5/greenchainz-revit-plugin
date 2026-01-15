@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import DashboardSkeleton from './loading';
 
 // Mock data fetcher
 const fetchUserData = async () => {
@@ -11,43 +12,14 @@ const fetchUserData = async () => {
       resolve({
         plan: 'Pro',
         credits: 150,
-        maxCredits: 500, // Added maxCredits for progress bar context
+        maxCredits: 500,
       });
-    }, 1500); // Increased delay to show off the skeleton
+    }, 1500);
   });
 };
 
-function DashboardSkeleton() {
-  return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-4xl mx-auto">
-        {/* Title Skeleton */}
-        <div className="h-8 w-48 bg-gray-200 rounded animate-pulse mb-6"></div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Card 1 Skeleton */}
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="h-5 w-32 bg-gray-200 rounded animate-pulse mb-3"></div>
-            <div className="h-10 w-24 bg-indigo-100 rounded animate-pulse mt-2"></div>
-            <div className="h-4 w-28 bg-gray-100 rounded animate-pulse mt-5"></div>
-          </div>
-
-          {/* Card 2 Skeleton */}
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="h-5 w-40 bg-gray-200 rounded animate-pulse mb-3"></div>
-            <div className="h-10 w-24 bg-green-100 rounded animate-pulse mt-2"></div>
-            {/* Progress bar skeleton */}
-            <div className="w-full bg-gray-200 rounded-full h-2.5 mt-4">
-              <div className="bg-gray-300 h-2.5 rounded-full animate-pulse" style={{ width: '45%' }}></div>
-            </div>
-            <div className="h-4 w-32 bg-gray-100 rounded animate-pulse mt-2"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
+export default async function DashboardPage() {
+  const userData = await fetchUserData();
 export default function DashboardPage() {
   const [userData, setUserData] = useState<{ plan: string; credits: number; maxCredits: number } | null>(null);
 
@@ -59,15 +31,30 @@ export default function DashboardPage() {
     return <DashboardSkeleton />;
   }
 
-  // Calculate percentage for progress bar
+  // Calculate usage
+  const usedCredits = userData.maxCredits - userData.credits;
   const percentage = Math.min(100, Math.max(0, (userData.credits / userData.maxCredits) * 100));
 
+  // Determine color based on availability
+  // < 25%: Red (Critical)
+  // < 50%: Orange (Warning)
+  // >= 50%: Green (Good)
+  let progressColor = 'bg-green-600';
+  if (percentage < 25) {
+    progressColor = 'bg-red-600';
+  } else if (percentage < 50) {
+    progressColor = 'bg-orange-500';
+  }
+
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    // Added animate-in for smoother transition from loading skeleton
+    <div className="min-h-screen bg-gray-100 p-8 animate-in fade-in duration-500">
+    <main id="main-content" className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
+        <h1 className="text-2xl font-bold mb-6 text-gray-900">Dashboard</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Plan Card */}
           <div className="bg-white p-6 rounded-lg shadow">
             <h2 className="text-lg font-semibold text-gray-700">Current Plan</h2>
             <p className="text-3xl font-bold text-indigo-600 mt-2">{userData.plan}</p>
@@ -86,36 +73,66 @@ export default function DashboardPage() {
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
+              className="inline-flex items-center text-sm text-gray-500 mt-4 hover:underline hover:text-indigo-600 transition-colors group"
+            >
+              <span>Change Plan</span>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+              className="mt-4 inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 rounded-md"
+              aria-label="Change current plan"
+            >
+              Change Plan <span aria-hidden="true" className="ml-1">→</span>
             </Link>
           </div>
 
+          {/* Credits Card */}
           <div className="bg-white p-6 rounded-lg shadow">
             <div className="flex justify-between items-baseline">
-              <h2 className="text-lg font-semibold text-gray-700">Credits Remaining</h2>
-              <span className="text-sm text-gray-500">{userData.credits} / {userData.maxCredits}</span>
+              <h2 className="text-lg font-semibold text-gray-700">Credits Balance</h2>
+              <span className="text-sm text-gray-500">
+                <span className="sr-only">Total credits: </span>
+                {userData.maxCredits}
+              </span>
             </div>
 
-            <p className="text-3xl font-bold text-green-600 mt-2">{userData.credits}</p>
+            <div className="flex items-baseline gap-2 mt-2">
+              <p className="text-3xl font-bold text-green-600">
+                {userData.credits}
+              </p>
+              <span className="text-sm text-gray-500">available</span>
+            </div>
 
             {/* Accessible Progress Bar */}
             <div
-              className="w-full bg-gray-200 rounded-full h-2.5 mt-4 mb-1"
-              role="progressbar"
-              aria-valuenow={userData.credits}
-              aria-valuemin={0}
-              aria-valuemax={userData.maxCredits}
-              aria-label="Credits usage"
+              className="mt-4 mb-1"
+              aria-describedby="usage-text"
             >
+              <div className="flex justify-between text-xs text-gray-400 mb-1">
+                <span>0</span>
+                <span>{userData.maxCredits}</span>
+              </div>
               <div
-                className="bg-green-600 h-2.5 rounded-full transition-all duration-500 ease-out"
-                style={{ width: `${percentage}%` }}
-              ></div>
+                className="w-full bg-gray-200 rounded-full h-2.5"
+                role="progressbar"
+                aria-valuenow={userData.credits}
+                aria-valuemin={0}
+                aria-valuemax={userData.maxCredits}
+                aria-label="Credits balance"
+              >
+                <div
+                  className={`${progressColor} h-2.5 rounded-full transition-all duration-500 ease-out`}
+                  style={{ width: `${percentage}%` }}
+                ></div>
+              </div>
             </div>
 
-            <p className="text-sm text-gray-500">Used for audits</p>
+            <p id="usage-text" className="text-sm text-gray-500 mt-2">
+              You have used {usedCredits} credits this period
+            </p>
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
