@@ -1,10 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
-
-// Replace with your actual publishable key
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 // Simple Spinner Component
 const Spinner = ({ className }: { className?: string }) => (
@@ -114,6 +110,10 @@ export default function BillingPage() {
     setMessage('');
 
     try {
+      // Add a small artificial delay to ensure the loading spinner is visible
+      // even if the API responds instantly (good for UX perception too)
+      await new Promise(resolve => setTimeout(resolve, 500));
+
       const res = await fetch('/api/stripe/create-checkout', {
         method: 'POST',
         headers: {
@@ -124,7 +124,7 @@ export default function BillingPage() {
         }),
       });
 
-      const { sessionId, url, error } = await res.json();
+      const { url, error } = await res.json();
 
       if (error) {
         console.error('Error creating checkout session:', error);
@@ -164,6 +164,9 @@ export default function BillingPage() {
           </p>
           <div className="mt-4">
              <button
+               onClick={handleManageSubscription}
+               className="text-indigo-600 hover:text-indigo-500 font-medium focus:outline-none focus:underline"
+             >
                 onClick={handleManageSubscription}
                 className="text-indigo-600 hover:text-indigo-500 flex items-center justify-center mx-auto"
                 disabled={!!loadingTierId}
@@ -175,6 +178,7 @@ export default function BillingPage() {
         </div>
 
         {message && (
+             <div className="mt-4 p-4 bg-blue-100 text-blue-700 rounded text-center" role="alert">
              <div
                className="mt-4 p-4 bg-blue-100 text-blue-700 rounded text-center"
                role="alert"
@@ -184,6 +188,7 @@ export default function BillingPage() {
         )}
 
         <div className="mt-12 space-y-4 sm:mt-16 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-6 lg:max-w-4xl lg:mx-auto xl:max-w-none xl:mx-0 xl:grid-cols-3">
+          {pricingTiers.map((tier) => (
           {pricingTiers.map((tier) => {
             const isThisLoading = loadingTierId === tier.id;
             const isAnyLoading = !!loadingTierId;
@@ -201,6 +206,18 @@ export default function BillingPage() {
                 </p>
                 <button
                   onClick={() => handleSubscribe(tier)}
+                  disabled={loading}
+                  aria-busy={loading}
+                  className={`mt-8 flex w-full justify-center items-center rounded-md py-2 text-sm font-semibold text-white shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
+                    ${loading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'}
+                  `}
+                >
+                  {loading ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
                   disabled={isAnyLoading}
                   aria-busy={isThisLoading}
                   className={`mt-8 w-full bg-indigo-600 border border-transparent rounded-md py-2 text-sm font-semibold text-white text-center hover:bg-indigo-700 transition-colors flex justify-center items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 ${isAnyLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
