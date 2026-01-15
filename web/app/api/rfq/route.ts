@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('RFQ API Error:', error);
     return NextResponse.json(
-      { error: 'Failed to process RFQ', details: String(error) },
+      { error: 'Failed to process RFQ' },
       { status: 500 }
     );
   }
