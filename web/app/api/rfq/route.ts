@@ -62,10 +62,6 @@ export async function POST(request: NextRequest) {
     if (projectName.length > 200) {
       return NextResponse.json(
         { error: 'Project name too long. Limit is 200 characters.' },
-    // Security: Limit number of materials to prevent DoS
-    if (Array.isArray(materials) && materials.length > 100) {
-      return NextResponse.json(
-        { error: 'Too many materials. Maximum allowed is 100.' },
         { status: 400 }
       );
     }
@@ -127,7 +123,6 @@ export async function POST(request: NextRequest) {
     console.error('RFQ API Error:', error);
     return NextResponse.json(
       { error: 'Failed to process RFQ' }, // Do not leak error details
-      { error: 'Failed to process RFQ' },
       { status: 500 }
     );
   }

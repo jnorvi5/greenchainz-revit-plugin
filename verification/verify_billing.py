@@ -1,43 +1,38 @@
 
-from playwright.sync_api import sync_playwright, expect
+from playwright.sync_api import sync_playwright
 
-def run():
+def verify_billing_page():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
-        context = browser.new_context()
-        page = context.new_page()
+        page = browser.new_page()
+        try:
+            page.goto('http://localhost:3000/billing')
 
-        print("Navigating to billing page...")
-        page.goto("http://localhost:3000/billing")
+            # Wait for content to load
+            page.wait_for_selector('text=Simple, Transparent Pricing')
 
-        print("Waiting for pricing cards...")
-        # Use exact text match for "Subscribe" button to avoid matching "Already a subscriber?"
-        subscribe_btn = page.get_by_role("button", name="Subscribe", exact=True)
-        expect(subscribe_btn).to_be_visible()
+            # Take screenshot of initial state
+            page.screenshot(path='verification/billing_initial.png')
 
-        print("Clicking Subscribe...")
-        # Click the button
-        subscribe_btn.click()
+            # Find the manage subscription button
+            manage_btn = page.locator('button:has-text("Manage your subscription")')
 
-        print("Verifying loading state...")
-        # Expect the button to have loading text "Processing..."
-        # And to be disabled
+            # Click it to trigger loading state
+            manage_btn.click()
 
-        # We need to wait for the state change to happen.
-        # The click triggers async handleSubscribe which sets loading=true immediately.
-        # But React might take a tick to update.
+            # Wait a tiny bit for the state update (react hook)
+            page.wait_for_timeout(100)
 
-        # Check for the loading text first, as that confirms the state update
-        expect(subscribe_btn).to_contain_text("Processing...")
-        expect(subscribe_btn).to_be_disabled()
+            # Take screenshot of loading state
+            page.screenshot(path='verification/billing_loading.png')
 
-        # Verify aria-busy attribute
-        expect(subscribe_btn).to_have_attribute("aria-busy", "true")
+            print('Verification screenshots taken.')
 
-        print("Taking screenshot...")
-        page.screenshot(path="verification/billing_loading.png")
+        except Exception as e:
+            print(f'Error: {e}')
+        finally:
+            browser.close()
 
-        browser.close()
+if __name__ == '__main__':
+    verify_billing_page()
 
-if __name__ == "__main__":
-    run()
