@@ -138,7 +138,7 @@ namespace GreenChainz.Revit.Services
              // SECURITY: Request body logging removed to prevent PII leakage (ProjectAddress, SpecialInstructions)
 
              try
-             {
+            {
                  return await SendRequestAsync<string>(httpRequest);
              }
              catch (Exception ex)
