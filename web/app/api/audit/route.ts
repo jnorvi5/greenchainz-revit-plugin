@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
   try {
     // 🛡️ SECURITY: Verify Authorization header
     // This prevents unauthorized users from submitting fake audit data
+    // 1. Security Check: Validate Authorization Header
     const authHeader = request.headers.get('authorization');
     const apiSecret = process.env.GREENCHAINZ_API_SECRET;
 
@@ -20,6 +21,9 @@ export async function POST(request: NextRequest) {
       // Sentinel: Fail securely if configuration is missing
       return NextResponse.json(
         { error: 'Server configuration error' },
+      console.error('GREENCHAINZ_API_SECRET is not configured on the server.');
+      return NextResponse.json(
+        { error: 'Server misconfiguration' },
         { status: 500 }
       );
     }
@@ -42,6 +46,22 @@ export async function POST(request: NextRequest) {
       console.warn('Unauthorized access attempt to /api/audit');
       return NextResponse.json(
         { error: 'Unauthorized' },
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: 'Unauthorized: Missing or invalid Authorization header' },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    // Use constant-time comparison to prevent timing attacks
+    const tokenBuffer = Buffer.from(token);
+    const secretBuffer = Buffer.from(apiSecret);
+
+    if (tokenBuffer.length !== secretBuffer.length || !crypto.timingSafeEqual(tokenBuffer, secretBuffer)) {
+      return NextResponse.json(
+        { error: 'Unauthorized: Invalid token' },
         { status: 401 }
       );
     }
@@ -106,7 +126,8 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Audit API Error:', error);
     return NextResponse.json(
-      { error: 'Failed to process Audit', details: String(error) },
+      { error: 'Failed to process Audit' }, // Do not leak error details
+      { error: 'Failed to process Audit' },
       { status: 500 }
     );
   }
