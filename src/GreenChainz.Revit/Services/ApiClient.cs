@@ -25,6 +25,15 @@ namespace GreenChainz.Revit.Services
         {
         }
 
+        public ApiClient(ILogger logger = null)
+            : this("https://api.greenchainz.com", null, logger)
+        {
+        }
+
+        public ApiClient(string baseUrl, string authToken = null, ILogger logger = null)
+        {
+            _baseUrl = (baseUrl ?? "https://api.greenchainz.com").TrimEnd('/');
+            _logger = logger ?? new TelemetryLogger();
         public ApiClient()
             : this("https://api.greenchainz.com", null, null, null)
         {
@@ -212,6 +221,31 @@ namespace GreenChainz.Revit.Services
             }
         }
 
+        public async Task<T> SendRequestAsync<T>(HttpRequestMessage request)
+        {
+            try
+            {
+                HttpResponseMessage response = await _httpClient.SendAsync(request);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string json = await response.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<T>(json);
+                }
+                else
+                {
+                    string errorBody = await response.Content.ReadAsStringAsync();
+                    throw new ApiException($"Request failed ({response.StatusCode}): {errorBody}", (int)response.StatusCode, errorBody);
+                }
+            }
+            catch (ApiException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error");
+                throw new ApiException($"Unexpected error: {ex.Message}", ex);
         public async Task<MaterialsResponse> GetMaterialsAsync(string category = null, string search = null)
         {
             // Logging as requested
