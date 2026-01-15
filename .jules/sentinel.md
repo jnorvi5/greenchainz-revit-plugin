@@ -5,6 +5,10 @@
 **Learning:** Next.js requires manual configuration in `next.config.ts` to add these headers globally.
 **Prevention:** Always verify security headers are configured in the framework's config file during project setup.
 
+## 2025-05-20 - Unauthenticated API Endpoints
+**Vulnerability:** The `/api/audit` endpoint was completely public, allowing any unauthenticated user to submit fake audit data.
+**Learning:** Next.js API Routes are public by default. Unlike some frameworks with global middleware defaults, each route must explicitly implement or import authentication checks.
+**Prevention:** Implement a middleware or a reusable `requireAuth` helper function that checks `Authorization` headers and use it in every secure API route.
 ## 2024-05-22 - [CRITICAL] PII Leakage in API Client Logging
 **Vulnerability:** The `ApiClient.SendRequestAsync` method was logging the full JSON request body to the telemetry file (`%AppData%/GreenChainz/logs.txt`). This included the `RFQRequest` object which contains `ProjectAddress` and `SpecialInstructions`, potentially exposing Personally Identifiable Information (PII) or sensitive project data in plain text logs on the user's machine.
 **Learning:** Generic logging wrappers that "log everything for debugging" often inadvertently capture sensitive data. Telemetry services that write to local disk are still a security risk if the machine is compromised or logs are shared for support.

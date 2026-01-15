@@ -10,6 +10,26 @@ const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabase
 // Audit API Endpoint - Receives Carbon Audit results from Revit plugin
 export async function POST(request: NextRequest) {
   try {
+    // 🛡️ Sentinel: Authenticate request
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const token = authHeader.split(' ')[1];
+    const secret = process.env.GREENCHAINZ_API_SECRET;
+
+    if (!secret) {
+      console.error('GREENCHAINZ_API_SECRET is not configured');
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+    }
+
+    // Secure constant-time comparison
+    const tokenBuffer = Buffer.from(token);
+    const secretBuffer = Buffer.from(secret);
+
+    if (tokenBuffer.length !== secretBuffer.length || !crypto.timingSafeEqual(tokenBuffer, secretBuffer)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     // 🛡️ SECURITY: Verify Authorization header
     // This prevents unauthorized users from submitting fake audit data
     // 1. Security Check: Validate Authorization Header
@@ -106,6 +126,7 @@ export async function POST(request: NextRequest) {
         } else if (error) {
           console.error('Supabase DB Error:', error);
         }
+      } catch (_) {
       } catch (_dbError) {
         console.log('Supabase not configured or error connecting, continuing without DB');
       }
