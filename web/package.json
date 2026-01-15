@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest"
   },
   "dependencies": {
     "@stripe/stripe-js": "^8.6.0",
@@ -26,5 +27,6 @@
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.0.16"
+    "vitest": "^4.0.17"
   }
 }

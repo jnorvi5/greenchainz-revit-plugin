@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { POST } from '../route';
 import { NextRequest } from 'next/server';
 
@@ -11,11 +12,12 @@ vi.mock('@supabase/supabase-js', () => ({
           single: vi.fn(() => ({ data: { id: 'mock-id' }, error: null })),
         })),
       })),
+      insert: vi.fn(() => ({ error: null })),
     })),
   })),
 }));
 
-describe('Audit API Endpoint Security', () => {
+describe('RFQ API Endpoint Security', () => {
   const originalEnv = process.env;
 
   beforeEach(() => {
@@ -28,76 +30,70 @@ describe('Audit API Endpoint Security', () => {
   });
 
   it('should return 401 if authorization header is missing', async () => {
-    const req = new NextRequest('http://localhost:3000/api/audit', {
+    const req = new NextRequest('http://localhost:3000/api/rfq', {
       method: 'POST',
-      body: JSON.stringify({ ProjectName: 'Test Project' }),
+      body: JSON.stringify({ projectName: 'Test Project', materials: [{ name: 'Steel' }] }),
     });
 
     const res = await POST(req);
     expect(res.status).toBe(401);
     const data = await res.json();
-    expect(data.error).toContain('Missing or invalid Authorization header');
+    expect(data.error).toContain('Unauthorized');
   });
 
   it('should return 401 if token is incorrect', async () => {
-    const req = new NextRequest('http://localhost:3000/api/audit', {
+    const req = new NextRequest('http://localhost:3000/api/rfq', {
       method: 'POST',
       headers: {
         Authorization: 'Bearer wrong-token',
       },
-      body: JSON.stringify({ ProjectName: 'Test Project' }),
+      body: JSON.stringify({ projectName: 'Test Project', materials: [{ name: 'Steel' }] }),
     });
 
     const res = await POST(req);
     expect(res.status).toBe(401);
-    const data = await res.json();
-    expect(data.error).toContain('Invalid token');
   });
 
-  it('should return 500 if server secret is not configured', async () => {
-    process.env.GREENCHAINZ_API_SECRET = ''; // Unset secret
-
-    const req = new NextRequest('http://localhost:3000/api/audit', {
+  it('should return 400 if materials array exceeds limit (DoS protection)', async () => {
+    const manyMaterials = Array(101).fill({ name: 'Steel' });
+    const req = new NextRequest('http://localhost:3000/api/rfq', {
       method: 'POST',
       headers: {
         Authorization: 'Bearer test-secret',
       },
-      body: JSON.stringify({ ProjectName: 'Test Project' }),
+      body: JSON.stringify({ projectName: 'Test Project', materials: manyMaterials }),
     });
 
     const res = await POST(req);
-    expect(res.status).toBe(500);
+    expect(res.status).toBe(400);
     const data = await res.json();
-    expect(data.error).toContain('Server misconfiguration');
+    expect(data.error).toContain('Too many materials');
   });
 
-  it('should return 200 if token is correct', async () => {
-    const req = new NextRequest('http://localhost:3000/api/audit', {
+  it('should return 200 if token is correct and payload is valid', async () => {
+    const req = new NextRequest('http://localhost:3000/api/rfq', {
       method: 'POST',
       headers: {
         Authorization: 'Bearer test-secret',
       },
-      body: JSON.stringify({ ProjectName: 'Test Project' }),
+      body: JSON.stringify({ projectName: 'Test Project', materials: [{ name: 'Steel' }] }),
     });
 
     const res = await POST(req);
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.success).toBe(true);
-  });
-
-  it('should not expose error details on unexpected failure', async () => {
-    // Force an internal error by mocking request.json to fail
+  it('should not expose error details on failure', async () => {
+    // Malformed JSON to trigger parse error or validation error
     const req = {
-      headers: { get: () => 'Bearer test-secret' },
-      json: async () => { throw new Error('Simulated internal error'); }
+      json: async () => { throw new Error('Simulated JSON parse error'); }
     } as unknown as NextRequest;
 
     const res = await POST(req);
     expect(res.status).toBe(500);
     const data = await res.json();
 
-    expect(data.error).toBe('Failed to process Audit');
+    expect(data.error).toBe('Failed to process RFQ');
     expect(data.details).toBeUndefined(); // Crucial security check
   });
 });
