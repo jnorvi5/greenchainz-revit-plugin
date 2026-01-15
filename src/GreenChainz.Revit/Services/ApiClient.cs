@@ -13,6 +13,7 @@ namespace GreenChainz.Revit.Services
     {
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl;
+        private readonly ILogger<ApiClient> _logger;
         private readonly string _authToken;
         private readonly IRevitLogger _logger;
         private readonly ILogger<ApiClient> _logger;
@@ -88,6 +89,14 @@ namespace GreenChainz.Revit.Services
         }
 
         public ApiClient(string baseUrl, string authToken = null)
+            : this(baseUrl, authToken, null)
+        {
+        }
+
+        public ApiClient(string baseUrl, string authToken, ILogger<ApiClient> logger)
+        {
+            _baseUrl = (baseUrl ?? "https://api.greenchainz.com").TrimEnd('/');
+            _logger = logger;
             : this(baseUrl, authToken, new TelemetryLogger())
             : this(baseUrl, authToken, new HttpClient { Timeout = TimeSpan.FromSeconds(30) })
         {
@@ -253,6 +262,21 @@ namespace GreenChainz.Revit.Services
             string url = $"{_baseUrl}/api/rfq";
             string json = JsonConvert.SerializeObject(request);
 
+            using (var message = new HttpRequestMessage(HttpMethod.Post, url))
+            {
+                message.Content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = await SendRequestAsync(message);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadAsStringAsync();
+                }
+                else
+                {
+                    string errorBody = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"RFQ submission failed ({response.StatusCode}): {errorBody}");
+                }
             using (var requestMessage = new HttpRequestMessage(HttpMethod.Post, url))
             {
                 requestMessage.Content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -389,6 +413,39 @@ namespace GreenChainz.Revit.Services
             string url = $"{_baseUrl}/api/audit";
             string json = JsonConvert.SerializeObject(request);
 
+            using (var message = new HttpRequestMessage(HttpMethod.Post, url))
+            {
+                message.Content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = await SendRequestAsync(message);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string responseString = await response.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<AuditResult>(responseString);
+                }
+                else
+                {
+                    return new AuditResult
+                    {
+                        OverallScore = -1,
+                        Summary = "API Error: " + response.ReasonPhrase
+                    };
+                }
+            }
+        }
+
+        private async Task<HttpResponseMessage> SendRequestAsync(HttpRequestMessage request)
+        {
+            try
+            {
+                return await _httpClient.SendAsync(request);
+            }
+            catch (TaskCanceledException ex)
+            {
+                _logger?.LogError(ex, "Request timeout");
+
+                throw new ApiException($"Request timeout after {ApiConfig.TIMEOUT_SECONDS} seconds", ex);
             using (var requestMessage = new HttpRequestMessage(HttpMethod.Post, url))
             {
                 requestMessage.Content = new StringContent(json, Encoding.UTF8, "application/json");
