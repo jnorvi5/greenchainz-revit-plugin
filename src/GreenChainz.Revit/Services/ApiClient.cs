@@ -537,6 +537,27 @@ namespace GreenChainz.Revit.Services
                     throw new ApiException($"API request failed with status code {response.StatusCode}", (int)response.StatusCode, errorBody);
                 }
             }
+
+        /// <summary>
+        /// Sends the HTTP request with logging.
+        /// </summary>
+        /// <param name="request">The HTTP request message.</param>
+        /// <param name="jsonBody">Optional JSON body string for logging purposes.</param>
+        /// <returns>The HTTP response.</returns>
+        private async Task<HttpResponseMessage> SendRequestAsync(HttpRequestMessage request, string jsonBody = null)
+        {
+            string method = request.Method.ToString();
+            string url = request.RequestUri.ToString();
+
+            // Sentinel: Suppressed request body logging to prevent PII/sensitive data leakage in logs
+            // if (!string.IsNullOrEmpty(jsonBody))
+            // {
+            //     _logger.LogDebug($"Request body: {jsonBody}");
+            // }
+
+            _logger.LogDebug($"Sending {method} request to {url}");
+
+            return await _httpClient.SendAsync(request);
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"HTTP request failed for {url}");
