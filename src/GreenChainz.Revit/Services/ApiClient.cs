@@ -23,7 +23,6 @@ namespace GreenChainz.Revit.Services
         // Default constructor
         public ApiClient(ILogger logger = null)
             : this(ApiConfig.BASE_URL, ApiConfig.LoadAuthToken(), logger)
-            : this("https://api.greenchainz.com", null, logger)
         {
         }
 
