@@ -4,7 +4,6 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using GreenChainz.Revit.Models;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace GreenChainz.Revit.Services
@@ -290,7 +289,7 @@ namespace GreenChainz.Revit.Services
              // SECURITY: Request body logging removed to prevent PII leakage (ProjectAddress, SpecialInstructions)
 
              try
-            {
+             {
                  return await SendRequestAsync<string>(httpRequest);
              }
              catch (Exception ex)
@@ -304,10 +303,8 @@ namespace GreenChainz.Revit.Services
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            // Logging added as requested
-            _logger?.LogInformation($"Submitting audit for project: {request.ProjectName}");
+            _logger.LogInfo($"Submitting audit for project: {request.ProjectName}");
 
-            string url = $"{_baseUrl}/audit/extract-materials";
             string url = $"{_baseUrl}/api/audit";
             string json = JsonConvert.SerializeObject(request);
             var httpRequest = new HttpRequestMessage(HttpMethod.Post, url)
@@ -315,32 +312,7 @@ namespace GreenChainz.Revit.Services
                 Content = new StringContent(json, Encoding.UTF8, "application/json")
             };
 
-            try
-            {
-                return await SendRequestAsync<AuditResult>(httpRequest);
-                string responseString = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<AuditResponse>(responseString);
-                return await SendRequestAsync<AuditResult>(requestMessage);
-            }
-            catch (ApiException ex)
-            {
-                string errorBody = await response.Content.ReadAsStringAsync();
-                throw new Exception($"Audit submission failed ({response.StatusCode}): {errorBody}");
-                // Preserve original behavior: return error object instead of throwing
-                return new AuditResult
-                {
-                    OverallScore = -1,
-                    Summary = "API Error: " + (ex.ResponseBody ?? ex.Message)
-                };
-            }
-            catch (Exception ex)
-            {
-                return new AuditResult
-                {
-                    OverallScore = -1,
-                    Summary = "API Error: " + ex.Message
-                };
-            }
+            return await SendRequestAsync<AuditResponse>(httpRequest);
         }
 
         private async Task<T> SendRequestAsync<T>(HttpRequestMessage request)
@@ -369,7 +341,8 @@ namespace GreenChainz.Revit.Services
                 else
                 {
                     string errorBody = await response.Content.ReadAsStringAsync();
-                     _logger.LogError(null, $"API request failed: {response.StatusCode} - {errorBody}");
+                    // SECURITY: Redact error body from logs to prevent potential PII leakage
+                    _logger.LogError(null, $"API request failed: {response.StatusCode}");
                     throw new ApiException($"API request failed with status code {response.StatusCode}", (int)response.StatusCode, errorBody);
                 }
             }
