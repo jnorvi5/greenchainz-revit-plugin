@@ -18,6 +18,21 @@ def verify_dashboard():
 
         except Exception as e:
             print(f"Error: {e}")
+            print("Navigating to dashboard...")
+            page.goto("http://localhost:3000/dashboard")
+
+            print("Waiting for Change Plan button...")
+            # Using CSS selector as a fallback to ensure we find it
+            change_plan_link = page.locator("a[href='/billing']")
+            change_plan_link.wait_for(state="visible", timeout=10000)
+
+            print("Taking screenshot...")
+            page.screenshot(path="verification/dashboard_fix.png")
+            print("Screenshot saved to verification/dashboard_fix.png")
+
+        except Exception as e:
+            print(f"Error: {e}")
+            page.screenshot(path="verification/error.png")
         finally:
             browser.close()
 
