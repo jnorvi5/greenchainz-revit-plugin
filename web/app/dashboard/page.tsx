@@ -1,4 +1,8 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import DashboardSkeleton from './loading';
 
 // Mock data fetcher
 const fetchUserData = async () => {
@@ -16,6 +20,16 @@ const fetchUserData = async () => {
 
 export default async function DashboardPage() {
   const userData = await fetchUserData();
+export default function DashboardPage() {
+  const [userData, setUserData] = useState<{ plan: string; credits: number; maxCredits: number } | null>(null);
+
+  useEffect(() => {
+    fetchUserData().then(setUserData);
+  }, []);
+
+  if (!userData) {
+    return <DashboardSkeleton />;
+  }
 
   // Calculate usage
   const usedCredits = userData.maxCredits - userData.credits;
@@ -35,6 +49,7 @@ export default async function DashboardPage() {
   return (
     // Added animate-in for smoother transition from loading skeleton
     <div className="min-h-screen bg-gray-100 p-8 animate-in fade-in duration-500">
+    <main id="main-content" className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold mb-6 text-gray-900">Dashboard</h1>
 
@@ -51,6 +66,10 @@ export default async function DashboardPage() {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
+              className="mt-4 inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 rounded-md"
+              aria-label="Change current plan"
+            >
+              Change Plan <span aria-hidden="true" className="ml-1">→</span>
             </Link>
           </div>
 
@@ -101,6 +120,6 @@ export default async function DashboardPage() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
