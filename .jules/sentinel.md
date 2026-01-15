@@ -12,3 +12,7 @@
 1. Never log full request/response bodies in production code.
 2. Use specific logging for specific fields if necessary.
 3. Implement a redaction policy for logging if body logging is absolutely required for debugging (which should be toggled off by default).
+## 2025-02-17 - Unsecured API Endpoints
+**Vulnerability:** The `/api/rfq` endpoint was exposed without authentication, allowing potential abuse.
+**Learning:** Next.js API routes are public by default. Authentication must be explicitly implemented, preferably using a shared middleware or utility function.
+**Prevention:** Audit all new API endpoints for authentication checks. Consider implementing a middleware to enforce `GREENCHAINZ_API_SECRET` verification globally or on specific paths.
