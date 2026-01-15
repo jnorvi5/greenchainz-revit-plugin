@@ -20,6 +20,13 @@ namespace GreenChainz.Revit.Services
         private bool _disposed;
         private readonly bool _shouldDisposeHttpClient;
 
+        // Default constructor uses default base URL and file logger
+        public ApiClient(ILogger logger = null)
+            : this(ApiConfig.BASE_URL, ApiConfig.LoadAuthToken(), logger)
+        {
+        }
+
+        // Constructor with base URL and auth token, creates its own HttpClient
         // Default constructor
         public ApiClient(ILogger logger = null)
             : this(ApiConfig.BASE_URL, ApiConfig.LoadAuthToken(), logger)
@@ -115,6 +122,7 @@ namespace GreenChainz.Revit.Services
             ConfigureHttpClient(authToken);
         }
 
+        // Constructor for dependency injection of HttpClient
         // Constructor for DI/Testing
         public ApiClient(string baseUrl, string authToken, HttpClient httpClient, ILogger logger = null)
         {
@@ -124,6 +132,12 @@ namespace GreenChainz.Revit.Services
             _shouldDisposeHttpClient = false;
 
             ConfigureHttpClient(authToken);
+        }
+
+        // Overload to maintain backward compatibility
+        public ApiClient(string baseUrl, string authToken, HttpClient httpClient)
+            : this(baseUrl, authToken, httpClient, null)
+        {
         }
 
         private void ConfigureHttpClient(string authToken)
@@ -142,6 +156,14 @@ namespace GreenChainz.Revit.Services
 
         private async Task<HttpResponseMessage> SendRequestAsync(HttpRequestMessage request)
         {
+            string method = request.Method.ToString();
+            string url = request.RequestUri.ToString();
+
+            _logger.LogDebug($"Sending {method} request to {url}");
+
+            // SECURITY: Request body logging removed to prevent PII leakage
+            // Previous insecure code: _logger.LogDebug($"Request body: {jsonBody}");
+
             try
             {
                 return await _httpClient.SendAsync(request);
@@ -153,23 +175,16 @@ namespace GreenChainz.Revit.Services
             }
         }
 
-        // Overload to maintain backward compatibility for tests/existing code that calls (baseUrl, authToken, httpClient)
-        public ApiClient(string baseUrl, string authToken, HttpClient httpClient)
-            : this(baseUrl, authToken, httpClient, null)
-        {
-        }
-
         private async Task<T> SendRequestAsync<T>(HttpRequestMessage request)
         {
             try
             {
-                HttpResponseMessage response = await _httpClient.SendAsync(request);
+                HttpResponseMessage response = await SendRequestAsync(request);
 
                 if (response.IsSuccessStatusCode)
                 {
                     string responseString = await response.Content.ReadAsStringAsync();
 
-                    // Handle string return type directly to avoid JSON deserialization
                     if (typeof(T) == typeof(string))
                     {
                         return (T)(object)responseString;
@@ -188,14 +203,6 @@ namespace GreenChainz.Revit.Services
                 _logger.LogError(ex, "Failed to deserialize response");
                 throw new ApiException($"Failed to parse API response: {ex.Message}", ex);
             }
-        private async Task<HttpResponseMessage> SendRequestAsync(HttpRequestMessage request)
-        {
-            HttpResponseMessage response = await _httpClient.SendAsync(request);
-            string responseContent = await response.Content.ReadAsStringAsync();
-
-            _logger.LogDebug($"Response status: {response.StatusCode}, body: {responseContent}");
-
-            return response;
         }
 
         public ApiClient(string baseUrl, string authToken, HttpClient httpClient)
@@ -203,6 +210,12 @@ namespace GreenChainz.Revit.Services
         {
         }
 
+            _logger.LogInfo($"Submitting RFQ for project: {request.ProjectName}");
+
+            string url = $"{_baseUrl}/api/rfq";
+            string json = JsonConvert.SerializeObject(request);
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, url)
         public ApiClient(string baseUrl, string authToken, HttpClient httpClient, IRevitLogger logger)
         {
             _logger = logger ?? new TelemetryLogger();
@@ -240,6 +253,12 @@ namespace GreenChainz.Revit.Services
             }
             catch (ApiException)
             {
+                 throw new Exception($"RFQ submission failed: {ex.Message}", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"RFQ submission failed: {ex.Message}", ex);
+            }
                 throw;
             }
             catch (Exception ex)
@@ -307,6 +326,12 @@ namespace GreenChainz.Revit.Services
             // Logging added as requested
             _logger?.LogInformation($"Submitting audit for project: {request.ProjectName}");
 
+            // SECURITY: Do not log full audit request details as they may contain sensitive project data
+
+            string url = $"{_baseUrl}/api/audit";
+            string json = JsonConvert.SerializeObject(request);
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, url)
             string url = $"{_baseUrl}/audit/extract-materials";
             string url = $"{_baseUrl}/api/audit";
             string json = JsonConvert.SerializeObject(request);
@@ -340,6 +365,7 @@ namespace GreenChainz.Revit.Services
                     OverallScore = -1,
                     Summary = "API Error: " + ex.Message
                 };
+            }
             }
         }
 
@@ -403,6 +429,20 @@ namespace GreenChainz.Revit.Services
 
         private class TelemetryLogger : ILogger
         {
+            public void LogDebug(string message)
+            {
+                TelemetryService.LogInfo($"[DEBUG] {message}");
+            }
+
+            public void LogInfo(string message)
+            {
+                TelemetryService.LogInfo(message);
+            }
+
+            public void LogError(Exception ex, string message)
+            {
+                TelemetryService.LogError(ex, message);
+            }
             public void LogDebug(string message) => TelemetryService.LogInfo($"[DEBUG] {message}");
             public void LogInfo(string message) => TelemetryService.LogInfo(message);
             public void LogError(Exception ex, string message) => TelemetryService.LogError(ex, message);
