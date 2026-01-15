@@ -18,6 +18,8 @@ const fetchUserData = async () => {
   });
 };
 
+export default async function DashboardPage() {
+  const userData = await fetchUserData();
 export default function DashboardPage() {
   const [userData, setUserData] = useState<{ plan: string; credits: number; maxCredits: number } | null>(null);
 
@@ -33,7 +35,7 @@ export default function DashboardPage() {
   const percentage = Math.min(100, Math.max(0, (userData.credits / userData.maxCredits) * 100));
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <main id="main-content" className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
 
@@ -41,8 +43,12 @@ export default function DashboardPage() {
           <div className="bg-white p-6 rounded-lg shadow">
             <h2 className="text-lg font-semibold text-gray-700">Current Plan</h2>
             <p className="text-3xl font-bold text-indigo-600 mt-2">{userData.plan}</p>
-            <Link href="/billing" className="text-sm text-gray-500 mt-4 block hover:underline hover:text-indigo-600 transition-colors">
-              Change Plan
+            <Link
+              href="/billing"
+              className="mt-4 inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 rounded-md"
+              aria-label="Change current plan"
+            >
+              Change Plan <span aria-hidden="true" className="ml-1">→</span>
             </Link>
           </div>
 
@@ -73,6 +79,6 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

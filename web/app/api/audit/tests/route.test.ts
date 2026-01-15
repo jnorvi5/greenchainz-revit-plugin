@@ -85,4 +85,19 @@ describe('Audit API Endpoint Security', () => {
     const data = await res.json();
     expect(data.success).toBe(true);
   });
+
+  it('should not expose error details on unexpected failure', async () => {
+    // Force an internal error by mocking request.json to fail
+    const req = {
+      headers: { get: () => 'Bearer test-secret' },
+      json: async () => { throw new Error('Simulated internal error'); }
+    } as unknown as NextRequest;
+
+    const res = await POST(req);
+    expect(res.status).toBe(500);
+    const data = await res.json();
+
+    expect(data.error).toBe('Failed to process Audit');
+    expect(data.details).toBeUndefined(); // Crucial security check
+  });
 });
