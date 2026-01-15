@@ -60,6 +60,19 @@ export default function DashboardPage() {
             <p className="text-3xl font-bold text-indigo-600 mt-2">{userData.plan}</p>
             <Link
               href="/billing"
+              className="group inline-flex items-center text-sm text-gray-500 mt-4 hover:text-indigo-600 transition-colors"
+              aria-label="Change subscription plan"
+            >
+              Change Plan
+              <svg
+                className="ml-1 w-4 h-4 transition-transform group-hover:translate-x-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
               className="inline-flex items-center text-sm text-gray-500 mt-4 hover:underline hover:text-indigo-600 transition-colors group"
             >
               <span>Change Plan</span>
