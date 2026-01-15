@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import crypto from 'crypto';
 
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -9,14 +10,62 @@ const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabase
 // RFQ API Endpoint - Receives RFQ from Revit plugin and finds suppliers
 export async function POST(request: NextRequest) {
   try {
+    // 1. Security Check: Validate Authorization Header
+    const authHeader = request.headers.get('authorization');
+    const apiSecret = process.env.GREENCHAINZ_API_SECRET;
+
+    if (!apiSecret) {
+      console.error('GREENCHAINZ_API_SECRET is not configured on the server.');
+      return NextResponse.json(
+        { error: 'Server misconfiguration' },
+        { status: 500 }
+      );
+    }
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: 'Unauthorized: Missing or invalid Authorization header' },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.split(' ')[1];
+    const tokenBuffer = Buffer.from(token);
+    const secretBuffer = Buffer.from(apiSecret);
+
+    if (tokenBuffer.length !== secretBuffer.length || !crypto.timingSafeEqual(tokenBuffer, secretBuffer)) {
+      return NextResponse.json(
+        { error: 'Unauthorized: Invalid token' },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     
     const { projectName, projectAddress, materials, deliveryDate, specialInstructions, selectedSupplierIds } = body;
 
-    // Validate required fields
+    // 2. Security Check: Input Validation & DoS Protection
     if (!projectName || !materials || materials.length === 0) {
       return NextResponse.json(
         { error: 'Missing required fields: projectName and materials' },
+        { status: 400 }
+      );
+    }
+
+    if (materials.length > 100) {
+      return NextResponse.json(
+        { error: 'Too many materials. Limit is 100 items.' },
+        { status: 400 }
+      );
+    }
+
+    if (projectName.length > 200) {
+      return NextResponse.json(
+        { error: 'Project name too long. Limit is 200 characters.' },
+    // Security: Limit number of materials to prevent DoS
+    if (Array.isArray(materials) && materials.length > 100) {
+      return NextResponse.json(
+        { error: 'Too many materials. Maximum allowed is 100.' },
         { status: 400 }
       );
     }
@@ -77,7 +126,8 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('RFQ API Error:', error);
     return NextResponse.json(
-      { error: 'Failed to process RFQ', details: String(error) },
+      { error: 'Failed to process RFQ' }, // Do not leak error details
+      { error: 'Failed to process RFQ' },
       { status: 500 }
     );
   }
