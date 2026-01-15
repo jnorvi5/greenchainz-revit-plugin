@@ -6,12 +6,3 @@
 **Action:**
 1.  Always prefer Skeleton UIs for dashboard-like views.
 2.  Use fallback/placeholder values for environment variables in global scope initializations to ensure builds pass in CI/CD environments without secrets.
-
-## 2025-02-23 - Semantic Data Visualization & Transition States
-**Learning:**
-1.  **Semantic Colors:** Using color (Red/Orange/Green) to indicate status (Critical/Warning/Good) in progress bars adds immediate cognitive value compared to a static brand color.
-2.  **Server Component Transitions:** When switching from a `loading.tsx` skeleton to the final Server Component UI, the instant "snap" can be jarring. Adding a simple CSS fade-in animation (`animate-in fade-in`) creates a much smoother, higher-quality feel.
-
-**Action:**
-1.  Use semantic colors for data visualization where status is implied.
-2.  Add fade-in transitions to page wrappers when using Next.js Suspense/Loading boundaries.

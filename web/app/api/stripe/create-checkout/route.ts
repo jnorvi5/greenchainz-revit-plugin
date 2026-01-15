@@ -1,17 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-const stripe = stripeSecretKey
-  ? new Stripe(stripeSecretKey, { apiVersion: '2025-12-15.clover' as any })
-  : null;
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder', {
+  apiVersion: '2025-12-15.clover' as any,
+});
 
 export async function POST(req: NextRequest) {
-  if (!stripe) {
-    console.error('STRIPE_SECRET_KEY is not set');
-    return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
-  }
-
   try {
     const { priceId, customerId } = await req.json();
 

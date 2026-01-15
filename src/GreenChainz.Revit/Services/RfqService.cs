@@ -55,12 +55,6 @@ namespace GreenChainz.Revit.Services
                 Timeout = TimeSpan.FromSeconds(ApiConfig.TIMEOUT_SECONDS)
             };
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            string token = ApiConfig.LoadAuthToken();
-            if (!string.IsNullOrEmpty(token))
-            {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            }
         }
 
         /// <summary>

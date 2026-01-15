@@ -17,11 +17,7 @@ export default function Loading() {
           <div className="bg-white p-6 rounded-lg shadow">
             <div className="h-5 w-40 bg-gray-200 rounded animate-pulse mb-3"></div>
             <div className="h-10 w-24 bg-green-100 rounded animate-pulse mt-2"></div>
-            {/* Progress bar skeleton */}
-            <div className="w-full bg-gray-200 rounded-full h-2.5 mt-4">
-              <div className="bg-gray-300 h-2.5 rounded-full animate-pulse" style={{ width: '45%' }}></div>
-            </div>
-            <div className="h-4 w-32 bg-gray-100 rounded animate-pulse mt-2"></div>
+            <div className="h-4 w-32 bg-gray-100 rounded animate-pulse mt-5"></div>
           </div>
         </div>
       </div>

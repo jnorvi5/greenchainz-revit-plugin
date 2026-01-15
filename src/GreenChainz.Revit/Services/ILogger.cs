@@ -4,8 +4,6 @@ namespace GreenChainz.Revit.Services
 {
     public interface ILogger
     {
-        void LogError(Exception ex, string context);
-        void LogInfo(string message);
         void LogError(Exception ex, string message);
         void LogInfo(string message);
         void LogInformation(string message);
@@ -21,9 +19,6 @@ namespace GreenChainz.Revit.Services
 
     public class TelemetryLogger : ILogger
     {
-        public void LogError(Exception ex, string context)
-        {
-            TelemetryService.LogError(ex, context);
         public void LogError(Exception ex, string message)
         {
             TelemetryService.LogError(ex, message);
