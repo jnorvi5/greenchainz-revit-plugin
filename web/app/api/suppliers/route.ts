@@ -43,6 +43,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { supplierIds, rfqData } = body;
 
     if (!supplierIds || supplierIds.length === 0) {
@@ -69,7 +70,7 @@ export async function POST(request: NextRequest) {
       results
     });
 
-  } catch (error) {
+  } catch (_error) { // eslint-disable-line @typescript-eslint/no-unused-vars
     return NextResponse.json(
       { error: 'Failed to send RFQ to suppliers' },
       { status: 500 }

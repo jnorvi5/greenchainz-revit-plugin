@@ -16,6 +16,9 @@ export async function POST(request: NextRequest) {
     const EXPECTED_AUTH_TOKEN = process.env.GREENCHAINZ_API_SECRET;
 
     if (!EXPECTED_AUTH_TOKEN) {
+    const apiSecret = process.env.GREENCHAINZ_API_SECRET;
+
+    if (!apiSecret) {
       console.error('SERVER CONFIG ERROR: GREENCHAINZ_API_SECRET is not set.');
       return NextResponse.json(
         { error: 'Server configuration error' },
@@ -33,6 +36,7 @@ export async function POST(request: NextRequest) {
     const token = authHeader.split(' ')[1];
 
     // Use constant-time comparison to prevent timing attacks
+    // Secure constant-time comparison
     const tokenBuffer = Buffer.from(token);
     const secretBuffer = Buffer.from(EXPECTED_AUTH_TOKEN);
 
@@ -46,7 +50,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Validate request based on AuditResult model in plugin
-    // ProjectName, OverallScore, etc.
     if (!body.ProjectName) {
       return NextResponse.json(
         { error: 'Missing required field: ProjectName' },
@@ -104,6 +107,7 @@ export async function POST(request: NextRequest) {
     console.error('Audit API Error:', error);
     return NextResponse.json(
       { error: 'Failed to process Audit' }, // Do not leak error details
+      { error: 'Failed to process Audit' },
       { status: 500 }
     );
   }

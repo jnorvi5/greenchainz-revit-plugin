@@ -7,6 +7,9 @@ vi.mock('@supabase/supabase-js', () => ({
   createClient: vi.fn(() => ({
     from: vi.fn(() => ({
       insert: vi.fn(() => ({ error: null })),
+      select: vi.fn(() => ({
+        single: vi.fn(() => ({ data: { id: 'mock-id' }, error: null })),
+      })),
     })),
   })),
 }));
@@ -84,6 +87,8 @@ describe('RFQ API Endpoint Security', () => {
     const req = {
       json: async () => { throw new Error('Simulated JSON parse error'); },
       headers: new Headers({ 'Authorization': 'Bearer test-secret' })
+      headers: { get: () => 'Bearer test-secret' },
+      json: async () => { throw new Error('Simulated JSON parse error'); }
     } as unknown as NextRequest;
 
     const res = await POST(req);
