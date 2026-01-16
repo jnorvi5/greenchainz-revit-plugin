@@ -45,6 +45,7 @@ export default function DashboardPage() {
   }
 
   return (
+    // Added animate-in for smoother transition from loading skeleton
     <main id="main-content" className="min-h-screen bg-gray-100 p-8 animate-in fade-in duration-500">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold mb-6 text-gray-900">Dashboard</h1>

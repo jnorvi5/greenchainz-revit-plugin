@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const stripe = stripeSecretKey
+  ? new Stripe(stripeSecretKey, { apiVersion: '2025-01-27.acacia' as any })
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ? new Stripe(stripeSecretKey, { apiVersion: '2025-12-15.clover' as any })
   : null;
@@ -35,6 +36,9 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ sessionId: session.id, url: session.url });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    return NextResponse.json({ error: message }, { status: 500 });
   } catch (err: unknown) {
     // Secure error handling: Don't leak stack traces, but message might be okay for Stripe errors
     // Using unknown instead of any

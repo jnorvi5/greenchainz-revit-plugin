@@ -12,6 +12,10 @@ export async function POST(request: NextRequest) {
   try {
     // 🔒 Security Check: Validate Authorization Token
     const authHeader = request.headers.get('authorization');
+    // Read the secret from env inside the function to support mocking in tests
+    const EXPECTED_AUTH_TOKEN = process.env.GREENCHAINZ_API_SECRET;
+
+    if (!EXPECTED_AUTH_TOKEN) {
     const apiSecret = process.env.GREENCHAINZ_API_SECRET;
 
     if (!apiSecret) {
@@ -31,9 +35,10 @@ export async function POST(request: NextRequest) {
 
     const token = authHeader.split(' ')[1];
 
+    // Use constant-time comparison to prevent timing attacks
     // Secure constant-time comparison
     const tokenBuffer = Buffer.from(token);
-    const secretBuffer = Buffer.from(apiSecret);
+    const secretBuffer = Buffer.from(EXPECTED_AUTH_TOKEN);
 
     if (tokenBuffer.length !== secretBuffer.length || !crypto.timingSafeEqual(tokenBuffer, secretBuffer)) {
       return NextResponse.json(
@@ -101,6 +106,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Audit API Error:', error);
     return NextResponse.json(
+      { error: 'Failed to process Audit' }, // Do not leak error details
       { error: 'Failed to process Audit' },
       { status: 500 }
     );

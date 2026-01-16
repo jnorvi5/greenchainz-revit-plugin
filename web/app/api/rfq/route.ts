@@ -7,6 +7,21 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 
+interface Supplier {
+    id: string;
+    name: string;
+    categories: string[];
+    certifications: string[];
+    region: string;
+    avgLeadTime: string;
+    sustainabilityScore: number;
+    contact: string;
+    website: string;
+    description: string;
+    matchedMaterial?: string;
+    quoteStatus?: string;
+}
+
 // RFQ API Endpoint - Receives RFQ from Revit plugin and finds suppliers
 export async function POST(request: NextRequest) {
   try {
@@ -75,6 +90,7 @@ export async function POST(request: NextRequest) {
 
     // Filter to selected suppliers if provided
     const notifySuppliers = selectedSupplierIds && selectedSupplierIds.length > 0
+      ? supplierMatches.filter((s: Supplier) => selectedSupplierIds.includes(s.id))
       ? supplierMatches.filter((s: { id: string }) => selectedSupplierIds.includes(s.id))
       : supplierMatches;
 
@@ -89,6 +105,7 @@ export async function POST(request: NextRequest) {
           materials: materials,
           delivery_date: deliveryDate,
           special_instructions: specialInstructions,
+          selected_suppliers: notifySuppliers.map((s: Supplier) => s.id),
           selected_suppliers: notifySuppliers.map((s: { id: string }) => s.id),
           status: 'pending',
           created_at: new Date().toISOString()
@@ -162,13 +179,22 @@ export async function GET(request: NextRequest) {
   });
 }
 
+interface Material {
+  materialName?: string;
+  name?: string;
+  // allow other properties
+  [key: string]: unknown;
+}
+
 // Supplier matching function with real sustainable suppliers
+async function findSuppliersForMaterials(materials: Material[]) {
+  const suppliers: Supplier[] = [];
 async function findSuppliersForMaterials(materials: { name?: string; materialName?: string }[]) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const suppliers: any[] = [];
 
   // Real sustainable material supplier database
-  const supplierDatabase = [
+  const supplierDatabase: Supplier[] = [
     // CONCRETE
     {
       id: 'carboncure',

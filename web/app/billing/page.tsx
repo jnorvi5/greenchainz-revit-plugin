@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 
 // Simple Spinner Component
 const Spinner = ({ className }: { className?: string }) => (
@@ -150,12 +151,31 @@ export default function BillingPage() {
   return (
     <main id="main-content" className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
+        <Link
+          href="/dashboard"
+          className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-indigo-600 transition-colors mb-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 rounded"
+          aria-label="Back to Dashboard"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4 mr-1"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to Dashboard
+        </Link>
+
         <div className="text-center">
           <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">Simple, Transparent Pricing</h2>
           <p className="mt-4 text-xl text-gray-600">Choose the plan that best fits your needs.</p>
           <div className="mt-4">
              <button
                onClick={handleManageSubscription}
+               className="text-indigo-600 hover:text-indigo-500 hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 rounded px-2 py-1 transition-colors flex items-center justify-center mx-auto"
                className="text-indigo-600 hover:text-indigo-500 font-medium focus:outline-none focus:underline flex items-center justify-center mx-auto"
                disabled={!!loadingTierId}
              >
@@ -166,6 +186,12 @@ export default function BillingPage() {
         </div>
 
         {message && (
+             <div
+               className="mt-4 p-4 bg-blue-100 text-blue-700 rounded text-center"
+               role="alert"
+             >
+                 {message}
+             </div>
           <div className="mt-4 p-4 bg-blue-100 text-blue-700 rounded text-center" role="alert">
             {message}
           </div>
