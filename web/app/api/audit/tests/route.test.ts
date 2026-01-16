@@ -68,7 +68,7 @@ describe('Audit API Endpoint Security', () => {
     const res = await POST(req);
     expect(res.status).toBe(500);
     const data = await res.json();
-    expect(data.error).toContain('Server misconfiguration');
+    expect(data.error).toContain('Server configuration error');
   });
 
   it('should return 200 if token is correct', async () => {
@@ -89,7 +89,9 @@ describe('Audit API Endpoint Security', () => {
   it('should not expose error details on unexpected failure', async () => {
     // Force an internal error by mocking request.json to fail
     const req = {
-      headers: { get: () => 'Bearer test-secret' },
+        headers: new Headers({
+            'Authorization': 'Bearer test-secret'
+        }),
       json: async () => { throw new Error('Simulated internal error'); }
     } as unknown as NextRequest;
 

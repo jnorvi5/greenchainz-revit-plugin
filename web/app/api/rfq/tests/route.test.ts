@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { describe, it, expect, vi } from 'vitest';
 import { POST } from '../route';
 import { NextRequest } from 'next/server';
 
@@ -7,11 +6,6 @@ import { NextRequest } from 'next/server';
 vi.mock('@supabase/supabase-js', () => ({
   createClient: vi.fn(() => ({
     from: vi.fn(() => ({
-      insert: vi.fn(() => ({
-        select: vi.fn(() => ({
-          single: vi.fn(() => ({ data: { id: 'mock-id' }, error: null })),
-        })),
-      })),
       insert: vi.fn(() => ({ error: null })),
     })),
   })),
@@ -83,10 +77,13 @@ describe('RFQ API Endpoint Security', () => {
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.success).toBe(true);
+  });
+
   it('should not expose error details on failure', async () => {
     // Malformed JSON to trigger parse error or validation error
     const req = {
-      json: async () => { throw new Error('Simulated JSON parse error'); }
+      json: async () => { throw new Error('Simulated JSON parse error'); },
+      headers: new Headers({ 'Authorization': 'Bearer test-secret' })
     } as unknown as NextRequest;
 
     const res = await POST(req);
