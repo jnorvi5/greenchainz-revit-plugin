@@ -52,9 +52,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (materials.length > 100) {
+    // Security: Limit number of materials to prevent DoS
+    if (Array.isArray(materials) && materials.length > 100) {
       return NextResponse.json(
-        { error: 'Too many materials. Limit is 100 items.' },
+        { error: 'Too many materials. Maximum allowed is 100.' },
         { status: 400 }
       );
     }
@@ -62,10 +63,6 @@ export async function POST(request: NextRequest) {
     if (projectName.length > 200) {
       return NextResponse.json(
         { error: 'Project name too long. Limit is 200 characters.' },
-    // Security: Limit number of materials to prevent DoS
-    if (Array.isArray(materials) && materials.length > 100) {
-      return NextResponse.json(
-        { error: 'Too many materials. Maximum allowed is 100.' },
         { status: 400 }
       );
     }
@@ -78,7 +75,7 @@ export async function POST(request: NextRequest) {
 
     // Filter to selected suppliers if provided
     const notifySuppliers = selectedSupplierIds && selectedSupplierIds.length > 0
-      ? supplierMatches.filter((s: any) => selectedSupplierIds.includes(s.id))
+      ? supplierMatches.filter((s: { id: string }) => selectedSupplierIds.includes(s.id))
       : supplierMatches;
 
     // Save to Supabase if available
@@ -92,13 +89,13 @@ export async function POST(request: NextRequest) {
           materials: materials,
           delivery_date: deliveryDate,
           special_instructions: specialInstructions,
-          selected_suppliers: notifySuppliers.map((s: any) => s.id),
+          selected_suppliers: notifySuppliers.map((s: { id: string }) => s.id),
           status: 'pending',
           created_at: new Date().toISOString()
         });
         
         if (!error) savedToDb = true;
-      } catch (dbError) {
+      } catch (_dbError) {
         console.log('Supabase not configured, continuing without DB');
       }
     }
@@ -127,7 +124,6 @@ export async function POST(request: NextRequest) {
     console.error('RFQ API Error:', error);
     return NextResponse.json(
       { error: 'Failed to process RFQ' }, // Do not leak error details
-      { error: 'Failed to process RFQ' },
       { status: 500 }
     );
   }
@@ -167,7 +163,8 @@ export async function GET(request: NextRequest) {
 }
 
 // Supplier matching function with real sustainable suppliers
-async function findSuppliersForMaterials(materials: any[]) {
+async function findSuppliersForMaterials(materials: { name?: string; materialName?: string }[]) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const suppliers: any[] = [];
 
   // Real sustainable material supplier database

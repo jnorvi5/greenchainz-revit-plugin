@@ -9,6 +9,8 @@ const Spinner = ({ className }: { className?: string }) => (
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
     viewBox="0 0 24 24"
+    role="status"
+    aria-label="loading"
   >
     <circle
       className="opacity-25"
@@ -64,24 +66,6 @@ const pricingTiers: PricingTier[] = [
   },
 ];
 
-const Spinner = () => (
-  <svg
-    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block"
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    role="status"
-    aria-label="loading"
-  >
-    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-    <path
-      className="opacity-75"
-      fill="currentColor"
-      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-    ></path>
-  </svg>
-);
-
 export default function BillingPage() {
   const [loadingTierId, setLoadingTierId] = useState<string | null>(null);
   const [message, setMessage] = useState('');
@@ -107,8 +91,7 @@ export default function BillingPage() {
       console.error(err);
       setMessage('Error accessing portal.');
     } finally {
-      setLoading(false);
-        setLoadingTierId(null);
+      setLoadingTierId(null);
     }
   };
 
@@ -130,7 +113,6 @@ export default function BillingPage() {
 
     try {
       // Add a small artificial delay to ensure the loading spinner is visible
-      // even if the API responds instantly (good for UX perception too)
       await new Promise(resolve => setTimeout(resolve, 500));
 
       const res = await fetch('/api/stripe/create-checkout', {
@@ -161,12 +143,6 @@ export default function BillingPage() {
       console.error('Checkout error:', err);
       setMessage('An unexpected error occurred.');
     } finally {
-      // Don't reset loading here if we're redirecting, to prevent flash of content
-      // But if there's an error, we should reset it.
-      // For safety, let's reset if we didn't redirect.
-      // In this simple implementation, we'll just reset it in catch blocks or if url is missing.
-      // But typically, we'd want to keep it loading until the page unloads.
-      // For now, I'll reset it to be safe.
       setLoadingTierId(null);
     }
   };
@@ -178,19 +154,10 @@ export default function BillingPage() {
           <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">Simple, Transparent Pricing</h2>
           <p className="mt-4 text-xl text-gray-600">Choose the plan that best fits your needs.</p>
           <div className="mt-4">
-            <button
-              onClick={handleManageSubscription}
-              className="text-indigo-600 hover:text-indigo-500 hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 rounded px-2 py-1 transition-colors"
-            >
-              Already a subscriber? Manage your subscription
-            </button>
              <button
                onClick={handleManageSubscription}
-               className="text-indigo-600 hover:text-indigo-500 font-medium focus:outline-none focus:underline"
-             >
-                onClick={handleManageSubscription}
-                className="text-indigo-600 hover:text-indigo-500 flex items-center justify-center mx-auto"
-                disabled={!!loadingTierId}
+               className="text-indigo-600 hover:text-indigo-500 font-medium focus:outline-none focus:underline flex items-center justify-center mx-auto"
+               disabled={!!loadingTierId}
              >
                  {loadingTierId === 'manage' && <Spinner className="mr-2 text-indigo-600" />}
                  Already a subscriber? Manage your subscription
@@ -202,28 +169,15 @@ export default function BillingPage() {
           <div className="mt-4 p-4 bg-blue-100 text-blue-700 rounded text-center" role="alert">
             {message}
           </div>
-             <div className="mt-4 p-4 bg-blue-100 text-blue-700 rounded text-center" role="alert">
-             <div
-               className="mt-4 p-4 bg-blue-100 text-blue-700 rounded text-center"
-               role="alert"
-             >
-                 {message}
-             </div>
         )}
 
         <div className="mt-12 space-y-4 sm:mt-16 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-6 lg:max-w-4xl lg:mx-auto xl:max-w-none xl:mx-0 xl:grid-cols-3">
-          {pricingTiers.map((tier) => (
-            <div
-              key={tier.id}
-              className="border border-gray-200 rounded-lg shadow-sm divide-y divide-gray-200 bg-white hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
-            >
-              <div className="p-6">
           {pricingTiers.map((tier) => {
             const isThisLoading = loadingTierId === tier.id;
             const isAnyLoading = !!loadingTierId;
 
             return (
-            <div key={tier.id} className="border border-gray-200 rounded-lg shadow-sm divide-y divide-gray-200 bg-white flex flex-col">
+            <div key={tier.id} className="border border-gray-200 rounded-lg shadow-sm divide-y divide-gray-200 bg-white flex flex-col hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
               <div className="p-6 flex-1">
                 <h3 className="text-lg leading-6 font-medium text-gray-900">{tier.name}</h3>
                 <p className="mt-4 text-sm text-gray-500">{tier.description}</p>
@@ -235,27 +189,6 @@ export default function BillingPage() {
                 </p>
                 <button
                   onClick={() => handleSubscribe(tier)}
-                  disabled={loading}
-                  className={`mt-8 block w-full bg-indigo-600 border border-transparent rounded-md py-2 text-sm font-semibold text-white text-center hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
-                    loading ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
-                  aria-busy={loading}
-                >
-                  {loading ? (
-                    <span className="flex items-center justify-center">
-                      <Spinner /> Processing...
-                    </span>
-                  aria-busy={loading}
-                  className={`mt-8 flex w-full justify-center items-center rounded-md py-2 text-sm font-semibold text-white shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
-                    ${loading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'}
-                  `}
-                >
-                  {loading ? (
-                    <>
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
                   disabled={isAnyLoading}
                   aria-busy={isThisLoading}
                   className={`mt-8 w-full bg-indigo-600 border border-transparent rounded-md py-2 text-sm font-semibold text-white text-center hover:bg-indigo-700 transition-colors flex justify-center items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 ${isAnyLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -294,7 +227,8 @@ export default function BillingPage() {
                 </ul>
               </div>
             </div>
-          )})}
+            );
+          })}
         </div>
       </div>
     </main>
