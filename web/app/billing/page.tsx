@@ -153,8 +153,9 @@ export default function BillingPage() {
       <div className="max-w-7xl mx-auto">
         <Link
           href="/dashboard"
-          className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-indigo-600 transition-colors mb-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 rounded"
+          className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-indigo-600 hover:underline transition-colors mb-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 rounded"
           aria-label="Back to Dashboard"
+          title="Return to your dashboard"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -175,9 +176,9 @@ export default function BillingPage() {
           <div className="mt-4">
              <button
                onClick={handleManageSubscription}
-               className="text-indigo-600 hover:text-indigo-500 hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 rounded px-2 py-1 transition-colors flex items-center justify-center mx-auto"
-               className="text-indigo-600 hover:text-indigo-500 font-medium focus:outline-none focus:underline flex items-center justify-center mx-auto"
+               className="text-indigo-600 hover:text-indigo-800 hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 rounded px-2 py-1 transition-colors flex items-center justify-center mx-auto"
                disabled={!!loadingTierId}
+               title="Manage your existing subscription and billing details"
              >
                  {loadingTierId === 'manage' && <Spinner className="mr-2 text-indigo-600" />}
                  Already a subscriber? Manage your subscription
@@ -192,9 +193,6 @@ export default function BillingPage() {
              >
                  {message}
              </div>
-          <div className="mt-4 p-4 bg-blue-100 text-blue-700 rounded text-center" role="alert">
-            {message}
-          </div>
         )}
 
         <div className="mt-12 space-y-4 sm:mt-16 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-6 lg:max-w-4xl lg:mx-auto xl:max-w-none xl:mx-0 xl:grid-cols-3">
@@ -203,10 +201,14 @@ export default function BillingPage() {
             const isAnyLoading = !!loadingTierId;
 
             return (
-            <div key={tier.id} className="border border-gray-200 rounded-lg shadow-sm divide-y divide-gray-200 bg-white flex flex-col hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+            <div
+              key={tier.id}
+              className="border border-gray-200 rounded-lg shadow-sm divide-y divide-gray-200 bg-white flex flex-col hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+              aria-labelledby={`tier-name-${tier.id}`}
+            >
               <div className="p-6 flex-1">
-                <h3 className="text-lg leading-6 font-medium text-gray-900">{tier.name}</h3>
-                <p className="mt-4 text-sm text-gray-500">{tier.description}</p>
+                <h3 id={`tier-name-${tier.id}`} className="text-lg leading-6 font-medium text-gray-900">{tier.name}</h3>
+                <p id={`tier-desc-${tier.id}`} className="mt-4 text-sm text-gray-500">{tier.description}</p>
                 <p className="mt-8">
                   <span className="text-4xl font-extrabold text-gray-900">
                     {tier.price >= 0 ? `$${tier.price}` : 'Custom'}
@@ -217,6 +219,7 @@ export default function BillingPage() {
                   onClick={() => handleSubscribe(tier)}
                   disabled={isAnyLoading}
                   aria-busy={isThisLoading}
+                  aria-describedby={`tier-desc-${tier.id}`}
                   className={`mt-8 w-full bg-indigo-600 border border-transparent rounded-md py-2 text-sm font-semibold text-white text-center hover:bg-indigo-700 transition-colors flex justify-center items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 ${isAnyLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   {isThisLoading ? (
