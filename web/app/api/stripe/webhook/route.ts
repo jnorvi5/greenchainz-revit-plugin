@@ -5,9 +5,8 @@ import { createClient } from '@supabase/supabase-js';
 // Make Stripe optional for builds
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const stripe = stripeSecretKey 
-  ? new Stripe(stripeSecretKey, { apiVersion: '2025-01-27.acacia' as any })
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ? new Stripe(stripeSecretKey, { apiVersion: '2025-12-15.clover' as any })
+  ? new Stripe(stripeSecretKey, { apiVersion: '2025-01-27.acacia' as any })
   : null;
 
 // Make Supabase optional
@@ -41,17 +40,11 @@ export async function POST(req: NextRequest) {
     const message = err instanceof Error ? err.message : 'Unknown error';
     console.error(`Webhook signature verification failed: ${message}`);
     return NextResponse.json({ error: message }, { status: 400 });
-  } catch (err: unknown) {
-    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-    console.error(`Webhook signature verification failed: ${errorMessage}`);
-    return NextResponse.json({ error: errorMessage }, { status: 400 });
   }
 
   // Handle the event
   switch (event.type) {
     case 'checkout.session.completed': {
-    case 'checkout.session.completed':
-      // eslint-disable-next-line no-case-declarations
       const session = event.data.object as Stripe.Checkout.Session;
       await handleCheckoutSessionCompleted(session);
       break;
