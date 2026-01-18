@@ -60,10 +60,22 @@ export async function POST(request: NextRequest) {
     const { projectName, projectAddress, materials, deliveryDate, specialInstructions, selectedSupplierIds } = body;
 
     // 2. Security Check: Input Validation & DoS Protection
-    if (!projectName || !materials || materials.length === 0) {
+    if (!projectName || typeof projectName !== 'string' || !materials || materials.length === 0) {
       return NextResponse.json(
-        { error: 'Missing required fields: projectName and materials' },
+        { error: 'Missing or invalid required fields: projectName and materials' },
         { status: 400 }
+      );
+    }
+
+    // Security: Validate types and sanitize
+    const sanitizedProjectName = projectName.trim();
+    const sanitizedAddress = typeof projectAddress === 'string' ? projectAddress.trim() : '';
+    const sanitizedInstructions = typeof specialInstructions === 'string' ? specialInstructions.trim() : '';
+
+    if (sanitizedProjectName.length === 0) {
+      return NextResponse.json(
+          { error: 'Project name cannot be empty' },
+          { status: 400 }
       );
     }
 
@@ -75,7 +87,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (projectName.length > 200) {
+    if (sanitizedProjectName.length > 200) {
       return NextResponse.json(
         { error: 'Project name too long. Limit is 200 characters.' },
         { status: 400 }
@@ -83,7 +95,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create RFQ record
-    const rfqId = `RFQ-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const rfqId = `RFQ-${Date.now()}-${crypto.randomUUID().split('-')[0]}`;
     
     // Find suppliers for each material
     const supplierMatches = await findSuppliersForMaterials(materials);
@@ -91,7 +103,6 @@ export async function POST(request: NextRequest) {
     // Filter to selected suppliers if provided
     const notifySuppliers = selectedSupplierIds && selectedSupplierIds.length > 0
       ? supplierMatches.filter((s: Supplier) => selectedSupplierIds.includes(s.id))
-      ? supplierMatches.filter((s: { id: string }) => selectedSupplierIds.includes(s.id))
       : supplierMatches;
 
     // Save to Supabase if available
@@ -100,13 +111,12 @@ export async function POST(request: NextRequest) {
       try {
         const { error } = await supabase.from('rfqs').insert({
           id: rfqId,
-          project_name: projectName,
-          project_address: projectAddress,
+          project_name: sanitizedProjectName,
+          project_address: sanitizedAddress,
           materials: materials,
           delivery_date: deliveryDate,
-          special_instructions: specialInstructions,
+          special_instructions: sanitizedInstructions,
           selected_suppliers: notifySuppliers.map((s: Supplier) => s.id),
-          selected_suppliers: notifySuppliers.map((s: { id: string }) => s.id),
           status: 'pending',
           created_at: new Date().toISOString()
         });
@@ -126,11 +136,11 @@ export async function POST(request: NextRequest) {
       message: `RFQ submitted successfully! ${notifySuppliers.length} suppliers will be notified.${savedToDb ? ' Saved to database.' : ''}`,
       rfq: {
         id: rfqId,
-        projectName,
-        projectAddress,
+        projectName: sanitizedProjectName,
+        projectAddress: sanitizedAddress,
         materials,
         deliveryDate,
-        specialInstructions,
+        specialInstructions: sanitizedInstructions,
         status: 'pending',
         createdAt: new Date().toISOString()
       },
@@ -389,11 +399,11 @@ async function findSuppliersForMaterials(materials: { name?: string; materialNam
     const materialName = (material.materialName || material.name || '').toLowerCase();
     
     for (const supplier of supplierDatabase) {
-      const matches = supplier.categories.some(cat => 
+      const matches = supplier.categories.some((cat: string) =>
         materialName.includes(cat) || cat.includes(materialName.split(' ')[0]) || cat.includes(materialName.split(',')[0].trim())
       );
       
-      if (matches && !suppliers.find(s => s.id === supplier.id)) {
+      if (matches && !suppliers.find((s: Supplier) => s.id === supplier.id)) {
         suppliers.push({
           ...supplier,
           matchedMaterial: material.materialName || material.name,

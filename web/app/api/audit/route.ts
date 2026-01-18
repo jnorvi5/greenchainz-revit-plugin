@@ -16,9 +16,6 @@ export async function POST(request: NextRequest) {
     const EXPECTED_AUTH_TOKEN = process.env.GREENCHAINZ_API_SECRET;
 
     if (!EXPECTED_AUTH_TOKEN) {
-    const apiSecret = process.env.GREENCHAINZ_API_SECRET;
-
-    if (!apiSecret) {
       console.error('SERVER CONFIG ERROR: GREENCHAINZ_API_SECRET is not set.');
       return NextResponse.json(
         { error: 'Server configuration error' },
@@ -50,15 +47,24 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Validate request based on AuditResult model in plugin
-    if (!body.ProjectName) {
+    if (!body.ProjectName || typeof body.ProjectName !== 'string') {
       return NextResponse.json(
-        { error: 'Missing required field: ProjectName' },
+        { error: 'Missing or invalid required field: ProjectName' },
         { status: 400 }
       );
     }
 
+    const sanitizedProjectName = body.ProjectName.trim();
+
+    if (sanitizedProjectName.length === 0) {
+      return NextResponse.json(
+          { error: 'Project name cannot be empty' },
+          { status: 400 }
+      );
+    }
+
     const auditData = {
-      project_name: body.ProjectName,
+      project_name: sanitizedProjectName,
       overall_score: body.OverallScore,
       summary: body.Summary,
       data_source: body.DataSource,
@@ -97,17 +103,15 @@ export async function POST(request: NextRequest) {
       id: dbId,
       // Echo back for confirmation
       audit: {
-          ProjectName: body.ProjectName,
+          ProjectName: sanitizedProjectName,
           OverallScore: body.OverallScore,
           Date: auditData.date
       }
     });
-
   } catch (error) {
     console.error('Audit API Error:', error);
     return NextResponse.json(
       { error: 'Failed to process Audit' }, // Do not leak error details
-      { error: 'Failed to process Audit' },
       { status: 500 }
     );
   }
