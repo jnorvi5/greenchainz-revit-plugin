@@ -175,9 +175,9 @@ export default function BillingPage() {
           <div className="mt-4">
              <button
                onClick={handleManageSubscription}
-               className="text-indigo-600 hover:text-indigo-500 hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 rounded px-2 py-1 transition-colors flex items-center justify-center mx-auto"
-               className="text-indigo-600 hover:text-indigo-500 font-medium focus:outline-none focus:underline flex items-center justify-center mx-auto"
+               className="text-indigo-600 hover:text-indigo-500 font-medium hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 rounded px-3 py-2 transition-colors flex items-center justify-center mx-auto"
                disabled={!!loadingTierId}
+               aria-busy={loadingTierId === 'manage'}
              >
                  {loadingTierId === 'manage' && <Spinner className="mr-2 text-indigo-600" />}
                  Already a subscriber? Manage your subscription
@@ -192,9 +192,6 @@ export default function BillingPage() {
              >
                  {message}
              </div>
-          <div className="mt-4 p-4 bg-blue-100 text-blue-700 rounded text-center" role="alert">
-            {message}
-          </div>
         )}
 
         <div className="mt-12 space-y-4 sm:mt-16 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-6 lg:max-w-4xl lg:mx-auto xl:max-w-none xl:mx-0 xl:grid-cols-3">
