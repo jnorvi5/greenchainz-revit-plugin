@@ -16,9 +16,6 @@ export async function POST(request: NextRequest) {
     const EXPECTED_AUTH_TOKEN = process.env.GREENCHAINZ_API_SECRET;
 
     if (!EXPECTED_AUTH_TOKEN) {
-    const apiSecret = process.env.GREENCHAINZ_API_SECRET;
-
-    if (!apiSecret) {
       console.error('SERVER CONFIG ERROR: GREENCHAINZ_API_SECRET is not set.');
       return NextResponse.json(
         { error: 'Server configuration error' },
@@ -107,7 +104,6 @@ export async function POST(request: NextRequest) {
     console.error('Audit API Error:', error);
     return NextResponse.json(
       { error: 'Failed to process Audit' }, // Do not leak error details
-      { error: 'Failed to process Audit' },
       { status: 500 }
     );
   }
