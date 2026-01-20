@@ -45,6 +45,7 @@ export async function POST(req: NextRequest) {
   // Handle the event
   switch (event.type) {
     case 'checkout.session.completed': {
+      // eslint-disable-next-line no-case-declarations
       const session = event.data.object as Stripe.Checkout.Session;
       await handleCheckoutSessionCompleted(session);
       break;

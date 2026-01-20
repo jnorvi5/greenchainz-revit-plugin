@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
         } else if (error) {
           console.error('Supabase DB Error:', error);
         }
-      } catch (_dbError) {
+      } catch {
         console.log('Supabase not configured or error connecting, continuing without DB');
       }
     }

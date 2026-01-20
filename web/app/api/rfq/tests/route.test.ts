@@ -86,6 +86,7 @@ describe('RFQ API Endpoint Security', () => {
     // Malformed JSON to trigger parse error or validation error
     const req = {
       headers: { get: () => 'Bearer test-secret' },
+      headers: new Headers({ 'Authorization': 'Bearer test-secret' }),
       json: async () => { throw new Error('Simulated JSON parse error'); }
     } as unknown as NextRequest;
 
