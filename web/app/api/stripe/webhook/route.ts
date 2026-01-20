@@ -36,10 +36,6 @@ export async function POST(req: NextRequest) {
   try {
     if (!signature) throw new Error('Missing stripe-signature header');
     event = stripe.webhooks.constructEvent(payload, signature, webhookSecret);
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error';
-    console.error(`Webhook signature verification failed: ${message}`);
-    return NextResponse.json({ error: message }, { status: 400 });
   } catch (err: unknown) {
     const errorMessage = err instanceof Error ? err.message : 'Unknown error';
     console.error(`Webhook signature verification failed: ${errorMessage}`);
