@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 
 // Make Stripe optional for builds
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const stripe = stripeSecretKey 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ? new Stripe(stripeSecretKey, { apiVersion: '2025-01-27.acacia' as any })

@@ -115,9 +115,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // In production: Send emails to suppliers
-    // await sendSupplierNotifications(notifySuppliers, { rfqId, projectName, materials, deliveryDate });
-
     return NextResponse.json({
       success: true,
       rfqId: rfqId,

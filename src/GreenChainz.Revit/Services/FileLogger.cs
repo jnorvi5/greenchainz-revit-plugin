@@ -6,12 +6,24 @@ namespace GreenChainz.Revit.Services
     {
         public void LogDebug(string message)
         {
-            TelemetryService.LogDebug(message);
+            // TelemetryService might not have LogDebug exposed publicly or it maps to LogInfo
+            // Assuming LogInfo is the safe fallback based on TelemetryLogger
+             TelemetryService.LogInfo($"[DEBUG] {message}");
         }
 
         public void LogInfo(string message)
         {
             TelemetryService.LogInfo(message);
+        }
+
+        public void LogInformation(string message)
+        {
+            TelemetryService.LogInfo(message);
+        }
+
+        public void LogError(Exception ex, string message)
+        {
+            TelemetryService.LogError(ex, message);
         }
 
         public void LogError(string message, Exception ex = null)
@@ -22,12 +34,6 @@ namespace GreenChainz.Revit.Services
             }
             else
             {
-                // If no exception object, just log the message as error
-                // TelemetryService.LogError requires an exception, so we create a dummy one or adapt TelemetryService.
-                // For now, let's treat it as Info with ERROR prefix or use a dummy exception.
-                // Better approach: Since TelemetryService is simple, we can just write to file directly or adapt.
-                // But let's assume TelemetryService.LogError is what we want.
-                // We'll pass a generic exception if none provided to satisfy signature.
                 TelemetryService.LogError(new Exception(message), "Error");
             }
         }

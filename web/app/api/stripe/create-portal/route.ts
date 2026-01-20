@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const stripe = stripeSecretKey
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ? new Stripe(stripeSecretKey, { apiVersion: '2025-01-27.acacia' as any })
