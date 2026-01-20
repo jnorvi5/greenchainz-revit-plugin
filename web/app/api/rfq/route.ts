@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
         });
         
         if (!error) savedToDb = true;
-      } catch (_dbError) {
+      } catch {
         console.log('Supabase not configured, continuing without DB');
       }
     }

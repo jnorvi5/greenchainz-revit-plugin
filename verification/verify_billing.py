@@ -1,28 +1,34 @@
+from playwright.sync_api import sync_playwright, expect
 
-from playwright.sync_api import sync_playwright
-
-def verify_billing_page():
+def run():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
+        try:
+            print("Navigating to billing page...")
+            page.goto("http://localhost:3000/billing")
 
-        # Navigate to billing page
-        page.goto("http://localhost:3000/billing")
+            # Wait for content
+            print("Waiting for heading...")
+            expect(page.get_by_role("heading", name="Simple, Transparent Pricing")).to_be_visible(timeout=10000)
 
-        # Verify title or header
-        page.wait_for_selector("h2:text('Simple, Transparent Pricing')")
+            # Verify Manage Subscription button
+            manage_btn = page.get_by_role("button", name="Manage your subscription")
+            expect(manage_btn).to_be_visible()
 
-        # Verify the "Back to Dashboard" link
-        back_link = page.get_by_role("link", name="Back to Dashboard")
+            # Focus the button to check focus ring styles
+            manage_btn.focus()
 
-        # Check accessibility - it should have focus styles when focused
-        back_link.focus()
+            # Take screenshot
+            print("Taking screenshot...")
+            page.screenshot(path="verification/billing_page.png")
+            print("Screenshot saved.")
 
-        # Take screenshot
-        page.screenshot(path="verification/billing_page_back_link.png")
-
-        browser.close()
-        print("Verification screenshot taken at verification/billing_page_back_link.png")
+        except Exception as e:
+            print(f"Error: {e}")
+            page.screenshot(path="verification/error.png")
+        finally:
+            browser.close()
 
 if __name__ == "__main__":
-    verify_billing_page()
+    run()
