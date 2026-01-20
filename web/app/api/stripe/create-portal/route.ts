@@ -3,9 +3,8 @@ import Stripe from 'stripe';
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const stripe = stripeSecretKey
-  ? new Stripe(stripeSecretKey, { apiVersion: '2025-01-27.acacia' as any })
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ? new Stripe(stripeSecretKey, { apiVersion: '2025-12-15.clover' as any })
+  ? new Stripe(stripeSecretKey, { apiVersion: '2025-01-27.acacia' as any })
   : null;
 
 export async function POST(req: NextRequest) {
