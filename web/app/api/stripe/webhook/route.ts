@@ -5,7 +5,6 @@ import { createClient } from '@supabase/supabase-js';
 // Make Stripe optional for builds
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const stripe = stripeSecretKey 
-  ? new Stripe(stripeSecretKey, { apiVersion: '2025-01-27.acacia' as any })
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ? new Stripe(stripeSecretKey, { apiVersion: '2025-12-15.clover' as any })
   : null;
@@ -37,10 +36,6 @@ export async function POST(req: NextRequest) {
   try {
     if (!signature) throw new Error('Missing stripe-signature header');
     event = stripe.webhooks.constructEvent(payload, signature, webhookSecret);
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error';
-    console.error(`Webhook signature verification failed: ${message}`);
-    return NextResponse.json({ error: message }, { status: 400 });
   } catch (err: unknown) {
     const errorMessage = err instanceof Error ? err.message : 'Unknown error';
     console.error(`Webhook signature verification failed: ${errorMessage}`);
@@ -50,7 +45,6 @@ export async function POST(req: NextRequest) {
   // Handle the event
   switch (event.type) {
     case 'checkout.session.completed': {
-    case 'checkout.session.completed':
       // eslint-disable-next-line no-case-declarations
       const session = event.data.object as Stripe.Checkout.Session;
       await handleCheckoutSessionCompleted(session);
