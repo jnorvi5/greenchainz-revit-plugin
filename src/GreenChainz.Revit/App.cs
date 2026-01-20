@@ -82,7 +82,25 @@ namespace GreenChainz.Revit
                 { ToolTip = "Browse sustainable materials" };
                 procurementPanel.AddItem(browseBtnData);
 
-                // Panel 5: Help
+                // Panel 5: AI Agent
+                RibbonPanel agentPanel = application.CreateRibbonPanel(tabName, "AI Agent");
+
+                PushButtonData runAgentButtonData = new PushButtonData(
+                    "RunAgent", "AI\nAgent", assemblyPath,
+                    "GreenChainz.Revit.Commands.RunAgentCommand")
+                { ToolTip = "Run AI Agent to analyze and tag materials by carbon impact" };
+                agentPanel.AddItem(runAgentButtonData);
+
+                // Panel 6: Export (IFC/BCF)
+                RibbonPanel exportPanel = application.CreateRibbonPanel(tabName, "Export");
+
+                PushButtonData sampleIfcButtonData = new PushButtonData(
+                    "SampleIFC", "Generate\nSample IFC", assemblyPath,
+                    "GreenChainz.Revit.Commands.GenerateSampleIfcCommand")
+                { ToolTip = "Generate sample IFC + BCF files for openBIM demonstration" };
+                exportPanel.AddItem(sampleIfcButtonData);
+
+                // Panel 7: Help
                 RibbonPanel helpPanel = application.CreateRibbonPanel(tabName, "Help");
 
                 PushButtonData aboutButtonData = new PushButtonData(

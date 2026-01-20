@@ -5,6 +5,9 @@ namespace GreenChainz.Revit.UI
 {
     public partial class AboutWindow : Window
     {
+        // Main website URL
+        private const string GREENCHAINZ_WEBSITE = "https://greenchainz-revit-plugin.vercel.app";
+
         public AboutWindow()
         {
             InitializeComponent();
@@ -22,7 +25,7 @@ namespace GreenChainz.Revit.UI
             
             if (ec3Connected && autodeskConnected)
             {
-                StatusText.Text = "Status: All APIs Connected ?";
+                StatusText.Text = "Status: All APIs Connected";
                 StatusText.Foreground = System.Windows.Media.Brushes.Green;
             }
             else if (ec3Connected)
@@ -35,6 +38,15 @@ namespace GreenChainz.Revit.UI
                 StatusText.Text = "Status: Using Local Data (Demo Mode)";
                 StatusText.Foreground = System.Windows.Media.Brushes.Gray;
             }
+        }
+
+        private void OpenWebsite_Click(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = GREENCHAINZ_WEBSITE,
+                UseShellExecute = true
+            });
         }
 
         private void OpenEC3_Click(object sender, RoutedEventArgs e)

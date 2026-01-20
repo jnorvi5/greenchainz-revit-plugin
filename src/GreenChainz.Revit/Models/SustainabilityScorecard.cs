@@ -158,10 +158,11 @@ namespace GreenChainz.Revit.Models
         public double DistanceFromProject { get; set; }  // Transport distance impact
         
         // Display
-        public string GwpDisplay => $"{Gwp:F1} kgCO2e/{Unit}";
-        public string TotalGwpDisplay => $"{TotalGwp:N0} kgCO2e";
+        public string GwpDisplay => HasEpd ? $"{Gwp:F1} kgCO2e/{Unit}" : $"{Gwp:F1}* kgCO2e/{Unit}";
+        public string TotalGwpDisplay => HasEpd ? $"{TotalGwp:N0} kgCO2e" : $"{TotalGwp:N0}*";
         public string TierDisplay => VerificationTier;
-        public string EpdStatus => HasEpd ? "EPD Available" : "No EPD";
+        public string EpdStatus => HasEpd ? "EPD Available" : "Estimated";
+        public string EpdStatusIcon => HasEpd ? "[EPD]" : "[Est]";
         public string DistanceDisplay => DistanceFromProject > 0 ? $"{DistanceFromProject:N0} mi" : "-";
 
         public MaterialScore()

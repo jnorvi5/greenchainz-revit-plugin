@@ -43,16 +43,40 @@ namespace GreenChainz.Revit.Services
         {
             Dictionary<string, MaterialBreakdown> materialMap = new Dictionary<string, MaterialBreakdown>();
 
+            // Expanded list of categories architects care about
             List<BuiltInCategory> categories = new List<BuiltInCategory>
             {
+                // Structure
                 BuiltInCategory.OST_Walls,
                 BuiltInCategory.OST_Floors,
                 BuiltInCategory.OST_Roofs,
                 BuiltInCategory.OST_Ceilings,
                 BuiltInCategory.OST_StructuralColumns,
                 BuiltInCategory.OST_StructuralFraming,
+                BuiltInCategory.OST_StructuralFoundation,
+                
+                // Openings
                 BuiltInCategory.OST_Windows,
-                BuiltInCategory.OST_Doors
+                BuiltInCategory.OST_Doors,
+                BuiltInCategory.OST_CurtainWallPanels,
+                BuiltInCategory.OST_CurtainWallMullions,
+                
+                // Interior
+                BuiltInCategory.OST_Stairs,
+                BuiltInCategory.OST_StairsRailing,
+                BuiltInCategory.OST_Ramps,
+                BuiltInCategory.OST_Railings,
+                
+                // MEP (for enclosures)
+                BuiltInCategory.OST_MechanicalEquipment,
+                BuiltInCategory.OST_Casework,
+                BuiltInCategory.OST_Furniture,
+                BuiltInCategory.OST_Columns,
+                
+                // Site
+                BuiltInCategory.OST_Topography,
+                BuiltInCategory.OST_Parking,
+                BuiltInCategory.OST_Planting
             };
 
             ElementMulticategoryFilter categoryFilter = new ElementMulticategoryFilter(categories);
@@ -61,6 +85,10 @@ namespace GreenChainz.Revit.Services
 
             foreach (Element elem in elements)
             {
+                // Get Revit category for IFC mapping
+                string revitCategory = elem.Category?.Name ?? "";
+                string ifcCategory = MapRevitCategoryToIfc(revitCategory);
+
                 foreach (ElementId matId in elem.GetMaterialIds(false))
                 {
                     Autodesk.Revit.DB.Material mat = doc.GetElement(matId) as Autodesk.Revit.DB.Material;
@@ -73,32 +101,45 @@ namespace GreenChainz.Revit.Services
                     {
                         if (!materialMap.ContainsKey(matName))
                         {
-                            // Get carbon factor from EC3 or fallback
                             var carbonFactor = GetCarbonFactor(matName);
                             
                             materialMap[matName] = new MaterialBreakdown
                             {
                                 MaterialName = matName,
-                                Quantity = "0 m�",
+                                Quantity = "0 m3",
                                 CarbonFactor = carbonFactor.AverageGwp,
                                 TotalCarbon = 0,
                                 DataSource = carbonFactor.Source,
-                                Ec3Category = carbonFactor.Ec3Category
+                                Ec3Category = carbonFactor.Ec3Category,
+                                // IFC fields for openBIM interoperability
+                                IfcGuid = MaterialBreakdown.ConvertToIfcGuid(Guid.NewGuid()),
+                                IfcExportAs = "IfcMaterial",
+                                IfcCategory = ifcCategory,
+                                RevitElementId = elem.Id.ToString(),
+                                VolumeM3 = 0,
+                                MassKg = 0
                             };
                         }
 
                         double volumeM3 = volume * 0.0283168;
                         double currentQty = 0;
-                        if (double.TryParse(materialMap[matName].Quantity.Replace(" m�", ""), out currentQty))
+                        string qtyStr = materialMap[matName].Quantity.Replace(" m3", "").Replace(" m�", "");
+                        if (double.TryParse(qtyStr, out currentQty))
                         {
-                            materialMap[matName].Quantity = $"{(currentQty + volumeM3):F2} m�";
+                            materialMap[matName].Quantity = $"{(currentQty + volumeM3):F2} m3";
                         }
                         materialMap[matName].TotalCarbon += volumeM3 * materialMap[matName].CarbonFactor;
+                        materialMap[matName].VolumeM3 += volumeM3;
+                        materialMap[matName].MassKg += volumeM3 * GetDensity(materialMap[matName].Ec3Category);
                     }
                 }
             }
 
-            return new List<MaterialBreakdown>(materialMap.Values);
+            // Sort by total carbon (highest first) so biggest impact shows first
+            var sortedList = new List<MaterialBreakdown>(materialMap.Values);
+            sortedList.Sort((a, b) => b.TotalCarbon.CompareTo(a.TotalCarbon));
+            
+            return sortedList;
         }
 
         private Ec3CarbonFactor GetCarbonFactor(string materialName)
@@ -139,11 +180,13 @@ namespace GreenChainz.Revit.Services
             double gwp;
             string category;
 
-            if (name.Contains("concrete"))
+            // CONCRETE & CEMENT
+            if (name.Contains("concrete") || name.Contains("cement") || name.Contains("cmu") || name.Contains("masonry unit"))
             {
                 gwp = 340; category = "Concrete";
             }
-            else if (name.Contains("steel"))
+            // STEEL & METALS
+            else if (name.Contains("steel") || name.Contains("iron") || name.Contains("metal deck") || name.Contains("rebar"))
             {
                 gwp = 1850; category = "Steel";
             }
@@ -151,26 +194,94 @@ namespace GreenChainz.Revit.Services
             {
                 gwp = 8000; category = "Aluminum";
             }
-            else if (name.Contains("glass"))
+            else if (name.Contains("copper"))
+            {
+                gwp = 3500; category = "Copper";
+            }
+            else if (name.Contains("zinc"))
+            {
+                gwp = 3200; category = "Zinc";
+            }
+            // GLASS & GLAZING
+            else if (name.Contains("glass") || name.Contains("glazing") || name.Contains("window"))
             {
                 gwp = 1500; category = "Glass";
             }
-            else if (name.Contains("wood") || name.Contains("timber"))
+            // WOOD & TIMBER
+            else if (name.Contains("wood") || name.Contains("timber") || name.Contains("lumber") || 
+                     name.Contains("plywood") || name.Contains("osb") || name.Contains("particle"))
             {
                 gwp = 110; category = "Wood";
             }
-            else if (name.Contains("brick"))
+            else if (name.Contains("clt") || name.Contains("glulam") || name.Contains("mass timber"))
             {
-                gwp = 200; category = "Brick";
+                gwp = -500; category = "Mass Timber"; // Carbon negative!
             }
-            else if (name.Contains("gypsum") || name.Contains("drywall"))
+            // MASONRY
+            else if (name.Contains("brick") || name.Contains("terra") || name.Contains("clay"))
+            {
+                gwp = 200; category = "Brick/Masonry";
+            }
+            else if (name.Contains("stone") || name.Contains("granite") || name.Contains("marble") || name.Contains("limestone"))
+            {
+                gwp = 100; category = "Stone";
+            }
+            // GYPSUM & INTERIOR
+            else if (name.Contains("gypsum") || name.Contains("drywall") || name.Contains("sheetrock") || name.Contains("plaster"))
             {
                 gwp = 200; category = "Gypsum Board";
             }
-            else if (name.Contains("insulation"))
+            else if (name.Contains("ceiling") || name.Contains("acoustic") || name.Contains("tile"))
+            {
+                gwp = 150; category = "Ceiling Tile";
+            }
+            // INSULATION
+            else if (name.Contains("insulation") || name.Contains("mineral wool") || name.Contains("fiberglass") || 
+                     name.Contains("rockwool") || name.Contains("foam") || name.Contains("xps") || name.Contains("eps"))
             {
                 gwp = 50; category = "Insulation";
             }
+            // ROOFING
+            else if (name.Contains("roof") || name.Contains("shingle") || name.Contains("membrane") || 
+                     name.Contains("tpo") || name.Contains("epdm") || name.Contains("bitumen"))
+            {
+                gwp = 300; category = "Roofing";
+            }
+            // FLOORING
+            else if (name.Contains("carpet") || name.Contains("vinyl") || name.Contains("lvt") || name.Contains("linoleum"))
+            {
+                gwp = 25; category = "Flooring";
+            }
+            else if (name.Contains("terrazzo") || name.Contains("epoxy"))
+            {
+                gwp = 150; category = "Flooring";
+            }
+            // PAINT & COATINGS
+            else if (name.Contains("paint") || name.Contains("coating") || name.Contains("finish"))
+            {
+                gwp = 5; category = "Coatings";
+            }
+            // WATERPROOFING
+            else if (name.Contains("waterproof") || name.Contains("vapor") || name.Contains("barrier") || name.Contains("membrane"))
+            {
+                gwp = 80; category = "Waterproofing";
+            }
+            // SEALANTS & ADHESIVES
+            else if (name.Contains("sealant") || name.Contains("adhesive") || name.Contains("caulk"))
+            {
+                gwp = 10; category = "Sealants";
+            }
+            // PLASTIC & COMPOSITES
+            else if (name.Contains("plastic") || name.Contains("pvc") || name.Contains("hdpe") || name.Contains("composite"))
+            {
+                gwp = 3000; category = "Plastics";
+            }
+            // CURTAIN WALL
+            else if (name.Contains("curtain") || name.Contains("panel") || name.Contains("cladding") || name.Contains("facade"))
+            {
+                gwp = 500; category = "Cladding";
+            }
+            // DEFAULT
             else
             {
                 gwp = 100; category = "Other";
@@ -183,6 +294,56 @@ namespace GreenChainz.Revit.Services
                 AverageGwp = gwp,
                 Unit = "kgCO2e/m�",
                 Source = "CLF v2021 Baseline"
+            };
+        }
+
+        /// <summary>
+        /// Maps Revit category to IFC element type
+        /// </summary>
+        private string MapRevitCategoryToIfc(string revitCategory)
+        {
+            return revitCategory?.ToLower() switch
+            {
+                "walls" => "IfcWall",
+                "floors" => "IfcSlab",
+                "roofs" => "IfcRoof",
+                "ceilings" => "IfcCovering",
+                "structural columns" => "IfcColumn",
+                "structural framing" => "IfcBeam",
+                "structural foundation" => "IfcFooting",
+                "windows" => "IfcWindow",
+                "doors" => "IfcDoor",
+                "curtain wall panels" => "IfcPlate",
+                "curtain wall mullions" => "IfcMember",
+                "stairs" => "IfcStair",
+                "railings" => "IfcRailing",
+                "ramps" => "IfcRamp",
+                "furniture" => "IfcFurniture",
+                "casework" => "IfcFurniture",
+                "mechanical equipment" => "IfcBuildingElementProxy",
+                _ => "IfcBuildingElementProxy"
+            };
+        }
+
+        /// <summary>
+        /// Gets material density for mass calculation (kg/m3)
+        /// </summary>
+        private double GetDensity(string category)
+        {
+            return category?.ToLower() switch
+            {
+                "concrete" => 2400,
+                "steel" => 7850,
+                "aluminum" => 2700,
+                "wood" => 500,
+                "glass" => 2500,
+                "gypsum board" => 800,
+                "insulation" => 30,
+                "brick/masonry" => 1800,
+                "stone" => 2500,
+                "roofing" => 1200,
+                "cladding" => 1500,
+                _ => 1000
             };
         }
 

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using Microsoft.Win32;
@@ -10,6 +11,7 @@ namespace GreenChainz.Revit.UI
     public partial class ScorecardWindow : Window
     {
         private readonly SustainabilityScorecard _scorecard;
+        private const string GREENCHAINZ_WEBSITE = "https://greenchainz-revit-plugin.vercel.app";
 
         public ScorecardWindow(SustainabilityScorecard scorecard)
         {
@@ -39,6 +41,13 @@ namespace GreenChainz.Revit.UI
             SetGradeColor(OverallGradeText, _scorecard.OverallGrade);
             SetGradeBorderColor(OverallGradeBorder, _scorecard.OverallGrade);
 
+            // Grade disclaimer - show what the grade is based on
+            int totalMaterials = _scorecard.Materials?.Count ?? 0;
+            int epdMaterials = _scorecard.Materials?.Count(m => m.HasEpd) ?? 0;
+            GradeDisclaimerText.Text = epdMaterials > 0 
+                ? $"Based on {epdMaterials} of {totalMaterials} materials with EPD data"
+                : $"Estimated from {totalMaterials} materials (no EPD data found)";
+
             // EPD Coverage
             EpdGradeText.Text = _scorecard.EpdScore.Grade;
             EpdValueText.Text = $"{_scorecard.EpdScore.CoveragePercent:F0}% Coverage";
@@ -48,6 +57,13 @@ namespace GreenChainz.Revit.UI
                 ? new SolidColorBrush(Color.FromRgb(76, 175, 80)) 
                 : new SolidColorBrush(Color.FromRgb(244, 67, 54));
             SetGradeColor(EpdGradeText, _scorecard.EpdScore.Grade);
+
+            // EPD action text
+            int missingEpd = totalMaterials - epdMaterials;
+            if (missingEpd > 0)
+            {
+                EpdActionText.Text = $"? {missingEpd} materials need EPD alternatives";
+            }
 
             // GWP Score
             GwpGradeText.Text = _scorecard.GwpScore.Grade;
@@ -59,11 +75,32 @@ namespace GreenChainz.Revit.UI
                 : new SolidColorBrush(Color.FromRgb(244, 67, 54));
             SetGradeColor(GwpGradeText, _scorecard.GwpScore.Grade);
 
+            // GWP source text
+            GwpSourceText.Text = epdMaterials < totalMaterials 
+                ? $"*{totalMaterials - epdMaterials} materials estimated from CLF baseline"
+                : "All materials have verified EPD data";
+
             // Verification Tier
             TierText.Text = _scorecard.VerificationScore.Tier.ToUpper();
             TierBreakdownText.Text = GetTierDescription(_scorecard.VerificationScore.Tier);
             TierDetailText.Text = _scorecard.VerificationScore.Breakdown;
             SetTierColor(TierText, _scorecard.VerificationScore.Tier);
+
+            // Data Quality Panel - show if EPD coverage is low
+            if (_scorecard.EpdScore.CoveragePercent < 50)
+            {
+                DataQualityPanel.Visibility = Visibility.Visible;
+                DataQualityTitle.Text = _scorecard.EpdScore.CoveragePercent < 20 
+                    ? "Limited EPD Data Available" 
+                    : "Some Materials Missing EPD Data";
+                DataQualityText.Text = $"Only {epdMaterials} of {totalMaterials} materials have verified EPD data. " +
+                    "Scores for remaining materials are estimated from CLF v2021 baseline. " +
+                    "Consider swapping to EPD-certified materials for accurate carbon reporting.";
+            }
+            else
+            {
+                DataQualityPanel.Visibility = Visibility.Collapsed;
+            }
 
             // Buy Clean Compliance Panel
             if (_scorecard.BuyCleanInfo?.HasRequirements == true)
@@ -161,6 +198,25 @@ namespace GreenChainz.Revit.UI
             _ => "No Verification"
         };
 
+        private void FindEpdMaterials_Click(object sender, RoutedEventArgs e)
+        {
+            // Open EC3 database to find EPD materials
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = "https://buildingtransparency.org/ec3/material-search",
+                UseShellExecute = true
+            });
+        }
+
+        private void OpenWebsite_Click(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = GREENCHAINZ_WEBSITE,
+                UseShellExecute = true
+            });
+        }
+
         private void ExportPdf_Click(object sender, RoutedEventArgs e)
         {
             SaveFileDialog saveDialog = new SaveFileDialog
@@ -192,6 +248,86 @@ namespace GreenChainz.Revit.UI
                         MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
+        }
+
+        private void ExportIfc_Click(object sender, RoutedEventArgs e)
+        {
+            if (_scorecard == null)
+            {
+                MessageBox.Show("No scorecard data to export.", "Export Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            SaveFileDialog saveDialog = new SaveFileDialog
+            {
+                Filter = "IFC Files (*.ifc)|*.ifc|IFC JSON (*.json)|*.json",
+                DefaultExt = "ifc",
+                FileName = $"Scorecard_{_scorecard.ProjectName}_{DateTime.Now:yyyyMMdd}"
+            };
+
+            if (saveDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    // Convert scorecard to audit result for IFC export
+                    var auditResult = new AuditResult
+                    {
+                        ProjectName = _scorecard.ProjectName,
+                        Date = _scorecard.GeneratedDate,
+                        OverallScore = _scorecard.GwpScore?.TotalGwp ?? 0,
+                        DataSource = "GreenChainz Scorecard",
+                        Materials = new System.Collections.Generic.List<MaterialBreakdown>()
+                    };
+
+                    foreach (var mat in _scorecard.Materials)
+                    {
+                        auditResult.Materials.Add(new MaterialBreakdown
+                        {
+                            MaterialName = mat.Name,
+                            Quantity = $"{mat.Quantity} m3",
+                            CarbonFactor = mat.Gwp,
+                            TotalCarbon = mat.TotalGwp,
+                            Ec3Category = mat.Category,
+                            IfcGuid = MaterialBreakdown.ConvertToIfcGuid(Guid.NewGuid()),
+                            IfcCategory = MapCategoryToIfc(mat.Category),
+                            VolumeM3 = mat.Quantity
+                        });
+                    }
+
+                    var ifcService = new IfcExportService();
+                    
+                    if (saveDialog.FileName.EndsWith(".json"))
+                    {
+                        ifcService.SaveIfcMapping(auditResult, saveDialog.FileName);
+                    }
+                    else
+                    {
+                        ifcService.SaveIfcSpf(auditResult, saveDialog.FileName);
+                    }
+                    
+                    MessageBox.Show($"IFC exported successfully!\n\n{saveDialog.FileName}\n\nContains:\n- Pset_EnvironmentalImpactIndicators\n- IFC GUIDs for cross-software tracking\n- LCA Stage A1-A3 data (EN 15804)", 
+                        "IFC Export Complete", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Failed to export IFC:\n\n{ex.Message}", 
+                        "Export Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private string MapCategoryToIfc(string category)
+        {
+            return category?.ToLower() switch
+            {
+                "concrete" => "IfcConcrete",
+                "steel" => "IfcSteel",
+                "wood" => "IfcWood",
+                "glass" => "IfcGlass",
+                "aluminum" => "IfcAluminium",
+                "insulation" => "IfcInsulation",
+                _ => "IfcMaterial"
+            };
         }
 
         private void Close_Click(object sender, RoutedEventArgs e)
