@@ -176,6 +176,7 @@ export default function BillingPage() {
           <div className="mt-4">
              <button
                onClick={handleManageSubscription}
+               className="text-indigo-600 hover:text-indigo-500 hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 rounded px-2 py-1 transition-colors flex items-center justify-center mx-auto"
                className="text-indigo-600 hover:text-indigo-800 hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 rounded px-2 py-1 transition-colors flex items-center justify-center mx-auto"
                disabled={!!loadingTierId}
                title="Manage your existing subscription and billing details"

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 
 // Supplier API - Search and manage sustainable material suppliers
 export async function GET(request: NextRequest) {
@@ -42,6 +43,37 @@ export async function GET(request: NextRequest) {
 // POST - Submit RFQ to specific suppliers
 export async function POST(request: NextRequest) {
   try {
+    // 🔒 Security Check: Validate Authorization Token
+    const authHeader = request.headers.get('authorization');
+    const EXPECTED_AUTH_TOKEN = process.env.GREENCHAINZ_API_SECRET;
+
+    if (!EXPECTED_AUTH_TOKEN) {
+      console.error('SERVER CONFIG ERROR: GREENCHAINZ_API_SECRET is not set.');
+      return NextResponse.json(
+        { error: 'Server configuration error' },
+        { status: 500 }
+      );
+    }
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: 'Unauthorized: Missing or invalid Authorization header' },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.split(' ')[1];
+    const tokenBuffer = Buffer.from(token);
+    const secretBuffer = Buffer.from(EXPECTED_AUTH_TOKEN);
+
+    // Use constant-time comparison to prevent timing attacks
+    if (tokenBuffer.length !== secretBuffer.length || !crypto.timingSafeEqual(tokenBuffer, secretBuffer)) {
+      return NextResponse.json(
+        { error: 'Unauthorized: Invalid token' },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { supplierIds, rfqData } = body;
@@ -70,7 +102,8 @@ export async function POST(request: NextRequest) {
       results
     });
 
-  } catch (_error) { // eslint-disable-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    console.error('Suppliers API Error:', error);
     return NextResponse.json(
       { error: 'Failed to send RFQ to suppliers' },
       { status: 500 }
