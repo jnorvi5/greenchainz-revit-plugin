@@ -31,3 +31,11 @@
 **Vulnerability:** Multiple API routes (`audit`, `rfq`) and UI pages contained duplicated code blocks and syntax errors resembling unresolved merge conflicts, but without conflict markers. This rendered security checks ambiguous (duplicate auth headers, cut-off validation blocks).
 **Learning:** Code corruption often manifests as "syntax errors" or "lint errors" but can be subtle enough to allow compilation while executing unexpected logic (e.g., duplicated side effects, bypassed checks). In this repo, it seems to stem from poor merge practices.
 **Prevention:** Treat "Parsing error" and "Duplicate identifier" lint errors as P0 security issues. Do not just "fix the build" by commenting out code; reconstruct the intended logic to ensure no security checks were deleted during the corruption.
+
+## 2026-01-20 - [CRITICAL] IDOR in Stripe Portal
+**Vulnerability:** The `/api/stripe/create-portal` endpoint accepted a `customerId` from the request body without verification, allowing any user to access the billing portal of any other user if they knew the customer ID.
+**Learning:** Trusting client-side parameters for sensitive resources (like billing accounts) leads to IDOR. The frontend was also hardcoding this ID, masking the issue.
+**Prevention:**
+1. Require authentication on all sensitive endpoints.
+2. Store mapping of User ID -> External Resource ID (Stripe Customer ID) in the database.
+3. Always look up the resource ID based on the authenticated user's session, ignoring client-provided overrides.

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { supabase } from '@/utils/supabase';
 
 // Simple Spinner Component
 const Spinner = ({ className }: { className?: string }) => (
@@ -71,16 +72,28 @@ export default function BillingPage() {
   const [loadingTierId, setLoadingTierId] = useState<string | null>(null);
   const [message, setMessage] = useState('');
 
-  // Example customer ID (in a real app, get this from auth context)
-  const customerId = 'cus_123456789';
-
   const handleManageSubscription = async () => {
     setLoadingTierId('manage');
     try {
+      if (!supabase) {
+        throw new Error('Supabase client not initialized');
+      }
+
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session) {
+        setMessage('Please sign in to manage your subscription.');
+        setLoadingTierId(null);
+        return;
+      }
+
       const res = await fetch('/api/stripe/create-portal', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ customerId }),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({}),
       });
       const { url, error } = await res.json();
       if (error) {
@@ -176,13 +189,9 @@ export default function BillingPage() {
           <div className="mt-4">
              <button
                onClick={handleManageSubscription}
-               className="text-indigo-600 hover:text-indigo-500 font-medium hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 rounded px-3 py-2 transition-colors flex items-center justify-center mx-auto"
+               className="mx-auto flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-indigo-600 transition-colors hover:bg-indigo-50 hover:text-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                disabled={!!loadingTierId}
                aria-busy={loadingTierId === 'manage'}
-               className="mx-auto flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-indigo-600 transition-colors hover:bg-indigo-50 hover:text-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-               className="text-indigo-600 hover:text-indigo-500 hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 rounded px-2 py-1 transition-colors flex items-center justify-center mx-auto"
-               className="text-indigo-600 hover:text-indigo-800 hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 rounded px-2 py-1 transition-colors flex items-center justify-center mx-auto"
-               disabled={!!loadingTierId}
                title="Manage your existing subscription and billing details"
              >
                  {loadingTierId === 'manage' && <Spinner className="mr-2 text-indigo-600" />}
