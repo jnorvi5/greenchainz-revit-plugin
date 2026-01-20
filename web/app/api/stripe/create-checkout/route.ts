@@ -38,5 +38,10 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';
     return NextResponse.json({ error: message }, { status: 500 });
+  } catch (err: unknown) {
+    // Secure error handling: Don't leak stack traces, but message might be okay for Stripe errors
+    // Using unknown instead of any
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
