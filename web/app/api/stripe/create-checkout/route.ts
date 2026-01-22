@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { validateApiSecret } from '@/utils/api-security';
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -9,6 +10,15 @@ const stripe = stripeSecretKey
   : null;
 
 export async function POST(req: NextRequest) {
+  // 🔒 Security Check: Validate Authorization Token
+  // This endpoint creates financial transactions, so strict auth is required.
+  if (!validateApiSecret(req)) {
+    return NextResponse.json(
+      { error: 'Unauthorized' },
+      { status: 401 }
+    );
+  }
+
   if (!stripe) {
     console.error('STRIPE_SECRET_KEY is not set');
     return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
