@@ -2,32 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-
-// Simple Spinner Component
-const Spinner = ({ className }: { className?: string }) => (
-  <svg
-    className={`animate-spin h-5 w-5 ${className || ''}`}
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    role="status"
-    aria-label="loading"
-  >
-    <circle
-      className="opacity-25"
-      cx="12"
-      cy="12"
-      r="10"
-      stroke="currentColor"
-      strokeWidth="4"
-    ></circle>
-    <path
-      className="opacity-75"
-      fill="currentColor"
-      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-    ></path>
-  </svg>
-);
+import { Spinner } from '../components/Spinner';
 
 interface PricingTier {
   id: string;
@@ -174,20 +149,22 @@ export default function BillingPage() {
           <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">Simple, Transparent Pricing</h2>
           <p className="mt-4 text-xl text-gray-600">Choose the plan that best fits your needs.</p>
           <div className="mt-4">
-             <button
-               onClick={handleManageSubscription}
-               className="text-indigo-600 hover:text-indigo-500 font-medium hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 rounded px-3 py-2 transition-colors flex items-center justify-center mx-auto"
-               disabled={!!loadingTierId}
-               aria-busy={loadingTierId === 'manage'}
-               className="mx-auto flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-indigo-600 transition-colors hover:bg-indigo-50 hover:text-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-               className="text-indigo-600 hover:text-indigo-500 hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 rounded px-2 py-1 transition-colors flex items-center justify-center mx-auto"
-               className="text-indigo-600 hover:text-indigo-800 hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 rounded px-2 py-1 transition-colors flex items-center justify-center mx-auto"
-               disabled={!!loadingTierId}
-               title="Manage your existing subscription and billing details"
-             >
-                 {loadingTierId === 'manage' && <Spinner className="mr-2 text-indigo-600" />}
-                 Already a subscriber? Manage your subscription
-             </button>
+            <button
+              onClick={handleManageSubscription}
+              disabled={!!loadingTierId}
+              aria-busy={loadingTierId === 'manage'}
+              className="mx-auto flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-indigo-600 transition-colors hover:bg-indigo-50 hover:text-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              title="Manage your existing subscription and billing details"
+            >
+              {loadingTierId === 'manage' ? (
+                <>
+                  <Spinner className="mr-2 text-indigo-600" />
+                  Redirecting...
+                </>
+              ) : (
+                'Already a subscriber? Manage your subscription'
+              )}
+            </button>
           </div>
         </div>
 

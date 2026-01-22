@@ -1,34 +1,44 @@
-from playwright.sync_api import sync_playwright, expect
 
-def run():
+from playwright.sync_api import sync_playwright
+
+def verify_billing_page():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
+        context = browser.new_context()
+        page = context.new_page()
+
         try:
-            print("Navigating to billing page...")
+            # Go to the billing page
             page.goto("http://localhost:3000/billing")
 
-            # Wait for content
-            print("Waiting for heading...")
-            expect(page.get_by_role("heading", name="Simple, Transparent Pricing")).to_be_visible(timeout=10000)
+            # Wait for the button to be visible
+            button = page.locator("button[title='Manage your existing subscription and billing details']")
+            button.wait_for(state="visible")
 
-            # Verify Manage Subscription button
-            manage_btn = page.get_by_role("button", name="Manage your subscription")
-            expect(manage_btn).to_be_visible()
+            # Check if the button has the correct initial text
+            if "Already a subscriber? Manage your subscription" not in button.text_content():
+                print("FAILED: Button text is incorrect")
+                print(f"Actual text: {button.text_content()}")
+            else:
+                print("SUCCESS: Button text is correct")
 
-            # Focus the button to check focus ring styles
-            manage_btn.focus()
+            # Check for the correct class names (partial match since Tailwind classes are long)
+            # We look for the ghost button classes we added
+            class_attr = button.get_attribute("class")
+            if "hover:bg-indigo-50" in class_attr and "text-indigo-600" in class_attr:
+                print("SUCCESS: Button has ghost button classes")
+            else:
+                print("FAILED: Button missing ghost button classes")
+                print(f"Actual classes: {class_attr}")
 
-            # Take screenshot
-            print("Taking screenshot...")
+            # Take a screenshot
             page.screenshot(path="verification/billing_page.png")
-            print("Screenshot saved.")
+            print("Screenshot saved to verification/billing_page.png")
 
         except Exception as e:
-            print(f"Error: {e}")
-            page.screenshot(path="verification/error.png")
+            print(f"Error during verification: {e}")
         finally:
             browser.close()
 
 if __name__ == "__main__":
-    run()
+    verify_billing_page()
