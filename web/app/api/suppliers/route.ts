@@ -78,7 +78,14 @@ export async function POST(request: NextRequest) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { supplierIds, rfqData } = body;
 
-    if (!supplierIds || supplierIds.length === 0) {
+    if (!Array.isArray(supplierIds)) {
+      return NextResponse.json(
+        { error: 'Invalid input: supplierIds must be an array' },
+        { status: 400 }
+      );
+    }
+
+    if (supplierIds.length === 0) {
       return NextResponse.json(
         { error: 'No suppliers selected' },
         { status: 400 }

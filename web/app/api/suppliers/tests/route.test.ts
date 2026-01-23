@@ -88,6 +88,21 @@ describe('Suppliers API Endpoint Security', () => {
     expect(data.error).toContain('No suppliers selected');
   });
 
+  it('should return 400 if supplierIds is not an array', async () => {
+    const req = new NextRequest('http://localhost:3000/api/suppliers', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer test-secret',
+      },
+      body: JSON.stringify({ supplierIds: 'invalid-string' }),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(400);
+    const data = await res.json();
+    expect(data.error).toContain('Invalid input: supplierIds must be an array');
+  });
+
   it('should not expose error details on unexpected failure', async () => {
     // Force an internal error by mocking request.json to fail
     const req = {
