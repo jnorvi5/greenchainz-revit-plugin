@@ -15,3 +15,12 @@
 **Action:**
 1.  Use semantic colors for data visualization where status is implied.
 2.  Add fade-in transitions to page wrappers when using Next.js Suspense/Loading boundaries.
+
+## 2025-05-21 - Ghost Buttons & Focus Rings
+**Learning:**
+1.  **Ghost Button Pattern:** For secondary actions (like "Manage Subscription" below main pricing cards), a "Ghost Button" style (`text-[brand] hover:bg-[brand]-50`) offers better affordance than a plain text link while remaining subordinate to primary solid buttons.
+2.  **Focus Visibility:** Using `focus-visible:ring` instead of standard `focus:ring` is critical for these text-heavy buttons to avoid ugly outlines on mouse clicks while preserving accessibility for keyboard users.
+
+**Action:**
+1.  Use `hover:bg-[brand]-50` + `rounded-md` for secondary text buttons.
+2.  Always pair custom button styles with `focus-visible` ring utilities.
