@@ -71,12 +71,18 @@ export default function BillingPage() {
   const [loadingTierId, setLoadingTierId] = useState<string | null>(null);
   const [message, setMessage] = useState('');
 
-  // Example customer ID (in a real app, get this from auth context)
-  const customerId = 'cus_123456789';
+  // Maintenance mode
+  const maintenanceMode = true;
 
   const handleManageSubscription = async () => {
+    if (maintenanceMode) {
+      setMessage('Billing portal is currently undergoing scheduled maintenance.');
+      return;
+    }
     setLoadingTierId('manage');
     try {
+      // Mocked customer ID would go here
+      const customerId = 'cus_mock';
       const res = await fetch('/api/stripe/create-portal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -98,14 +104,17 @@ export default function BillingPage() {
 
   const handleSubscribe = async (tier: PricingTier) => {
     if (tier.price === 0) {
-      // Handle free tier logic (e.g., redirect to dashboard)
       setMessage('Free tier selected. Welcome!');
       return;
     }
 
     if (tier.price === -1) {
-      // Handle enterprise logic (e.g., open contact form)
       window.location.href = 'mailto:sales@greenchainz.com';
+      return;
+    }
+
+    if (maintenanceMode) {
+      setMessage('New subscriptions are temporarily disabled for maintenance.');
       return;
     }
 
@@ -113,23 +122,16 @@ export default function BillingPage() {
     setMessage('');
 
     try {
-      // Add a small artificial delay to ensure the loading spinner is visible
       await new Promise(resolve => setTimeout(resolve, 500));
-
       const res = await fetch('/api/stripe/create-checkout', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          priceId: tier.priceId,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ priceId: tier.priceId }),
       });
 
       const { url, error } = await res.json();
 
       if (error) {
-        console.error('Error creating checkout session:', error);
         setMessage('Error initiating checkout. Please try again.');
         setLoadingTierId(null);
         return;
@@ -141,7 +143,7 @@ export default function BillingPage() {
         setMessage('Failed to get checkout URL.');
       }
     } catch (err) {
-      console.error('Checkout error:', err);
+      console.error(err);
       setMessage('An unexpected error occurred.');
     } finally {
       setLoadingTierId(null);
@@ -170,20 +172,22 @@ export default function BillingPage() {
           Back to Dashboard
         </Link>
 
+        {/* Maintenance Alert */}
+        <div className="mb-8 p-4 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-700" role="alert">
+          <p className="font-bold">Scheduled Maintenance</p>
+          <p>Billing services are currently unavailable as we upgrade our security systems.</p>
+        </div>
+
         <div className="text-center">
           <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">Simple, Transparent Pricing</h2>
           <p className="mt-4 text-xl text-gray-600">Choose the plan that best fits your needs.</p>
           <div className="mt-4">
              <button
                onClick={handleManageSubscription}
-               className="text-indigo-600 hover:text-indigo-500 font-medium hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 rounded px-3 py-2 transition-colors flex items-center justify-center mx-auto"
-               disabled={!!loadingTierId}
+               disabled={maintenanceMode || !!loadingTierId}
                aria-busy={loadingTierId === 'manage'}
-               className="mx-auto flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-indigo-600 transition-colors hover:bg-indigo-50 hover:text-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-               className="text-indigo-600 hover:text-indigo-500 hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 rounded px-2 py-1 transition-colors flex items-center justify-center mx-auto"
-               className="text-indigo-600 hover:text-indigo-800 hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 rounded px-2 py-1 transition-colors flex items-center justify-center mx-auto"
-               disabled={!!loadingTierId}
-               title="Manage your existing subscription and billing details"
+               className={`mx-auto flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${maintenanceMode ? 'text-gray-400 bg-gray-100' : 'text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700'}`}
+               title={maintenanceMode ? "Billing portal unavailable" : "Manage your existing subscription and billing details"}
              >
                  {loadingTierId === 'manage' && <Spinner className="mr-2 text-indigo-600" />}
                  Already a subscriber? Manage your subscription
@@ -204,6 +208,7 @@ export default function BillingPage() {
           {pricingTiers.map((tier) => {
             const isThisLoading = loadingTierId === tier.id;
             const isAnyLoading = !!loadingTierId;
+            const isActionable = tier.price > 0 && maintenanceMode;
 
             return (
             <div
@@ -222,10 +227,10 @@ export default function BillingPage() {
                 </p>
                 <button
                   onClick={() => handleSubscribe(tier)}
-                  disabled={isAnyLoading}
+                  disabled={isAnyLoading || isActionable}
                   aria-busy={isThisLoading}
                   aria-describedby={`tier-desc-${tier.id}`}
-                  className={`mt-8 w-full bg-indigo-600 border border-transparent rounded-md py-2 text-sm font-semibold text-white text-center hover:bg-indigo-700 transition-colors flex justify-center items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 ${isAnyLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`mt-8 w-full border border-transparent rounded-md py-2 text-sm font-semibold text-center transition-colors flex justify-center items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 ${isActionable || isAnyLoading ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-indigo-600 text-white hover:bg-indigo-700'}`}
                 >
                   {isThisLoading ? (
                     <>

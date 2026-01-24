@@ -31,3 +31,8 @@
 **Vulnerability:** Multiple API routes (`audit`, `rfq`) and UI pages contained duplicated code blocks and syntax errors resembling unresolved merge conflicts, but without conflict markers. This rendered security checks ambiguous (duplicate auth headers, cut-off validation blocks).
 **Learning:** Code corruption often manifests as "syntax errors" or "lint errors" but can be subtle enough to allow compilation while executing unexpected logic (e.g., duplicated side effects, bypassed checks). In this repo, it seems to stem from poor merge practices.
 **Prevention:** Treat "Parsing error" and "Duplicate identifier" lint errors as P0 security issues. Do not just "fix the build" by commenting out code; reconstruct the intended logic to ensure no security checks were deleted during the corruption.
+
+## 2025-05-22 - [CRITICAL] Disable Insecure Stripe Endpoints
+**Vulnerability:** The Stripe `create-checkout` and `create-portal` API endpoints were vulnerable to IDOR (Insecure Direct Object Reference) as they accepted `customerId` without verifying user ownership or session authentication.
+**Learning:** Endpoints designed for frontend consumption cannot be secured with a static API secret (which would be exposed in client code). They require robust session-based authentication (e.g., Supabase Auth).
+**Prevention:** If critical authentication infrastructure is missing for a feature, the safest security action is to disable (quarantine) the feature returning `503 Service Unavailable` rather than leaving it open or implementing a flawed security model.

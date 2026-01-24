@@ -4,10 +4,11 @@ import { createClient } from '@supabase/supabase-js';
 
 // Make Stripe optional for builds
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const stripe = stripeSecretKey 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ? new Stripe(stripeSecretKey, { apiVersion: '2025-01-27.acacia' as any })
+const stripe = stripeSecretKey
+  ? new Stripe(stripeSecretKey, {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      apiVersion: '2025-01-27.acacia' as any,
+    })
   : null;
 
 // Make Supabase optional
@@ -46,7 +47,6 @@ export async function POST(req: NextRequest) {
   // Handle the event
   switch (event.type) {
     case 'checkout.session.completed': {
-      // eslint-disable-next-line no-case-declarations
       const session = event.data.object as Stripe.Checkout.Session;
       await handleCheckoutSessionCompleted(session);
       break;
