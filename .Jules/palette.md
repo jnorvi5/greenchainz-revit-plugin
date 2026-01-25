@@ -15,3 +15,12 @@
 **Action:**
 1.  Use semantic colors for data visualization where status is implied.
 2.  Add fade-in transitions to page wrappers when using Next.js Suspense/Loading boundaries.
+
+## 2025-02-27 - Ghost Buttons & Duplicate Props
+**Learning:**
+1.  **Duplicate Props Risk:** Merge conflicts or copy-paste errors can lead to duplicate props (e.g., `className`) which valid JSX might ignore but cause unpredictable rendering or linting errors.
+2.  **Ghost Buttons:** For secondary actions (like "Manage Subscription") that sit alongside primary calls-to-action ("Subscribe"), a "Ghost Button" style (transparent bg, colored text) reduces visual noise while maintaining accessibility.
+
+**Action:**
+1.  Run `pnpm lint` to catch duplicate props.
+2.  Use Ghost Button pattern (`text-indigo-600 hover:bg-indigo-50`) for secondary or maintenance-related actions.
