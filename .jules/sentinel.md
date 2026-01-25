@@ -31,3 +31,11 @@
 **Vulnerability:** Multiple API routes (`audit`, `rfq`) and UI pages contained duplicated code blocks and syntax errors resembling unresolved merge conflicts, but without conflict markers. This rendered security checks ambiguous (duplicate auth headers, cut-off validation blocks).
 **Learning:** Code corruption often manifests as "syntax errors" or "lint errors" but can be subtle enough to allow compilation while executing unexpected logic (e.g., duplicated side effects, bypassed checks). In this repo, it seems to stem from poor merge practices.
 **Prevention:** Treat "Parsing error" and "Duplicate identifier" lint errors as P0 security issues. Do not just "fix the build" by commenting out code; reconstruct the intended logic to ensure no security checks were deleted during the corruption.
+
+## 2025-05-23 - Missing Input Validation in API Routes
+**Vulnerability:** The `/api/audit` endpoint accepted JSON payloads of any size and structure without validation, exposing the server to Denial of Service (DoS) attacks via memory exhaustion or massive database insertions.
+**Learning:** Checking for authentication (`401 Unauthorized`) is not enough. Authenticated endpoints are still vulnerable to resource exhaustion attacks if input size and content are not strictly validated.
+**Prevention:**
+1. Enforce strict character limits on string fields (e.g., `ProjectName.length > 200`).
+2. Limit array sizes for nested collections (e.g., `Materials` max 500 items).
+3. Validate data types for all critical fields to prevent logic errors or injection risks downstream.

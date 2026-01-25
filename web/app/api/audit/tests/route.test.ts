@@ -102,4 +102,45 @@ describe('Audit API Endpoint Security', () => {
     expect(data.error).toBe('Failed to process Audit');
     expect(data.details).toBeUndefined(); // Crucial security check
   });
+
+  it('should reject project name exceeding 200 chars', async () => {
+    const longName = 'a'.repeat(201);
+    const req = new NextRequest('http://localhost:3000/api/audit', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer test-secret' },
+      body: JSON.stringify({ ProjectName: longName }),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(400);
+    const data = await res.json();
+    expect(data.error).toContain('ProjectName invalid or too long');
+  });
+
+  it('should reject invalid OverallScore type', async () => {
+    const req = new NextRequest('http://localhost:3000/api/audit', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer test-secret' },
+      body: JSON.stringify({ ProjectName: 'Test', OverallScore: 'not-a-number' }),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(400);
+    const data = await res.json();
+    expect(data.error).toContain('OverallScore must be a number');
+  });
+
+  it('should reject excessive materials', async () => {
+    const materials = Array(501).fill({ name: 'mat' });
+    const req = new NextRequest('http://localhost:3000/api/audit', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer test-secret' },
+      body: JSON.stringify({ ProjectName: 'Test', Materials: materials }),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(400);
+    const data = await res.json();
+    expect(data.error).toContain('Materials must be an array with max 500 items');
+  });
 });
