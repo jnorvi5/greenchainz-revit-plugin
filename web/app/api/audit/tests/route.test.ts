@@ -86,6 +86,69 @@ describe('Audit API Endpoint Security', () => {
     expect(data.success).toBe(true);
   });
 
+  it('should reject ProjectName if too long', async () => {
+    const req = new NextRequest('http://localhost:3000/api/audit', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer test-secret' },
+      body: JSON.stringify({
+        ProjectName: 'A'.repeat(201)
+      }),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(400);
+    const data = await res.json();
+    expect(data.error).toContain('ProjectName exceeds maximum length');
+  });
+
+  it('should reject Materials if not an array', async () => {
+    const req = new NextRequest('http://localhost:3000/api/audit', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer test-secret' },
+      body: JSON.stringify({
+        ProjectName: 'Test Project',
+        Materials: "Not an array"
+      }),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(400);
+    const data = await res.json();
+    expect(data.error).toContain('Materials must be an array');
+  });
+
+  it('should reject Materials if too many items', async () => {
+    const req = new NextRequest('http://localhost:3000/api/audit', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer test-secret' },
+      body: JSON.stringify({
+        ProjectName: 'Test Project',
+        Materials: Array(501).fill({ name: 'item' })
+      }),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(400);
+    const data = await res.json();
+    expect(data.error).toContain('fewer than 500 items');
+  });
+
+  it('should reject OverallScore if out of range', async () => {
+    const req = new NextRequest('http://localhost:3000/api/audit', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer test-secret' },
+      body: JSON.stringify({
+        ProjectName: 'Test Project',
+        OverallScore: 101
+      }),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(400);
+    const data = await res.json();
+    expect(data.error).toContain('number between 0 and 100');
+  });
+
   it('should not expose error details on unexpected failure', async () => {
     // Force an internal error by mocking request.json to fail
     const req = {

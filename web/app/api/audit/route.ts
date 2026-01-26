@@ -54,6 +54,35 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 🔒 Security: Input Validation & DoS Protection
+    if (body.ProjectName.length > 200) {
+      return NextResponse.json(
+        { error: 'ProjectName exceeds maximum length of 200 characters.' },
+        { status: 400 }
+      );
+    }
+
+    if (body.Materials && (!Array.isArray(body.Materials) || body.Materials.length > 500)) {
+      return NextResponse.json(
+        { error: 'Materials must be an array with fewer than 500 items.' },
+        { status: 400 }
+      );
+    }
+
+    if (body.Recommendations && (!Array.isArray(body.Recommendations) || body.Recommendations.length > 100)) {
+      return NextResponse.json(
+        { error: 'Recommendations must be an array with fewer than 100 items.' },
+        { status: 400 }
+      );
+    }
+
+    if (body.OverallScore !== undefined && (typeof body.OverallScore !== 'number' || body.OverallScore < 0 || body.OverallScore > 100)) {
+      return NextResponse.json(
+        { error: 'OverallScore must be a number between 0 and 100.' },
+        { status: 400 }
+      );
+    }
+
     const auditData = {
       project_name: body.ProjectName,
       overall_score: body.OverallScore,
