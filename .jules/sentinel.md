@@ -31,3 +31,12 @@
 **Vulnerability:** Multiple API routes (`audit`, `rfq`) and UI pages contained duplicated code blocks and syntax errors resembling unresolved merge conflicts, but without conflict markers. This rendered security checks ambiguous (duplicate auth headers, cut-off validation blocks).
 **Learning:** Code corruption often manifests as "syntax errors" or "lint errors" but can be subtle enough to allow compilation while executing unexpected logic (e.g., duplicated side effects, bypassed checks). In this repo, it seems to stem from poor merge practices.
 **Prevention:** Treat "Parsing error" and "Duplicate identifier" lint errors as P0 security issues. Do not just "fix the build" by commenting out code; reconstruct the intended logic to ensure no security checks were deleted during the corruption.
+
+## 2025-10-27 - Input Validation Gaps & Code Corruption
+**Vulnerability:** The `/api/audit` endpoint accepted unlimited payloads and unchecked data types, posing a Denial of Service (DoS) and data integrity risk. Additionally, `web/app/billing/page.tsx` contained duplicated JSX props (code corruption) which blocked linting but passed build.
+**Learning:**
+1. Next.js API routes do not have built-in payload validation; it must be manually implemented.
+2. Code corruption (duplicate props) can silently exist in production builds if `pnpm lint` is not enforced in CI, as `next build` might not catch them all.
+**Prevention:**
+1. Enforce strict input limits (length, array size) on all public POST endpoints.
+2. Treat `pnpm lint` failures as blockers, even if the app compiles.

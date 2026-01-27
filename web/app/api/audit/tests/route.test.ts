@@ -86,6 +86,51 @@ describe('Audit API Endpoint Security', () => {
     expect(data.success).toBe(true);
   });
 
+  it('should return 400 if ProjectName is too long', async () => {
+    const req = new NextRequest('http://localhost:3000/api/audit', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer test-secret' },
+      body: JSON.stringify({ ProjectName: 'A'.repeat(201) }),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(400);
+    const data = await res.json();
+    expect(data.error).toContain('ProjectName exceeds 200 characters');
+  });
+
+  it('should return 400 if Materials array is too large', async () => {
+    const req = new NextRequest('http://localhost:3000/api/audit', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer test-secret' },
+      body: JSON.stringify({
+        ProjectName: 'Test Project',
+        Materials: new Array(501).fill({ name: 'Mat' })
+      }),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(400);
+    const data = await res.json();
+    expect(data.error).toContain('Materials must be an array with maximum 500 items');
+  });
+
+  it('should return 400 if OverallScore is not a number', async () => {
+    const req = new NextRequest('http://localhost:3000/api/audit', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer test-secret' },
+      body: JSON.stringify({
+        ProjectName: 'Test Project',
+        OverallScore: "not-a-number"
+      }),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(400);
+    const data = await res.json();
+    expect(data.error).toContain('OverallScore must be a number');
+  });
+
   it('should not expose error details on unexpected failure', async () => {
     // Force an internal error by mocking request.json to fail
     const req = {
