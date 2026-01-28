@@ -67,6 +67,21 @@ describe('RFQ API Endpoint Security', () => {
     expect(data.error).toContain('Too many materials');
   });
 
+  it('should return 400 if materials is not an array', async () => {
+    const req = new NextRequest('http://localhost:3000/api/rfq', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer test-secret',
+      },
+      body: JSON.stringify({ projectName: 'Test Project', materials: "invalid-string" }),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(400);
+    const data = await res.json();
+    expect(data.error).toContain('Invalid or missing materials array');
+  });
+
   it('should return 200 if token is correct and payload is valid', async () => {
     const req = new NextRequest('http://localhost:3000/api/rfq', {
       method: 'POST',

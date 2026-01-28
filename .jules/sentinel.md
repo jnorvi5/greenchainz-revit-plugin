@@ -31,3 +31,9 @@
 **Vulnerability:** Multiple API routes (`audit`, `rfq`) and UI pages contained duplicated code blocks and syntax errors resembling unresolved merge conflicts, but without conflict markers. This rendered security checks ambiguous (duplicate auth headers, cut-off validation blocks).
 **Learning:** Code corruption often manifests as "syntax errors" or "lint errors" but can be subtle enough to allow compilation while executing unexpected logic (e.g., duplicated side effects, bypassed checks). In this repo, it seems to stem from poor merge practices.
 **Prevention:** Treat "Parsing error" and "Duplicate identifier" lint errors as P0 security issues. Do not just "fix the build" by commenting out code; reconstruct the intended logic to ensure no security checks were deleted during the corruption.
+## 2025-05-22 - Input Validation Bypass in API Routes
+**Vulnerability:** The `/api/rfq` endpoint used loose type checking (`!materials || materials.length === 0`) followed by `Array.isArray` only for the DoS check. This allowed non-array inputs (like strings or objects with `length`) to bypass validation and potentially cause logic errors or CPU exhaustion.
+**Learning:** Type coercion and weak checks in JavaScript/TypeScript can lead to unexpected execution paths. Assuming input is an array without strictly verifying it first is a common pitfall.
+**Prevention:**
+1. Always validate input types strictly (`Array.isArray()`, `typeof x === 'string'`) as the very first step in an API handler.
+2. Use schema validation libraries (like Zod) to enforce shapes before business logic executes.

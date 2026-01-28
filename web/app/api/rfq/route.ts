@@ -60,15 +60,22 @@ export async function POST(request: NextRequest) {
     const { projectName, projectAddress, materials, deliveryDate, specialInstructions, selectedSupplierIds } = body;
 
     // 2. Security Check: Input Validation & DoS Protection
-    if (!projectName || !materials || materials.length === 0) {
+    if (!projectName || typeof projectName !== 'string') {
       return NextResponse.json(
-        { error: 'Missing required fields: projectName and materials' },
+        { error: 'Missing or invalid required field: projectName' },
+        { status: 400 }
+      );
+    }
+
+    if (!Array.isArray(materials) || materials.length === 0) {
+      return NextResponse.json(
+        { error: 'Invalid or missing materials array' },
         { status: 400 }
       );
     }
 
     // Security: Limit number of materials to prevent DoS
-    if (Array.isArray(materials) && materials.length > 100) {
+    if (materials.length > 100) {
       return NextResponse.json(
         { error: 'Too many materials. Maximum allowed is 100.' },
         { status: 400 }
