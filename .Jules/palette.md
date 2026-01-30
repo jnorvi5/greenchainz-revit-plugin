@@ -15,3 +15,10 @@
 **Action:**
 1.  Use semantic colors for data visualization where status is implied.
 2.  Add fade-in transitions to page wrappers when using Next.js Suspense/Loading boundaries.
+
+## 2025-02-24 - Semantic Feedback Messages
+**Learning:**
+1.  **Feedback Clarity:** Generic blue alerts for all feedback (success/error/info) reduce clarity. Using semantic colors (Red/Green) immediately communicates the nature of the outcome and guides user expectation.
+
+**Action:**
+1.  Use specific `messageType` states ('success' | 'error' | 'info') to drive semantic styling for all user feedback notifications.
