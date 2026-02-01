@@ -15,3 +15,10 @@
 **Action:**
 1.  Use semantic colors for data visualization where status is implied.
 2.  Add fade-in transitions to page wrappers when using Next.js Suspense/Loading boundaries.
+
+## 2025-02-23 - Code Integrity as UX
+**Learning:**
+1.  **Duplicate Props Hazard:** Duplicate props (like `className`) in JSX are not just technical debt; they often mask the intended design. In this case, a "ghost button" style was hidden by conflicting class definitions, leading to an inconsistent UI. Fixing the code revealed the correct, accessible design.
+
+**Action:**
+1.  Treat linter errors like `react/jsx-no-duplicate-props` as high-priority UX issues, as they often indicate broken or unpredictable interface states.
