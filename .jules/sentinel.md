@@ -31,3 +31,11 @@
 **Vulnerability:** Multiple API routes (`audit`, `rfq`) and UI pages contained duplicated code blocks and syntax errors resembling unresolved merge conflicts, but without conflict markers. This rendered security checks ambiguous (duplicate auth headers, cut-off validation blocks).
 **Learning:** Code corruption often manifests as "syntax errors" or "lint errors" but can be subtle enough to allow compilation while executing unexpected logic (e.g., duplicated side effects, bypassed checks). In this repo, it seems to stem from poor merge practices.
 **Prevention:** Treat "Parsing error" and "Duplicate identifier" lint errors as P0 security issues. Do not just "fix the build" by commenting out code; reconstruct the intended logic to ensure no security checks were deleted during the corruption.
+
+## 2025-05-22 - Missing Test Configuration & Public API Exposure
+**Vulnerability:** The `GET /api/suppliers` endpoint was public, exposing the supplier database. Additionally, `vitest.config.ts` was missing, preventing tests from running correctly (specifically module alias resolution), which likely contributed to previous code corruption issues.
+**Learning:** Security fixes are impossible to verify if the test environment is broken. Missing configuration files in "standard" setups (like Next.js) can silently break CI/CD or local verification.
+**Prevention:**
+1. Secure all API endpoints by default; use explicit "public" markers if intended.
+2. Verify test execution (`pnpm test`) as the first step of any security audit to ensure the environment is sound.
+3. Centralize duplicated security logic (like auth checks) into helpers to prevent inconsistency.

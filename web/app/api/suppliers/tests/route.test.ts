@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { POST } from '../route';
+import { POST, GET } from '../route';
 import { NextRequest } from 'next/server';
 
 describe('Suppliers API Endpoint Security', () => {
@@ -103,5 +103,47 @@ describe('Suppliers API Endpoint Security', () => {
 
     expect(data.error).toBe('Failed to send RFQ to suppliers');
     // Ensure no stack trace or internal error message is leaked
+  });
+
+  describe('GET Endpoint', () => {
+    it('should return 401 if authorization header is missing', async () => {
+      const req = new NextRequest('http://localhost:3000/api/suppliers', {
+        method: 'GET',
+      });
+
+      const res = await GET(req);
+      expect(res.status).toBe(401);
+      const data = await res.json();
+      expect(data.error).toContain('Missing or invalid Authorization header');
+    });
+
+    it('should return 401 if token is incorrect', async () => {
+      const req = new NextRequest('http://localhost:3000/api/suppliers', {
+        method: 'GET',
+        headers: {
+          Authorization: 'Bearer wrong-token',
+        },
+      });
+
+      const res = await GET(req);
+      expect(res.status).toBe(401);
+      const data = await res.json();
+      expect(data.error).toContain('Invalid token');
+    });
+
+    it('should return 200 with suppliers list if token is correct', async () => {
+      const req = new NextRequest('http://localhost:3000/api/suppliers', {
+        method: 'GET',
+        headers: {
+          Authorization: 'Bearer test-secret',
+        },
+      });
+
+      const res = await GET(req);
+      expect(res.status).toBe(200);
+      const data = await res.json();
+      expect(data.suppliers).toBeDefined();
+      expect(Array.isArray(data.suppliers)).toBe(true);
+    });
   });
 });

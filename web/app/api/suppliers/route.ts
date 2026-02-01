@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import crypto from 'crypto';
+import { validateApiSecret } from '@/utils/auth-helper';
 
 // Supplier API - Search and manage sustainable material suppliers
 export async function GET(request: NextRequest) {
+  // 🔒 Security Check: Validate Authorization Token
+  const authError = validateApiSecret(request);
+  if (authError) return authError;
+
   const { searchParams } = new URL(request.url);
   const category = searchParams.get('category');
   const region = searchParams.get('region');
@@ -44,35 +48,8 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // 🔒 Security Check: Validate Authorization Token
-    const authHeader = request.headers.get('authorization');
-    const EXPECTED_AUTH_TOKEN = process.env.GREENCHAINZ_API_SECRET;
-
-    if (!EXPECTED_AUTH_TOKEN) {
-      console.error('SERVER CONFIG ERROR: GREENCHAINZ_API_SECRET is not set.');
-      return NextResponse.json(
-        { error: 'Server configuration error' },
-        { status: 500 }
-      );
-    }
-
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { error: 'Unauthorized: Missing or invalid Authorization header' },
-        { status: 401 }
-      );
-    }
-
-    const token = authHeader.split(' ')[1];
-    const tokenBuffer = Buffer.from(token);
-    const secretBuffer = Buffer.from(EXPECTED_AUTH_TOKEN);
-
-    // Use constant-time comparison to prevent timing attacks
-    if (tokenBuffer.length !== secretBuffer.length || !crypto.timingSafeEqual(tokenBuffer, secretBuffer)) {
-      return NextResponse.json(
-        { error: 'Unauthorized: Invalid token' },
-        { status: 401 }
-      );
-    }
+    const authError = validateApiSecret(request);
+    if (authError) return authError;
 
     const body = await request.json();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
