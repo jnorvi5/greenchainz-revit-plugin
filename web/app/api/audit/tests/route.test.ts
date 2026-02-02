@@ -102,4 +102,23 @@ describe('Audit API Endpoint Security', () => {
     expect(data.error).toBe('Failed to process Audit');
     expect(data.details).toBeUndefined(); // Crucial security check
   });
+
+  it('should return 400 for invalid input types', async () => {
+    const invalidReq = new NextRequest('http://localhost:3000/api/audit', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer test-secret',
+      },
+      body: JSON.stringify({
+        ProjectName: 'Test Project',
+        OverallScore: 'not-a-number', // Invalid type
+        Materials: 'not-an-array', // Invalid type
+      }),
+    });
+
+    const res = await POST(invalidReq);
+    expect(res.status).toBe(400);
+    const data = await res.json();
+    expect(data.error).toBeDefined();
+  });
 });

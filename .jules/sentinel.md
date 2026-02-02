@@ -31,3 +31,13 @@
 **Vulnerability:** Multiple API routes (`audit`, `rfq`) and UI pages contained duplicated code blocks and syntax errors resembling unresolved merge conflicts, but without conflict markers. This rendered security checks ambiguous (duplicate auth headers, cut-off validation blocks).
 **Learning:** Code corruption often manifests as "syntax errors" or "lint errors" but can be subtle enough to allow compilation while executing unexpected logic (e.g., duplicated side effects, bypassed checks). In this repo, it seems to stem from poor merge practices.
 **Prevention:** Treat "Parsing error" and "Duplicate identifier" lint errors as P0 security issues. Do not just "fix the build" by commenting out code; reconstruct the intended logic to ensure no security checks were deleted during the corruption.
+
+## 2024-05-22 - [Medium] Missing Input Validation in Audit API
+**Vulnerability:** The `/api/audit` endpoint accepted any JSON structure for `Materials` and `Recommendations`, relying on implicit database handling. It also lacked type checks for `OverallScore`.
+**Learning:** Even internal/machine-to-machine APIs (authenticated via secret) must validate input to prevent data corruption or potential injection/DoS vectors.
+**Prevention:** Implement strict schema validation (using Zod or manual checks) for all API inputs, regardless of authentication method.
+
+## 2024-05-22 - [Critical] Code Corruption in Billing Page
+**Vulnerability:** The `BillingPage` contained quadruple duplicate `className` props on a button, indicating a bad merge resolution.
+**Learning:** `pnpm build` might not catch all JSX issues that `pnpm lint` catches.
+**Prevention:** Always run `pnpm lint` before pushing, especially after resolving merge conflicts.

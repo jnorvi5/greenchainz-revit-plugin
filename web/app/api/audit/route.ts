@@ -47,9 +47,37 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Validate request based on AuditResult model in plugin
-    if (!body.ProjectName) {
+    if (!body.ProjectName || typeof body.ProjectName !== 'string') {
       return NextResponse.json(
-        { error: 'Missing required field: ProjectName' },
+        { error: 'Missing or invalid required field: ProjectName' },
+        { status: 400 }
+      );
+    }
+
+    if (body.ProjectName.length > 200) {
+      return NextResponse.json(
+        { error: 'ProjectName too long. Limit is 200 characters.' },
+        { status: 400 }
+      );
+    }
+
+    if (body.OverallScore !== undefined && typeof body.OverallScore !== 'number') {
+      return NextResponse.json(
+        { error: 'Invalid OverallScore: must be a number' },
+        { status: 400 }
+      );
+    }
+
+    if (body.Materials && !Array.isArray(body.Materials)) {
+      return NextResponse.json(
+        { error: 'Invalid Materials: must be an array' },
+        { status: 400 }
+      );
+    }
+
+    if (body.Recommendations && !Array.isArray(body.Recommendations)) {
+      return NextResponse.json(
+        { error: 'Invalid Recommendations: must be an array' },
         { status: 400 }
       );
     }
