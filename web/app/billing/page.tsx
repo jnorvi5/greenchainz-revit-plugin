@@ -69,13 +69,14 @@ const pricingTiers: PricingTier[] = [
 
 export default function BillingPage() {
   const [loadingTierId, setLoadingTierId] = useState<string | null>(null);
-  const [message, setMessage] = useState('');
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
 
   // Example customer ID (in a real app, get this from auth context)
   const customerId = 'cus_123456789';
 
   const handleManageSubscription = async () => {
     setLoadingTierId('manage');
+    setFeedback(null);
     try {
       const res = await fetch('/api/stripe/create-portal', {
         method: 'POST',
@@ -84,13 +85,13 @@ export default function BillingPage() {
       });
       const { url, error } = await res.json();
       if (error) {
-        setMessage('Error accessing portal.');
+        setFeedback({ type: 'error', text: 'Error accessing portal.' });
       } else if (url) {
         window.location.href = url;
       }
     } catch (err) {
       console.error(err);
-      setMessage('Error accessing portal.');
+      setFeedback({ type: 'error', text: 'Error accessing portal.' });
     } finally {
       setLoadingTierId(null);
     }
@@ -99,7 +100,7 @@ export default function BillingPage() {
   const handleSubscribe = async (tier: PricingTier) => {
     if (tier.price === 0) {
       // Handle free tier logic (e.g., redirect to dashboard)
-      setMessage('Free tier selected. Welcome!');
+      setFeedback({ type: 'success', text: 'Free tier selected. Welcome!' });
       return;
     }
 
@@ -110,7 +111,7 @@ export default function BillingPage() {
     }
 
     setLoadingTierId(tier.id);
-    setMessage('');
+    setFeedback(null);
 
     try {
       // Add a small artificial delay to ensure the loading spinner is visible
@@ -130,7 +131,7 @@ export default function BillingPage() {
 
       if (error) {
         console.error('Error creating checkout session:', error);
-        setMessage('Error initiating checkout. Please try again.');
+        setFeedback({ type: 'error', text: 'Error initiating checkout. Please try again.' });
         setLoadingTierId(null);
         return;
       }
@@ -138,11 +139,11 @@ export default function BillingPage() {
       if (url) {
         window.location.href = url;
       } else {
-        setMessage('Failed to get checkout URL.');
+        setFeedback({ type: 'error', text: 'Failed to get checkout URL.' });
       }
     } catch (err) {
       console.error('Checkout error:', err);
-      setMessage('An unexpected error occurred.');
+      setFeedback({ type: 'error', text: 'An unexpected error occurred.' });
     } finally {
       setLoadingTierId(null);
     }
@@ -176,13 +177,9 @@ export default function BillingPage() {
           <div className="mt-4">
              <button
                onClick={handleManageSubscription}
-               className="text-indigo-600 hover:text-indigo-500 font-medium hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 rounded px-3 py-2 transition-colors flex items-center justify-center mx-auto"
                disabled={!!loadingTierId}
                aria-busy={loadingTierId === 'manage'}
                className="mx-auto flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-indigo-600 transition-colors hover:bg-indigo-50 hover:text-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-               className="text-indigo-600 hover:text-indigo-500 hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 rounded px-2 py-1 transition-colors flex items-center justify-center mx-auto"
-               className="text-indigo-600 hover:text-indigo-800 hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 rounded px-2 py-1 transition-colors flex items-center justify-center mx-auto"
-               disabled={!!loadingTierId}
                title="Manage your existing subscription and billing details"
              >
                  {loadingTierId === 'manage' && <Spinner className="mr-2 text-indigo-600" />}
@@ -191,12 +188,16 @@ export default function BillingPage() {
           </div>
         </div>
 
-        {message && (
+        {feedback && (
              <div
-               className="mt-4 p-4 bg-blue-100 text-blue-700 rounded text-center"
+               className={`mt-4 p-4 rounded text-center ${
+                 feedback.type === 'error' ? 'bg-red-100 text-red-700' :
+                 feedback.type === 'success' ? 'bg-green-100 text-green-700' :
+                 'bg-blue-100 text-blue-700'
+               }`}
                role="alert"
              >
-                 {message}
+                 {feedback.text}
              </div>
         )}
 
