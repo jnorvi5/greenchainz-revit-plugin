@@ -31,3 +31,10 @@
 **Vulnerability:** Multiple API routes (`audit`, `rfq`) and UI pages contained duplicated code blocks and syntax errors resembling unresolved merge conflicts, but without conflict markers. This rendered security checks ambiguous (duplicate auth headers, cut-off validation blocks).
 **Learning:** Code corruption often manifests as "syntax errors" or "lint errors" but can be subtle enough to allow compilation while executing unexpected logic (e.g., duplicated side effects, bypassed checks). In this repo, it seems to stem from poor merge practices.
 **Prevention:** Treat "Parsing error" and "Duplicate identifier" lint errors as P0 security issues. Do not just "fix the build" by commenting out code; reconstruct the intended logic to ensure no security checks were deleted during the corruption.
+
+## 2025-05-22 - [CRITICAL] IDOR in Billing Portal
+**Vulnerability:** The `/api/stripe/create-portal` endpoint accepted a `customerId` from the client request body without verifying it belonged to the authenticated user, allowing any user to access another's billing portal (IDOR).
+**Learning:** Trusting client-side IDs for sensitive resources (like billing) is a common trap. Also, module-level variable initialization in Next.js API routes makes testing difficult (`process.env` mocking fails) and can lead to shared state issues.
+**Prevention:**
+1. Never accept resource IDs (like `customerId`) from the client if they can be derived securely from the authenticated session (e.g., via email lookup).
+2. Initialize API clients (Stripe, Supabase) lazily or inside handlers to support runtime configuration and test mocking.
