@@ -69,7 +69,7 @@ const pricingTiers: PricingTier[] = [
 
 export default function BillingPage() {
   const [loadingTierId, setLoadingTierId] = useState<string | null>(null);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
 
   // Example customer ID (in a real app, get this from auth context)
   const customerId = 'cus_123456789';
@@ -84,13 +84,13 @@ export default function BillingPage() {
       });
       const { url, error } = await res.json();
       if (error) {
-        setMessage('Error accessing portal.');
+        setMessage({ type: 'error', text: 'Error accessing portal.' });
       } else if (url) {
         window.location.href = url;
       }
     } catch (err) {
       console.error(err);
-      setMessage('Error accessing portal.');
+      setMessage({ type: 'error', text: 'Error accessing portal.' });
     } finally {
       setLoadingTierId(null);
     }
@@ -99,7 +99,7 @@ export default function BillingPage() {
   const handleSubscribe = async (tier: PricingTier) => {
     if (tier.price === 0) {
       // Handle free tier logic (e.g., redirect to dashboard)
-      setMessage('Free tier selected. Welcome!');
+      setMessage({ type: 'success', text: 'Free tier selected. Welcome!' });
       return;
     }
 
@@ -110,7 +110,7 @@ export default function BillingPage() {
     }
 
     setLoadingTierId(tier.id);
-    setMessage('');
+    setMessage(null);
 
     try {
       // Add a small artificial delay to ensure the loading spinner is visible
@@ -130,7 +130,7 @@ export default function BillingPage() {
 
       if (error) {
         console.error('Error creating checkout session:', error);
-        setMessage('Error initiating checkout. Please try again.');
+        setMessage({ type: 'error', text: 'Error initiating checkout. Please try again.' });
         setLoadingTierId(null);
         return;
       }
@@ -138,11 +138,11 @@ export default function BillingPage() {
       if (url) {
         window.location.href = url;
       } else {
-        setMessage('Failed to get checkout URL.');
+        setMessage({ type: 'error', text: 'Failed to get checkout URL.' });
       }
     } catch (err) {
       console.error('Checkout error:', err);
-      setMessage('An unexpected error occurred.');
+      setMessage({ type: 'error', text: 'An unexpected error occurred.' });
     } finally {
       setLoadingTierId(null);
     }
@@ -176,13 +176,9 @@ export default function BillingPage() {
           <div className="mt-4">
              <button
                onClick={handleManageSubscription}
-               className="text-indigo-600 hover:text-indigo-500 font-medium hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 rounded px-3 py-2 transition-colors flex items-center justify-center mx-auto"
+               className="mx-auto flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-indigo-600 transition-colors hover:bg-indigo-50 hover:text-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                disabled={!!loadingTierId}
                aria-busy={loadingTierId === 'manage'}
-               className="mx-auto flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-indigo-600 transition-colors hover:bg-indigo-50 hover:text-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-               className="text-indigo-600 hover:text-indigo-500 hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 rounded px-2 py-1 transition-colors flex items-center justify-center mx-auto"
-               className="text-indigo-600 hover:text-indigo-800 hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 rounded px-2 py-1 transition-colors flex items-center justify-center mx-auto"
-               disabled={!!loadingTierId}
                title="Manage your existing subscription and billing details"
              >
                  {loadingTierId === 'manage' && <Spinner className="mr-2 text-indigo-600" />}
@@ -193,10 +189,29 @@ export default function BillingPage() {
 
         {message && (
              <div
-               className="mt-4 p-4 bg-blue-100 text-blue-700 rounded text-center"
+               className={`mt-4 p-4 rounded text-center flex items-center justify-center gap-2 ${
+                 message.type === 'error' ? 'bg-red-50 text-red-700' :
+                 message.type === 'success' ? 'bg-green-50 text-green-700' :
+                 'bg-blue-50 text-blue-700'
+               }`}
                role="alert"
              >
-                 {message}
+               {message.type === 'error' && (
+                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                 </svg>
+               )}
+               {message.type === 'success' && (
+                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                 </svg>
+               )}
+               {message.type === 'info' && (
+                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                 </svg>
+               )}
+               {message.text}
              </div>
         )}
 
