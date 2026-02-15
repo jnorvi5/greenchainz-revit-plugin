@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -16,31 +17,20 @@ namespace GreenChainz.Revit.Services
         private bool _disposed;
         private readonly bool _shouldDisposeHttpClient;
 
-        // Default constructor uses production URL and TelemetryLogger
         public ApiClient()
             : this(ApiConfig.BASE_URL, ApiConfig.LoadAuthToken(), new TelemetryLogger())
         {
         }
 
-        // Constructor with logger injection
         public ApiClient(ILogger logger)
             : this(ApiConfig.BASE_URL, ApiConfig.LoadAuthToken(), logger)
         {
         }
 
-        // Constructor with explicit params
         public ApiClient(string baseUrl, string authToken = null, ILogger logger = null)
         {
             _baseUrl = (baseUrl ?? ApiConfig.BASE_URL).TrimEnd('/');
             _logger = logger ?? new TelemetryLogger();
-
-            // Security: Enforce HTTPS for non-localhost
-            if (!_baseUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase) &&
-                !_baseUrl.Contains("localhost") &&
-                !_baseUrl.Contains("127.0.0.1"))
-            {
-                _logger.LogInformation($"[SECURITY WARNING] Using insecure connection to {_baseUrl}");
-            }
 
             _httpClient = new HttpClient
             {
@@ -51,7 +41,6 @@ namespace GreenChainz.Revit.Services
             ConfigureHttpClient(authToken);
         }
 
-        // Constructor for dependency injection of HttpClient
         public ApiClient(string baseUrl, string authToken, HttpClient httpClient, ILogger logger = null)
         {
             _baseUrl = (baseUrl ?? ApiConfig.BASE_URL).TrimEnd('/');
@@ -62,12 +51,6 @@ namespace GreenChainz.Revit.Services
             ConfigureHttpClient(authToken);
         }
 
-        // Overload to maintain backward compatibility
-        public ApiClient(string baseUrl, string authToken, HttpClient httpClient)
-            : this(baseUrl, authToken, httpClient, null)
-        {
-        }
-
         private void ConfigureHttpClient(string authToken)
         {
             _httpClient.DefaultRequestHeaders.Accept.Clear();
@@ -75,174 +58,90 @@ namespace GreenChainz.Revit.Services
 
             if (!string.IsNullOrEmpty(authToken))
             {
-                if (_httpClient.DefaultRequestHeaders.Authorization == null)
-                {
-                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
-                }
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
             }
         }
 
         private async Task<T> SendRequestAsync<T>(HttpRequestMessage request)
         {
-            string method = request.Method.ToString();
-            string url = request.RequestUri.ToString();
-
-            _logger.LogDebug($"Sending {method} request to {url}");
-            // SECURITY: Do not log request body to avoid PII leakage
-
             try
             {
                 HttpResponseMessage response = await _httpClient.SendAsync(request);
+                string responseString = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
                 {
-                    string responseString = await response.Content.ReadAsStringAsync();
-
-                    if (typeof(T) == typeof(string))
-                    {
-                        return (T)(object)responseString;
-                    }
-
+                    if (typeof(T) == typeof(string)) return (T)(object)responseString;
                     return JsonConvert.DeserializeObject<T>(responseString);
                 }
                 else
                 {
-                    string errorBody = await response.Content.ReadAsStringAsync();
-                    _logger.LogError(null, $"API request failed: {response.StatusCode} - {errorBody}");
-                    throw new ApiException($"API request failed with status code {response.StatusCode}", (int)response.StatusCode, errorBody);
+                    _logger.LogError(null, $"API Error: {response.StatusCode} - {responseString}");
+                    throw new ApiException($"API Error {response.StatusCode}", (int)response.StatusCode, responseString);
                 }
-            }
-            catch (JsonException ex)
-            {
-                _logger.LogError(ex, "Failed to deserialize response");
-                throw new ApiException($"Failed to parse API response: {ex.Message}", ex);
-            }
-            catch (HttpRequestException ex)
-            {
-                _logger.LogError(ex, "HTTP request failed");
-                throw;
-            }
-        }
-
-        private async Task<HttpResponseMessage> SendRequestAsync(HttpRequestMessage request)
-        {
-            string method = request.Method.ToString();
-            string url = request.RequestUri.ToString();
-
-            _logger.LogDebug($"Sending {method} request to {url}");
-
-            try
-            {
-                return await _httpClient.SendAsync(request);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"HTTP request failed for {url}");
+                _logger.LogError(ex, "API request failed");
                 throw;
             }
         }
 
-        public async Task<string> SubmitRFQ(RFQRequest request)
+        #region Messaging
+        public async Task<object> GetConversationsAsync()
         {
-             if (request == null) throw new ArgumentNullException(nameof(request));
-
-             string url = $"{_baseUrl}/api/rfq";
-             string json = JsonConvert.SerializeObject(request);
-             var httpRequest = new HttpRequestMessage(HttpMethod.Post, url)
-             {
-                 Content = new StringContent(json, Encoding.UTF8, "application/json")
-             };
-
-             _logger.LogInformation($"Submitting RFQ for project: {request.ProjectName}");
-             // SECURITY: Request body logging removed to prevent PII leakage (ProjectAddress, SpecialInstructions)
-
-             try
-             {
-                 return await SendRequestAsync<string>(httpRequest);
-             }
-             catch (Exception ex)
-             {
-                 // Wrapping to match original behavior intent
-                 throw new Exception($"RFQ submission failed: {ex.Message}", ex);
-             }
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{_baseUrl}/api/messaging/conversations");
+            return await SendRequestAsync<object>(request);
         }
 
-        public async Task<AuditResult> SubmitAuditAsync(AuditRequest request)
+        public async Task<object> SendMessageAsync(int conversationId, string content)
         {
-            if (request == null) throw new ArgumentNullException(nameof(request));
+            var body = new { conversationId, content };
+            var request = new HttpRequestMessage(HttpMethod.Post, $"{_baseUrl}/api/messaging/send")
+            {
+                Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json")
+            };
+            return await SendRequestAsync<object>(request);
+        }
+        #endregion
 
-            _logger.LogInformation($"Submitting audit for project: {request.ProjectName}");
-            // SECURITY: Do not log full audit request details as they may contain sensitive project data
-
-            string url = $"{_baseUrl}/api/audit";
-            string json = JsonConvert.SerializeObject(request);
-
-            // Re-using the generic SendRequestAsync to ensure consistent error handling
-            var httpRequest = new HttpRequestMessage(HttpMethod.Post, url)
+        #region RFQ & Scorecards
+        public async Task<string> SubmitRFQ(RFQRequest request)
+        {
+            var json = JsonConvert.SerializeObject(request);
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, $"{_baseUrl}/api/rfqs/submit")
             {
                 Content = new StringContent(json, Encoding.UTF8, "application/json")
             };
-
-            try
-            {
-                return await SendRequestAsync<AuditResult>(httpRequest);
-            }
-            catch (ApiException ex)
-            {
-                // Preserve original behavior: return error object instead of throwing
-                return new AuditResult
-                {
-                    OverallScore = -1,
-                    Summary = "API Error: " + (ex.ResponseBody ?? ex.Message)
-                };
-            }
-            catch (Exception ex)
-            {
-                 return new AuditResult
-                {
-                    OverallScore = -1,
-                    Summary = "API Error: " + ex.Message
-                };
-            }
+            return await SendRequestAsync<string>(httpRequest);
         }
 
-        public async Task<MaterialsResponse> GetMaterialsAsync(string category = null, string search = null)
+        public async Task<CcpsBreakdown> GetMaterialScorecardAsync(int materialId)
         {
-            _logger.LogDebug($"Getting materials with category={category}, search={search}");
-
-            var uriBuilder = new UriBuilder($"{_baseUrl}/materials");
-            var query = new System.Collections.Generic.List<string>();
-            if (!string.IsNullOrEmpty(category)) query.Add($"category={Uri.EscapeDataString(category)}");
-            if (!string.IsNullOrEmpty(search)) query.Add($"search={Uri.EscapeDataString(search)}");
-
-            if (query.Count > 0)
-            {
-                uriBuilder.Query = string.Join("&", query);
-            }
-
-            var httpRequest = new HttpRequestMessage(HttpMethod.Get, uriBuilder.Uri);
-            return await SendRequestAsync<MaterialsResponse>(httpRequest);
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{_baseUrl}/api/materials/{materialId}/scorecard");
+            return await SendRequestAsync<CcpsBreakdown>(request);
         }
+        #endregion
 
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
             if (!_disposed)
             {
-                if (disposing)
-                {
-                    if (_shouldDisposeHttpClient)
-                    {
-                        _httpClient?.Dispose();
-                    }
-                }
+                if (_shouldDisposeHttpClient) _httpClient?.Dispose();
                 _disposed = true;
             }
         }
+    }
+
+    public class CcpsBreakdown
+    {
+        public double CarbonScore { get; set; }
+        public double ComplianceScore { get; set; }
+        public double CertificationScore { get; set; }
+        public double CostScore { get; set; }
+        public double SupplyChainScore { get; set; }
+        public double HealthScore { get; set; }
+        public double CcpsTotal { get; set; }
+        public int SourcingDifficulty { get; set; }
     }
 }
