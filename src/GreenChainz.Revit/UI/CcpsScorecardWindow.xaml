@@ -1,0 +1,67 @@
+<Window x:Class="GreenChainz.Revit.UI.CcpsScorecardWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Enterprise CCPS Scorecard - GreenChainz" Height="550" Width="450" WindowStartupLocation="CenterScreen">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Material Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,15">
+            <TextBlock x:Name="MaterialNameText" Text="Material Name" FontSize="20" FontWeight="Bold" Foreground="#1B5E20"/>
+            <TextBlock x:Name="CategoryText" Text="Category" FontSize="12" Foreground="Gray"/>
+        </StackPanel>
+
+        <!-- Total CCPS Score -->
+        <Border Grid.Row="1" Background="#E8F5E9" CornerRadius="10" Padding="15" Margin="0,0,0,20">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="Total CCPS Score" FontSize="14" FontWeight="SemiBold"/>
+                    <TextBlock Text="Comprehensive Carbon Performance Score" FontSize="10" Foreground="Gray"/>
+                </StackPanel>
+                <TextBlock x:Name="TotalScoreText" Grid.Column="1" Text="85" FontSize="32" FontWeight="Bold" Foreground="#2E7D32" VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+
+        <!-- 6 Pillars Breakdown -->
+        <ItemsControl Grid.Row="2" x:Name="PillarsItemsControl">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="0,0,0,12">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="12"/>
+                        <TextBlock Grid.Column="1" Text="{Binding Score}" FontWeight="Bold" FontSize="12"/>
+                        <ProgressBar Grid.Row="1" Grid.ColumnSpan="2" Value="{Binding Score}" Height="8" Margin="0,4,0,0" Foreground="{Binding Color}"/>
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <!-- Swaps Suggestion -->
+        <Border Grid.Row="3" Background="#FFF3E0" BorderBrush="#FFE0B2" BorderThickness="1" CornerRadius="5" Padding="10" Margin="0,15,0,15">
+            <StackPanel>
+                <TextBlock Text="♻️ Better Swap Available" FontWeight="Bold" Foreground="#E65100" Margin="0,0,0,5"/>
+                <TextBlock x:Name="SwapSuggestionText" Text="Loading swap candidates..." FontSize="11" TextWrapping="Wrap"/>
+                <Button Content="View Swap Details" Margin="0,8,0,0" HorizontalAlignment="Left" Padding="10,2" Click="ViewSwap_Click"/>
+            </StackPanel>
+        </Border>
+
+        <Button Grid.Row="4" Content="Close" HorizontalAlignment="Right" Padding="20,8" Click="Close_Click"/>
+    </Grid>
+</Window>

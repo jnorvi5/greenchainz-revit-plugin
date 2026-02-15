@@ -13,7 +13,6 @@ namespace GreenChainz.Revit
         public static readonly Guid MaterialBrowserPaneId = new Guid("A1B2C3D4-E5F6-7890-1234-567890ABCDEF");
         public static readonly Guid ChainBotPaneId = new Guid("B2C3D4E5-F6A7-8901-2345-67890ABCDEF0");
         
-        // Services
         public static AutodeskAuthService AuthService { get; private set; }
         public static SdaConnectorService SdaService { get; private set; }
         public static MaterialService MaterialService { get; private set; }
@@ -30,37 +29,50 @@ namespace GreenChainz.Revit
                 
                 string assemblyPath = Assembly.GetExecutingAssembly().Location;
 
-                // Panel: AI Assistant
-                RibbonPanel aiPanel = application.CreateRibbonPanel(tabName, "AI Assistant");
+                // Panel: AI & Intelligence
+                RibbonPanel intelPanel = application.CreateRibbonPanel(tabName, "Intelligence");
+                
                 PushButtonData chainBotBtn = new PushButtonData(
                     "ChainBot", "ChainBot\n(AI)", assemblyPath,
                     "GreenChainz.Revit.Commands.ShowChainBotCommand")
                 { ToolTip = "Open ChainBot for contextual sustainability advice" };
-                aiPanel.AddItem(chainBotBtn);
+                intelPanel.AddItem(chainBotBtn);
 
-                // Panel 1: Scorecard
-                RibbonPanel scorecardPanel = application.CreateRibbonPanel(tabName, "Scorecard");
+                PushButtonData ccpsBtn = new PushButtonData(
+                    "CCPS", "CCPS\nScorecard", assemblyPath,
+                    "GreenChainz.Revit.Commands.ShowCcpsScorecardCommand")
+                { ToolTip = "View the 6-pillar Comprehensive Carbon Performance Score for selected material" };
+                intelPanel.AddItem(ccpsBtn);
+
+                // Panel 1: Analysis
+                RibbonPanel analysisPanel = application.CreateRibbonPanel(tabName, "Analysis");
+                
                 PushButtonData scorecardButtonData = new PushButtonData(
-                    "Scorecard", "Sustainability\nScorecard", assemblyPath,
+                    "Scorecard", "Project\nScorecard", assemblyPath,
                     "GreenChainz.Revit.Commands.ScorecardCommand")
-                { ToolTip = "Generate enterprise-grade sustainability scorecard" };
-                scorecardPanel.AddItem(scorecardButtonData);
+                { ToolTip = "Generate project-wide sustainability scorecard" };
+                analysisPanel.AddItem(scorecardButtonData);
 
-                // Panel 2: Carbon Analysis
-                RibbonPanel carbonPanel = application.CreateRibbonPanel(tabName, "Carbon");
                 PushButtonData carbonAuditButtonData = new PushButtonData(
                     "CarbonAudit", "Carbon\nAudit", assemblyPath,
                     "GreenChainz.Revit.Commands.CarbonAuditCommand")
-                { ToolTip = "Detailed carbon footprint analysis" };
-                carbonPanel.AddItem(carbonAuditButtonData);
+                { ToolTip = "Sync BIM data with GreenChainz Carbon Dashboard" };
+                analysisPanel.AddItem(carbonAuditButtonData);
 
-                // Panel 4: Procurement
+                // Panel 2: Procurement
                 RibbonPanel procurementPanel = application.CreateRibbonPanel(tabName, "Procurement");
+                
                 PushButtonData sendRfqButtonData = new PushButtonData(
                     "SendRFQ", "Send\nRFQ", assemblyPath,
                     "GreenChainz.Revit.Commands.SendRFQCommand")
                 { ToolTip = "Send RFQ to sustainable suppliers" };
                 procurementPanel.AddItem(sendRfqButtonData);
+
+                PushButtonData rfqStatusBtn = new PushButtonData(
+                    "RFQStatus", "RFQ\nStatus", assemblyPath,
+                    "GreenChainz.Revit.Commands.ShowRfqStatusCommand")
+                { ToolTip = "Track RFQ status and message suppliers" };
+                procurementPanel.AddItem(rfqStatusBtn);
 
                 // Register Dockable Panes
                 MaterialBrowserPanel browserPanel = new MaterialBrowserPanel(MaterialService);
