@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
+using System.Diagnostics;
 using Microsoft.Win32;
 using GreenChainz.Revit.Models;
 using GreenChainz.Revit.Services;
@@ -45,6 +46,25 @@ namespace GreenChainz.Revit.UI
             if (result.Recommendations != null)
             {
                 RecommendationsList.ItemsSource = result.Recommendations;
+            }
+        }
+
+        private void ViewDashboard_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // Open the main app dashboard in the browser
+                // In a production scenario, we'd deep-link to the specific project ID
+                string dashboardUrl = $"{ApiConfig.BASE_URL}/dashboard";
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = dashboardUrl,
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Could not open dashboard: {ex.Message}", "Browser Error", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -102,7 +122,7 @@ namespace GreenChainz.Revit.UI
                         "Export Complete", MessageBoxButton.OK, MessageBoxImage.Information);
                     
                     // Open the PDF
-                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                    Process.Start(new ProcessStartInfo
                     {
                         FileName = saveDialog.FileName,
                         UseShellExecute = true

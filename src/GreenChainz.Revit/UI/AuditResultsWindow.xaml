@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GreenChainz.Revit.UI"
         mc:Ignorable="d"
-        Title="Carbon Audit Results" Height="600" Width="800"
+        Title="Carbon Audit Results" Height="650" Width="850"
         WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
@@ -22,6 +22,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -77,6 +78,7 @@
 
         <!-- Action Buttons -->
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="View in Dashboard" Click="ViewDashboard_Click" Padding="15,8" Margin="0,0,10,0" Background="#4CAF50" Foreground="White"/>
             <Button Content="Send RFQ" Click="SendRFQ_Click" Padding="15,8" Margin="0,0,10,0" Background="#007ACC" Foreground="White"/>
             <Button Content="Export PDF" Click="ExportPDF_Click" Padding="15,8" Margin="0,0,10,0"/>
             <Button Content="Close" Click="Close_Click" Padding="15,8"/>
