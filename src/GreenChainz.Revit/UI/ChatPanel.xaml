@@ -1,0 +1,68 @@
+<UserControl x:Class="GreenChainz.Revit.UI.ChatPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="300">
+    <Grid Background="#F5F5F5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#1B5E20" Padding="10">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="🤖" FontSize="20" Margin="0,0,10,0"/>
+                <StackPanel>
+                    <TextBlock Text="ChainBot &amp; Otto" Foreground="White" FontWeight="Bold" FontSize="14"/>
+                    <TextBlock Text="Your Sustainability AI Assistants" Foreground="#E8F5E9" FontSize="10"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Chat History -->
+        <ScrollViewer Grid.Row="1" x:Name="ChatScrollViewer" VerticalScrollBarVisibility="Auto" Padding="10">
+            <ItemsControl x:Name="ChatItemsControl">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Margin="0,5" Padding="8" CornerRadius="8" 
+                                Background="{Binding IsUser, Converter={StaticResource BooleanToChatColorConverter}}"
+                                HorizontalAlignment="{Binding IsUser, Converter={StaticResource BooleanToAlignmentConverter}}"
+                                MaxWidth="240">
+                            <StackPanel>
+                                <TextBlock Text="{Binding SenderName}" FontSize="10" FontWeight="Bold" Margin="0,0,0,3" 
+                                           Visibility="{Binding IsUser, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Inverse}"/>
+                                <TextBlock Text="{Binding Content}" TextWrapping="Wrap" FontSize="12"/>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- Context Info -->
+        <Border Grid.Row="2" Background="#E8F5E9" Padding="8" BorderBrush="#C8E6C9" BorderThickness="0,1,0,0">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="📍" Margin="0,0,5,0"/>
+                <TextBlock x:Name="ContextText" Text="No material selected" FontSize="10" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" MaxWidth="220"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Input Area -->
+        <Grid Grid.Row="3" Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="MessageInput" Height="40" TextWrapping="Wrap" AcceptsReturn="True" 
+                     VerticalScrollBarVisibility="Auto" Margin="0,0,8,0" Padding="5"
+                     KeyDown="MessageInput_KeyDown"/>
+            <Button x:Name="SendButton" Grid.Column="1" Content="Send" Width="50" Click="SendButton_Click" 
+                    Background="#4CAF50" Foreground="White" FontWeight="Bold"/>
+        </Grid>
+    </Grid>
+</UserControl>
