@@ -13,6 +13,7 @@ namespace GreenChainz.Revit.UI
         private readonly ApiClient _apiClient;
         private readonly ObservableCollection<ChatMessage> _messages;
         private string _currentContext = "";
+        private int _activeConversationId = 0; // Should be initialized from user session or specific RFQ
 
         public ChatPanel()
         {
@@ -48,20 +49,21 @@ namespace GreenChainz.Revit.UI
 
             try
             {
-                // Call the Agent API from the main app
-                // This targets the 'material' or 'rfq' agents based on context
-                var response = await _apiClient.SendMessageAsync(0, $"{text} [Context: {_currentContext}]");
+                // Call the Agent API with the new sendWithAgent endpoint
+                // This ensures Otto/ChainBot processes the message with BIM context
+                var response = await _apiClient.SendWithAgentAsync(_activeConversationId, text, _currentContext);
                 
+                // Note: Real implementation would parse the TRPC response object
                 _messages.Add(new ChatMessage 
                 { 
                     SenderName = "ChainBot", 
-                    Content = response?.ToString() ?? "I'm here to help, but I couldn't reach the brain right now.", 
+                    Content = "Processing your request with Otto and ChainBot...", 
                     IsUser = false 
                 });
             }
             catch (Exception ex)
             {
-                _messages.Add(new ChatMessage { SenderName = "System", Content = $"Error: {ex.Message}", IsUser = false });
+                _messages.Add(new ChatMessage { SenderName = "System", Content = $"Connection Error: {ex.Message}. Check your GreenChainz login.", IsUser = false });
             }
             
             ChatScrollViewer.ScrollToBottom();

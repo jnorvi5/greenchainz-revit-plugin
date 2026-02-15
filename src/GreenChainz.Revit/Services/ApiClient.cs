@@ -87,17 +87,37 @@ namespace GreenChainz.Revit.Services
             }
         }
 
-        #region Messaging
+        #region Real-Time Messaging
         public async Task<object> GetConversationsAsync()
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, $"{_baseUrl}/api/messaging/conversations");
+            // Maps to TRPC messaging.getConversations
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{_baseUrl}/api/trpc/messaging.getConversations");
+            return await SendRequestAsync<object>(request);
+        }
+
+        public async Task<object> GetMessagesAsync(int conversationId)
+        {
+            // Maps to TRPC messaging.getMessages
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{_baseUrl}/api/trpc/messaging.getMessages?input={{\"conversationId\":{conversationId}}}");
             return await SendRequestAsync<object>(request);
         }
 
         public async Task<object> SendMessageAsync(int conversationId, string content)
         {
+            // Maps to TRPC messaging.send
             var body = new { conversationId, content };
-            var request = new HttpRequestMessage(HttpMethod.Post, $"{_baseUrl}/api/messaging/send")
+            var request = new HttpRequestMessage(HttpMethod.Post, $"{_baseUrl}/api/trpc/messaging.send")
+            {
+                Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json")
+            };
+            return await SendRequestAsync<object>(request);
+        }
+
+        public async Task<object> SendWithAgentAsync(int conversationId, string content, string context = null)
+        {
+            // Maps to TRPC messaging.sendWithAgent
+            var body = new { conversationId, content, conversationContext = context };
+            var request = new HttpRequestMessage(HttpMethod.Post, $"{_baseUrl}/api/trpc/messaging.sendWithAgent")
             {
                 Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json")
             };
@@ -109,7 +129,7 @@ namespace GreenChainz.Revit.Services
         public async Task<string> SubmitRFQ(RFQRequest request)
         {
             var json = JsonConvert.SerializeObject(request);
-            var httpRequest = new HttpRequestMessage(HttpMethod.Post, $"{_baseUrl}/api/rfqs/submit")
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, $"{_baseUrl}/api/trpc/rfqMarketplace.submit")
             {
                 Content = new StringContent(json, Encoding.UTF8, "application/json")
             };
@@ -118,8 +138,10 @@ namespace GreenChainz.Revit.Services
 
         public async Task<CcpsBreakdown> GetMaterialScorecardAsync(int materialId)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, $"{_baseUrl}/api/materials/{materialId}/scorecard");
-            return await SendRequestAsync<CcpsBreakdown>(request);
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{_baseUrl}/api/trpc/materials.getById?input={{\"id\":{materialId}}}");
+            var result = await SendRequestAsync<dynamic>(request);
+            // The backend returns a complex object, we extract the CCPS part
+            return JsonConvert.DeserializeObject<CcpsBreakdown>(JsonConvert.SerializeObject(result.result.data.ccpsByPersona.default));
         }
         #endregion
 
