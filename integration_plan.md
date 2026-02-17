@@ -1,56 +1,46 @@
-# GreenChainz Revit Plugin & Backend Integration Plan
+# GreenChainz Revit Plugin Integration Plan - MVP & Final Deployment
 
-## 1. Executive Summary
-This plan outlines the technical roadmap for integrating the GreenChainz Revit Plugin with the centralized web backend. The primary goal is to transition from local/mock data to a real-time, cloud-synchronized ecosystem supporting Carbon Audits and RFQ management.
-
-## 2. Integration Architecture
-The integration follows a **Client-Server** model utilizing a RESTful API layer.
-
-### 2.1 Key Components
-*   **Revit Plugin (C#/.NET 8.0):** Extracts BIM data, performs local carbon calculations, and initiates cloud sync.
-*   **Web Backend (Next.js/Node.js):** Hosts API endpoints for data ingestion, supplier matching, and project management.
-*   **Data Layer (Supabase/PostgreSQL):** Stores audit history, RFQ records, and user profiles.
-*   **External Integrations:** Placeholders for BuildingTransparency (EC3) and Autodesk Construction Cloud (ACC).
-
-### 2.2 Data Flow
-1.  **Audit Flow:** Revit -> Extract Materials -> Local GWP Calculation -> `POST /api/audit` -> Web Dashboard.
-2.  **RFQ Flow:** Revit -> Select Materials -> `POST /api/rfq` -> Supplier Notification -> Web Messaging.
-
-## 3. Implementation Roadmap
-
-### Phase 1: Authentication & Connectivity (Week 1)
-*   **Task 1.1:** Implement secure token storage in `ApiConfig.cs` using Windows Data Protection API (DPAPI).
-*   **Task 1.2:** Transition `ApiClient.cs` from hardcoded URLs to dynamic configuration based on environment.
-*   **Task 1.3:** Implement a "Connection Test" feature in the Revit UI to verify backend reachability.
-
-### Phase 2: Live Carbon Audit Sync (Week 2)
-*   **Task 2.1:** Update `AuditService.cs` to send real project data instead of fallback baselines.
-*   **Task 2.2:** Map Revit Material IDs to EC3 categories on the backend for more accurate matching.
-*   **Task 2.3:** Implement "View in Dashboard" button in `AuditResultsWindow.xaml` to open the web project page directly.
-
-### Phase 3: Enhanced RFQ & Supplier Integration (Week 3)
-*   **Task 3.1:** Connect `CreateRFQDialog.xaml` to the live `GET /api/suppliers` endpoint.
-*   **Task 3.2:** Implement real-time status updates for RFQs using WebSockets (Azure Web PubSub).
-*   **Task 3.3:** Add support for file attachments (specifications, drawings) via Azure Blob Storage.
-
-## 4. Security & Compliance
-*   **Managed Identities:** Utilize Azure Managed Identities for service-to-service communication where possible.
-*   **RBAC:** Enforce Role-Based Access Control on all API endpoints.
-*   **Encryption:** All data in transit must use TLS 1.3.
-
-## 5. Testing & Verification Strategy
-| Test Type | Description | Success Criteria |
-| :--- | :--- | :--- |
-| **Unit Testing** | Test `ApiClient` with mocked HTTP responses. | 100% pass on core API methods. |
-| **Integration Testing** | End-to-end flow from Revit to Supabase. | Audit record appears in DB within 2s. |
-| **User Acceptance** | Verify RFQ submission with a test supplier account. | Supplier receives email/notification. |
-
-## 6. Maintenance & Monitoring
-*   **Telemetry:** Integrate Azure Application Insights in both the plugin and backend.
-*   **Auto-Update:** Implement a version check on plugin startup to ensure users are on the latest integration schema.
+## Overview
+This plan outlines the final steps to transition the GreenChainz Revit plugin from a development prototype to a production-ready MVP. The focus is on robust data synchronization, AI-driven material auditing, and direct integration with the B2B marketplace's "Founding 50" campaign.
 
 ---
-**Next Steps:**
-1. Approve the Phase 1 implementation.
-2. Provide Azure/Supabase credentials for the staging environment.
-3. Schedule a review of the RFQ messaging UI.
+
+## **Phase 1: Real-Time Marketplace Integration (Completed)**
+*   **Secure Authentication:** Implemented Windows DPAPI for local token protection, ensuring architects stay logged in securely.
+*   **Direct API Access:** `ApiClient.cs` now connects to the main app's TRPC backend for real-time messaging and RFQ management.
+*   **BIM Data Sync:** Automated the extraction of material volumes and categories from Revit to populate the Carbon Audit dashboard.
+
+## **Phase 2: AI Audit Agent Deployment (Completed)**
+*   **Defensibility Agent:** Integrated the "Anti-Value Engineering" logic into Revit. Architects can now verify if a material specification is defensible against cheaper, less sustainable substitutes.
+*   **Contextual AI Panel:** The `ChatPanel` (ChainBot) now sends BIM context (element IDs, material names) with every query, enabling Otto and ChainBot to provide site-specific advice.
+*   **LEED Verification:** Automated the mapping of Revit material properties to LEED v4.1 credit requirements for instant compliance checking.
+
+## **Phase 3: Founding 50 Campaign & MVP Launch (Final Phase)**
+*   **Premium Supplier Matching:** The plugin now prioritizes "Founding 50" suppliers in the material browser and search results, providing them with direct access to architects at the point of specification.
+*   **Direct RFQ Submission:** Architects can now bundle Revit materials into a single RFQ and submit it directly to matched suppliers via the plugin.
+*   **Cloud-Native Scorecards:** Replaced local mock scorecards with the cloud-based CCPS (Carbon, Compliance, Certs, Cost, Supply, Health) engine, ensuring 1:1 parity with the web dashboard.
+
+---
+
+## **Technical Roadmap & Timelines**
+
+| Task | Priority | Status | Est. Completion |
+| :--- | :--- | :--- | :--- |
+| **Finalize RFQ Sync** | Critical | ✅ Complete | Feb 17, 2026 |
+| **Deploy AI Audit Agent** | High | ✅ Complete | Feb 17, 2026 |
+| **Founding 50 Integration**| High | ✅ Complete | Feb 17, 2026 |
+| **MVP Documentation** | Medium | 🔄 In Progress | Feb 18, 2026 |
+| **Beta Launch (200 Architects)**| High | 📅 Scheduled | Q1 2026 |
+
+---
+
+## **Verification & Quality Assurance**
+1.  **Auth Persistence:** Verify token refresh logic across Revit sessions.
+2.  **Data Accuracy:** Cross-check Revit volume extractions against manual takeoffs for top 5 material categories.
+3.  **Agent Response:** Test ChainBot's ability to handle ambiguous material queries by requesting BIM context.
+4.  **Marketplace Loop:** Confirm that an RFQ submitted in Revit appears instantly in the buyer's web dashboard and supplier's portal.
+
+---
+
+**Prepared by:** Manus AI for Jerit Norville, Founder & CEO, GreenChainz Inc.
+**Date:** Feb 17, 2026
