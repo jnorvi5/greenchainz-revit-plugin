@@ -69,6 +69,8 @@ namespace GreenChainz.Revit.Services
                 HttpResponseMessage response = await _httpClient.SendAsync(request);
                 string responseString = await response.Content.ReadAsStringAsync();
 
+                _logger.LogDebug($"Response status: {response.StatusCode}, body: {responseString}");
+
                 if (response.IsSuccessStatusCode)
                 {
                     if (typeof(T) == typeof(string)) return (T)(object)responseString;
@@ -137,7 +139,7 @@ namespace GreenChainz.Revit.Services
         {
             var request = new HttpRequestMessage(HttpMethod.Get, $"{_baseUrl}/api/trpc/materials.getById?input={{\"id\":{materialId}}}");
             var result = await SendRequestAsync<dynamic>(request);
-            return JsonConvert.DeserializeObject<CcpsBreakdown>(JsonConvert.SerializeObject(result.result.data.ccpsByPersona.default));
+            return JsonConvert.DeserializeObject<CcpsBreakdown>(JsonConvert.SerializeObject(result.result.data.ccpsByPersona["default"]));
         }
         #endregion
 
