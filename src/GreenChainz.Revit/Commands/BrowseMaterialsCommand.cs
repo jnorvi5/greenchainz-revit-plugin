@@ -7,6 +7,7 @@ namespace GreenChainz.Revit.Commands
 {
     /// <summary>
     /// Command to browse sustainable materials from the GreenChainz marketplace.
+    /// Opens the Material Browser dockable panel.
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     public class BrowseMaterialsCommand : IExternalCommand
@@ -18,10 +19,9 @@ namespace GreenChainz.Revit.Commands
         {
             try
             {
-                TaskDialog.Show(
-                    "GreenChainz - Browse Materials",
-                    "Browse Materials feature coming soon!");
-
+                DockablePaneId dpid = new DockablePaneId(App.MaterialBrowserPaneId);
+                DockablePane dp = commandData.Application.GetDockablePane(dpid);
+                dp.Show();
                 return Result.Succeeded;
             }
             catch (Exception ex)

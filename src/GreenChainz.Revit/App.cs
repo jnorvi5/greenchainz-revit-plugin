@@ -59,7 +59,16 @@ namespace GreenChainz.Revit
                 { ToolTip = "Sync BIM data with GreenChainz Carbon Dashboard" };
                 analysisPanel.AddItem(carbonAuditButtonData);
 
-                // Panel 2: Procurement
+                // Panel 2: Materials
+                RibbonPanel materialsPanel = application.CreateRibbonPanel(tabName, "Materials");
+
+                PushButtonData browseMaterialsButtonData = new PushButtonData(
+                    "BrowseMaterials", "Browse\nMaterials", assemblyPath,
+                    "GreenChainz.Revit.Commands.BrowseMaterialsCommand")
+                { ToolTip = "Browse sustainable materials and add them to your Revit project" };
+                materialsPanel.AddItem(browseMaterialsButtonData);
+
+                // Panel 3: Procurement
                 RibbonPanel procurementPanel = application.CreateRibbonPanel(tabName, "Procurement");
                 
                 PushButtonData sendRfqButtonData = new PushButtonData(
