@@ -9,7 +9,7 @@
         </Grid.ColumnDefinitions>
 
         <!-- RFQ List -->
-        <DockPanel Grid.Column0 Margin="0,0,10,0">
+        <DockPanel Grid.Column="0" Margin="0,0,10,0">
             <TextBlock DockPanel.Dock="Top" Text="Your RFQs" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
             <ListBox Name="RfqListBox" DisplayMemberPath="ProjectName" SelectionChanged="RfqListBox_SelectionChanged"/>
         </DockPanel>
