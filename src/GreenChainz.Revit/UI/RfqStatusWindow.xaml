@@ -1,7 +1,7 @@
 <Window x:Class="GreenChainz.Revit.UI.RfqStatusWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="RFQ Status & Messaging - GreenChainz" Height="600" Width="800" WindowStartupLocation="CenterScreen">
+        Title="RFQ Status &amp; Messaging - GreenChainz" Height="600" Width="800" WindowStartupLocation="CenterScreen">
     <Grid Margin="15">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="300"/>
