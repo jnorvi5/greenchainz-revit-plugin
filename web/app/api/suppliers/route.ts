@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
 
     // In production, this would:
     // 1. Send emails to suppliers
-    // 2. Create records in Supabase
+    // 2. Create records in the database
     // 3. Trigger webhook notifications
 
     const results = supplierIds.map((id: string) => ({
