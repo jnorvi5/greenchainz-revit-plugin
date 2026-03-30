@@ -284,10 +284,25 @@ namespace GreenChainz.Revit.Services
 
         public void CreateRevitMaterial(Document doc, Application app, Models.Material apiMaterial)
         {
+            // Step 1: Try to create shared parameters (outside main transaction)
+            try
+            {
+                using (Transaction paramTx = new Transaction(doc, "Setup GreenChainz Parameters"))
+                {
+                    paramTx.Start();
+                    SharedParameterHelper.CreateSharedParameters(doc, app);
+                    paramTx.Commit();
+                }
+            }
+            catch
+            {
+                // Shared params failed — continue without them, material will still be created
+            }
+
+            // Step 2: Create or update the material
             using (Transaction t = new Transaction(doc, "Create Green Material"))
             {
                 t.Start();
-                SharedParameterHelper.CreateSharedParameters(doc, app);
 
                 Autodesk.Revit.DB.Material revitMaterial = null;
                 FilteredElementCollector collector = new FilteredElementCollector(doc);
@@ -308,33 +323,55 @@ namespace GreenChainz.Revit.Services
                     revitMaterial = doc.GetElement(matId) as Autodesk.Revit.DB.Material;
                 }
 
-                revitMaterial.MaterialClass = apiMaterial.Category;
+                if (revitMaterial == null)
+                    throw new Exception("Revit could not create the material element.");
 
-                Parameter carbonParam = revitMaterial.LookupParameter("GC_CarbonScore");
-                if (carbonParam != null && !carbonParam.IsReadOnly)
-                    carbonParam.Set(apiMaterial.EmbodiedCarbon);
+                revitMaterial.MaterialClass = apiMaterial.Category ?? "Unknown";
 
-                Parameter manufacturerParam = revitMaterial.LookupParameter("GC_Supplier");
-                if (manufacturerParam != null && !manufacturerParam.IsReadOnly)
-                    manufacturerParam.Set(apiMaterial.Manufacturer);
+                // Try to set GreenChainz custom parameters (may not exist if shared params failed)
+                try
+                {
+                    Parameter carbonParam = revitMaterial.LookupParameter("GC_CarbonScore");
+                    if (carbonParam != null && !carbonParam.IsReadOnly)
+                        carbonParam.Set(apiMaterial.EmbodiedCarbon);
+                }
+                catch { /* Parameter not available */ }
 
-                Parameter certParam = revitMaterial.LookupParameter("GC_Certifications");
-                if (certParam != null && !certParam.IsReadOnly)
-                    certParam.Set(apiMaterial.Certifications != null
-                        ? string.Join(", ", apiMaterial.Certifications)
-                        : string.Empty);
+                try
+                {
+                    Parameter manufacturerParam = revitMaterial.LookupParameter("GC_Supplier");
+                    if (manufacturerParam != null && !manufacturerParam.IsReadOnly)
+                        manufacturerParam.Set(apiMaterial.Manufacturer ?? "");
+                }
+                catch { /* Parameter not available */ }
 
-                Color displayColor = new Color(128, 128, 128);
-                if (apiMaterial.EmbodiedCarbon < 0)
-                    displayColor = new Color(0, 150, 0); // Dark green for carbon negative
-                else if (apiMaterial.EmbodiedCarbon < 10)
-                    displayColor = new Color(0, 200, 0); // Green
-                else if (apiMaterial.EmbodiedCarbon < 50)
-                    displayColor = new Color(200, 200, 0); // Yellow
-                else if (apiMaterial.EmbodiedCarbon > 500)
-                    displayColor = new Color(200, 100, 100); // Red for high carbon
+                try
+                {
+                    Parameter certParam = revitMaterial.LookupParameter("GC_Certifications");
+                    if (certParam != null && !certParam.IsReadOnly)
+                        certParam.Set(apiMaterial.Certifications != null
+                            ? string.Join(", ", apiMaterial.Certifications)
+                            : string.Empty);
+                }
+                catch { /* Parameter not available */ }
 
-                revitMaterial.Color = displayColor;
+                // Set display color based on carbon score
+                try
+                {
+                    Color displayColor = new Color(128, 128, 128);
+                    if (apiMaterial.EmbodiedCarbon < 0)
+                        displayColor = new Color(0, 150, 0);
+                    else if (apiMaterial.EmbodiedCarbon < 10)
+                        displayColor = new Color(0, 200, 0);
+                    else if (apiMaterial.EmbodiedCarbon < 50)
+                        displayColor = new Color(200, 200, 0);
+                    else if (apiMaterial.EmbodiedCarbon > 500)
+                        displayColor = new Color(200, 100, 100);
+
+                    revitMaterial.Color = displayColor;
+                }
+                catch { /* Color setting not critical */ }
+
                 t.Commit();
             }
         }
