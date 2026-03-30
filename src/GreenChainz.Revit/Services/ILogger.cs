@@ -9,7 +9,6 @@ namespace GreenChainz.Revit.Services
         void LogInformation(string message); // Alias for LogInfo often used
         void LogError(Exception ex, string message);
     }
-<<<<<<< HEAD
 
     public class TelemetryLogger : ILogger
     {
@@ -28,6 +27,4 @@ namespace GreenChainz.Revit.Services
             TelemetryService.LogError(ex, message);
         }
     }
-=======
->>>>>>> 039e306a47b2bc6544e95c271ca02a818ce678bf
 }

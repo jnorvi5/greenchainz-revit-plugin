@@ -7,16 +7,9 @@ export async function POST(request: NextRequest) {
   try {
     // 🔒 Security Check: Validate Authorization Token
     const authHeader = request.headers.get('authorization');
-<<<<<<< HEAD
     const apiSecret = process.env.GREENCHAINZ_API_SECRET;
 
     if (!apiSecret) {
-=======
-    // Read the secret from env inside the function to support mocking in tests
-    const EXPECTED_AUTH_TOKEN = process.env.GREENCHAINZ_API_SECRET;
-
-    if (!EXPECTED_AUTH_TOKEN) {
->>>>>>> 039e306a47b2bc6544e95c271ca02a818ce678bf
       console.error('SERVER CONFIG ERROR: GREENCHAINZ_API_SECRET is not set.');
       return NextResponse.json(
         { error: 'Server configuration error' },
@@ -109,11 +102,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Audit API Error:', error);
     return NextResponse.json(
-<<<<<<< HEAD
       { error: 'Failed to process Audit' },
-=======
-      { error: 'Failed to process Audit' }, // Do not leak error details
->>>>>>> 039e306a47b2bc6544e95c271ca02a818ce678bf
       { status: 500 }
     );
   }

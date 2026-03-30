@@ -74,97 +74,8 @@ namespace GreenChainz.Revit.Services
         private List<MaterialBreakdown> ExtractMaterials(Document doc)
         {
             Dictionary<string, MaterialBreakdown> materialMap = new Dictionary<string, MaterialBreakdown>();
-<<<<<<< HEAD
 
             // Expanded list of categories architects care about
-=======
->>>>>>> 039e306a47b2bc6544e95c271ca02a818ce678bf
-            List<BuiltInCategory> categories = new List<BuiltInCategory>
-            {
-                // Structure
-                BuiltInCategory.OST_Walls,
-                BuiltInCategory.OST_Floors,
-                BuiltInCategory.OST_Roofs,
-                BuiltInCategory.OST_Ceilings,
-                BuiltInCategory.OST_StructuralColumns,
-                BuiltInCategory.OST_StructuralFraming,
-                BuiltInCategory.OST_StructuralFoundation,
-                
-                // Openings
-                BuiltInCategory.OST_Windows,
-                BuiltInCategory.OST_Doors,
-                BuiltInCategory.OST_CurtainWallPanels,
-                BuiltInCategory.OST_CurtainWallMullions,
-                
-                // Interior
-                BuiltInCategory.OST_Stairs,
-                BuiltInCategory.OST_StairsRailing,
-                BuiltInCategory.OST_Ramps,
-                BuiltInCategory.OST_Railings,
-                
-                // MEP (for enclosures)
-                BuiltInCategory.OST_MechanicalEquipment,
-                BuiltInCategory.OST_Casework,
-                BuiltInCategory.OST_Furniture,
-                BuiltInCategory.OST_Columns,
-                
-                // Site
-                BuiltInCategory.OST_Topography,
-                BuiltInCategory.OST_Parking,
-                BuiltInCategory.OST_Planting
-            };
-
-            ElementMulticategoryFilter categoryFilter = new ElementMulticategoryFilter(categories);
-            FilteredElementCollector collector = new FilteredElementCollector(doc);
-            IList<Element> elements = collector.WherePasses(categoryFilter).WhereElementIsNotElementType().ToElements();
-
-            foreach (Element elem in elements)
-            {
-                // Get Revit category for IFC mapping
-                string revitCategory = elem.Category?.Name ?? "";
-                string ifcCategory = MapRevitCategoryToIfc(revitCategory);
-
-                foreach (ElementId matId in elem.GetMaterialIds(false))
-                {
-                    Autodesk.Revit.DB.Material mat = doc.GetElement(matId) as Autodesk.Revit.DB.Material;
-                    if (mat == null) continue;
-
-                    string matName = mat.Name;
-                    double volume = elem.GetMaterialVolume(matId);
-
-                    if (volume > 0.0001)
-                    {
-                        if (!materialMap.ContainsKey(matName))
-                        {
-                            var carbonFactor = GetCarbonFactor(matName);
-                            
-                            materialMap[matName] = new MaterialBreakdown
-                            {
-                                MaterialName = matName,
-                                Quantity = "0 m3",
-                                CarbonFactor = carbonFactor.AverageGwp,
-                                TotalCarbon = 0,
-                                DataSource = carbonFactor.Source,
-                                Ec3Category = carbonFactor.Ec3Category,
-                                // IFC fields for openBIM interoperability
-                                IfcGuid = MaterialBreakdown.ConvertToIfcGuid(Guid.NewGuid()),
-                                IfcExportAs = "IfcMaterial",
-                                IfcCategory = ifcCategory,
-                                RevitElementId = elem.Id.ToString(),
-                                VolumeM3 = 0,
-                                MassKg = 0
-                            };
-                        }
-
-                        double volumeM3 = volume * 0.0283168;
-                        double currentQty = 0;
-<<<<<<< HEAD
-                        string qtyStr = materialMap[matName].Quantity.Replace(" m3", "").Replace(" m³", "");
-                        if (double.TryParse(qtyStr, out currentQty))
-=======
-                        string qtyString = materialMap[matName].Quantity.Replace(" m3", "");
-                        if (double.TryParse(qtyString, out currentQty))
->>>>>>> 039e306a47b2bc6544e95c271ca02a818ce678bf
                         {
                             materialMap[matName].Quantity = $"{(currentQty + volumeM3):F2} m3";
                         }
@@ -174,16 +85,12 @@ namespace GreenChainz.Revit.Services
                     }
                 }
             }
-<<<<<<< HEAD
 
             // Sort by total carbon (highest first) so biggest impact shows first
             var sortedList = new List<MaterialBreakdown>(materialMap.Values);
             sortedList.Sort((a, b) => b.TotalCarbon.CompareTo(a.TotalCarbon));
             
             return sortedList;
-=======
-            return new List<MaterialBreakdown>(materialMap.Values);
->>>>>>> 039e306a47b2bc6544e95c271ca02a818ce678bf
         }
 
         private Ec3CarbonFactor GetCarbonFactor(string materialName)
@@ -220,7 +127,6 @@ namespace GreenChainz.Revit.Services
             double gwp;
             string category;
 
-<<<<<<< HEAD
             // CONCRETE & CEMENT
             if (name.Contains("concrete") || name.Contains("cement") || name.Contains("cmu") || name.Contains("masonry unit"))
             {
@@ -327,17 +233,6 @@ namespace GreenChainz.Revit.Services
             {
                 gwp = 100; category = "Other";
             }
-=======
-            if (name.Contains("concrete")) { gwp = 340; category = "Concrete"; }
-            else if (name.Contains("steel")) { gwp = 1850; category = "Steel"; }
-            else if (name.Contains("aluminum") || name.Contains("aluminium")) { gwp = 8000; category = "Aluminum"; }
-            else if (name.Contains("glass")) { gwp = 1500; category = "Glass"; }
-            else if (name.Contains("wood") || name.Contains("timber")) { gwp = 110; category = "Wood"; }
-            else if (name.Contains("brick")) { gwp = 200; category = "Brick"; }
-            else if (name.Contains("gypsum") || name.Contains("drywall")) { gwp = 200; category = "Gypsum Board"; }
-            else if (name.Contains("insulation")) { gwp = 50; category = "Insulation"; }
-            else { gwp = 100; category = "Other"; }
->>>>>>> 039e306a47b2bc6544e95c271ca02a818ce678bf
 
             return new Ec3CarbonFactor
             {

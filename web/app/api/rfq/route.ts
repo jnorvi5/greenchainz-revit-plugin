@@ -96,26 +96,6 @@ export async function POST(request: NextRequest) {
 
     // Save to database
     let savedToDb = false;
-<<<<<<< HEAD
-    if (supabase) {
-      try {
-        const { error } = await supabase.from('rfqs').insert({
-          id: rfqId,
-          project_name: projectName,
-          project_address: projectAddress,
-          materials: materials,
-          delivery_date: deliveryDate,
-          special_instructions: specialInstructions,
-          selected_suppliers: notifySuppliers.map((s: Supplier) => s.id),
-          status: 'pending',
-          created_at: new Date().toISOString()
-        });
-        
-        if (!error) savedToDb = true;
-      } catch (_dbError) {
-        console.log('Supabase not configured, continuing without DB');
-      }
-=======
     try {
       await pool.query(
         `INSERT INTO rfqs (id, project_name, project_address, materials, delivery_date, special_instructions, selected_suppliers, status, created_at)
@@ -133,9 +113,8 @@ export async function POST(request: NextRequest) {
         ]
       );
       savedToDb = true;
-    } catch {
-      console.log('DB not configured, continuing without DB');
->>>>>>> 039e306a47b2bc6544e95c271ca02a818ce678bf
+    } catch (_dbError) {
+      console.log('DB insert failed, continuing without persistence');
     }
 
     return NextResponse.json({

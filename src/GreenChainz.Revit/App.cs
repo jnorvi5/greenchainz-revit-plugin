@@ -89,7 +89,6 @@ namespace GreenChainz.Revit
                 { ToolTip = "Track RFQ status and message suppliers" };
                 procurementPanel.AddItem(rfqStatusBtn);
 
-<<<<<<< HEAD
                 // Panel 5: AI Agent
                 RibbonPanel agentPanel = application.CreateRibbonPanel(tabName, "AI Agent");
 
@@ -118,9 +117,6 @@ namespace GreenChainz.Revit
                 helpPanel.AddItem(aboutButtonData);
 
                 // Register Dockable Pane
-=======
-                // Register Dockable Panes
->>>>>>> 039e306a47b2bc6544e95c271ca02a818ce678bf
                 MaterialBrowserPanel browserPanel = new MaterialBrowserPanel(MaterialService);
                 application.RegisterDockablePane(new DockablePaneId(MaterialBrowserPaneId), "Material Browser", browserPanel);
 

@@ -1,10 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY!
-);
+import pool from '@/utils/db';
 
 // Emission factor for trucking (kg CO2e per ton-mile)
 const TRUCK_EMISSION_FACTOR = 0.161;
@@ -70,34 +65,27 @@ export async function POST(request: NextRequest) {
     const category = ec3Category || detectCategory(materialName);
 
     // Fetch suppliers with products in this category
-    const { data: suppliers, error: supplierError } = await supabase
-      .from('suppliers')
-      .select(`
-        id,
-        name,
-        latitude,
-        longitude,
-        city,
-        state,
-        service_radius_miles,
-        sustainability_score,
-        products (
-          id,
-          name,
-          gwp_per_unit,
-          unit_of_measure,
-          kg_per_unit,
-          has_epd,
-          epd_url,
-          certifications
-        )
-      `)
-      .not('latitude', 'is', null)
-      .not('longitude', 'is', null);
-
-    if (supplierError) {
-      console.error('Supabase error:', supplierError);
-      // Fall back to local data
+    let suppliers: any[] = [];
+    try {
+      const result = await pool.query(`
+        SELECT s.id, s.name, s.latitude, s.longitude, s.city, s.state,
+               s.service_radius_miles, s.sustainability_score,
+               COALESCE(json_agg(
+                 json_build_object(
+                   'id', p.id, 'name', p.name, 'gwp_per_unit', p.gwp_per_unit,
+                   'unit_of_measure', p.unit_of_measure, 'kg_per_unit', p.kg_per_unit,
+                   'has_epd', p.has_epd, 'epd_url', p.epd_url,
+                   'certifications', p.certifications
+                 )
+               ) FILTER (WHERE p.id IS NOT NULL), '[]') as products
+        FROM suppliers s
+        LEFT JOIN products p ON p.supplier_id = s.id
+        WHERE s.latitude IS NOT NULL AND s.longitude IS NOT NULL
+        GROUP BY s.id
+      `);
+      suppliers = result.rows;
+    } catch (dbError) {
+      console.error('DB query error:', dbError);
       return NextResponse.json(getLocalComparison(materialName, quantity, currentProductGWP, category));
     }
 

@@ -16,21 +16,7 @@ namespace GreenChainz.Revit.Services
             TelemetryService.LogInfo(message);
         }
 
-<<<<<<< HEAD
         public void LogError(Exception ex, string message)
-=======
-        public void LogInformation(string message)
-        {
-            TelemetryService.LogInfo(message);
-        }
-
-        public void LogError(Exception ex, string message)
-        {
-            TelemetryService.LogError(ex, message);
-        }
-
-        public void LogError(string message, Exception ex = null)
->>>>>>> 039e306a47b2bc6544e95c271ca02a818ce678bf
         {
             if (ex != null)
             {
