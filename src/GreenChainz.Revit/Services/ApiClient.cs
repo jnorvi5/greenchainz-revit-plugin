@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace GreenChainz.Revit.Services
 {
-    public class ApiClient : IDisposable
+    public partial class ApiClient : IDisposable
     {
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl;
@@ -221,11 +221,5 @@ namespace GreenChainz.Revit.Services
             }
         }
 
-        private class TelemetryLogger : ILogger
-        {
-            public void LogDebug(string message) => TelemetryService.LogInfo($"[DEBUG] {message}");
-            public void LogInfo(string message) => TelemetryService.LogInfo(message);
-            public void LogError(Exception ex, string message) => TelemetryService.LogError(ex, message);
-        }
     }
 }
