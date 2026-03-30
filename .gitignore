@@ -109,3 +109,9 @@ $RECYCLE.BIN/
 .env
 .env.local
 .env.*.local
+
+# Jules session archives
+jules_session_*.zip
+
+# Verification screenshots
+verification/

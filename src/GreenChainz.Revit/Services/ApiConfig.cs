@@ -14,7 +14,7 @@ namespace GreenChainz.Revit.Services
         /// The base URL for the GreenChainz API.
         /// Points to the main app production endpoint.
         /// </summary>
-        public const string BASE_URL = "https://green-sourcing-b2b-app.vercel.app";
+        public const string BASE_URL = "https://greenchainz.com";
 
         /// <summary>
         /// The default timeout for API requests in seconds.
