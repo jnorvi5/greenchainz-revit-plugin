@@ -66,5 +66,53 @@ namespace GreenChainz.Revit.Models
         /// Gets or sets the price per unit (optional).
         /// </summary>
         public decimal? PricePerUnit { get; set; }
+
+        // Engineering specs for swap engine matching
+
+        /// <summary>
+        /// Gets or sets the compressive strength in MPa.
+        /// </summary>
+        public double CompressiveStrength { get; set; }
+
+        /// <summary>
+        /// Gets or sets the density in kg/m³.
+        /// </summary>
+        public double Density { get; set; }
+
+        /// <summary>
+        /// Gets or sets the fire rating (e.g. "Class A", "1-Hour").
+        /// </summary>
+        public string FireRating { get; set; }
+
+        /// <summary>
+        /// Gets or sets the thermal conductivity in W/(m·K).
+        /// </summary>
+        public double ThermalConductivity { get; set; }
+
+        /// <summary>
+        /// Gets or sets the cost per unit in USD.
+        /// </summary>
+        public double CostPerUnit { get; set; }
+
+        /// <summary>
+        /// Gets or sets the life expectancy (e.g. "50+ years").
+        /// </summary>
+        public string LifeExpectancy { get; set; }
+
+        /// <summary>
+        /// Gets or sets the recycled content as a percentage (0–100).
+        /// </summary>
+        public double RecycledContent { get; set; }
+
+        /// <summary>
+        /// Gets or sets the shipping origin region.
+        /// </summary>
+        public string Region { get; set; }
+
+        /// <summary>
+        /// Returns true when the material sequesters more carbon than it emits (EmbodiedCarbon &lt; 0).
+        /// Used for carbon score color-coding in the UI.
+        /// </summary>
+        public bool IsCarbonNegative => EmbodiedCarbon < 0;
     }
 }

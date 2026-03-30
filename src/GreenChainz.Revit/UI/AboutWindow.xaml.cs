@@ -6,7 +6,7 @@ namespace GreenChainz.Revit.UI
     public partial class AboutWindow : Window
     {
         // Main website URL
-        private const string GREENCHAINZ_WEBSITE = "https://greenchainz-revit-plugin.vercel.app";
+        private const string GREENCHAINZ_WEBSITE = "https://greenchainz.com";
 
         public AboutWindow()
         {

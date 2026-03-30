@@ -158,7 +158,10 @@ namespace GreenChainz.Revit.Services
                     EmbodiedCarbon = 280, PricePerUnit = 125m,
                     Certifications = new List<string> { "EPD", "Carbon Negative", "LEED" },
                     Manufacturer = "CarbonCure Technologies",
-                    Description = "CO2 mineralized concrete - 5-10% lower GWP", Unit = "m³", IsVerified = true
+                    Description = "CO2 mineralized concrete - 5-10% lower GWP", Unit = "m³", IsVerified = true,
+                    CompressiveStrength = 28, Density = 2400, FireRating = "4-Hour",
+                    ThermalConductivity = 1.7, CostPerUnit = 125, LifeExpectancy = "75+ years",
+                    RecycledContent = 15, Region = "North America"
                 },
                 new Models.Material
                 {
@@ -166,7 +169,10 @@ namespace GreenChainz.Revit.Services
                     EmbodiedCarbon = 320, PricePerUnit = 110m,
                     Certifications = new List<string> { "EPD", "LEED Contributing" },
                     Manufacturer = "Central Concrete",
-                    Description = "40% fly ash replacement concrete", Unit = "m³", IsVerified = true
+                    Description = "40% fly ash replacement concrete", Unit = "m³", IsVerified = true,
+                    CompressiveStrength = 27.6, Density = 2350, FireRating = "3-Hour",
+                    ThermalConductivity = 1.6, CostPerUnit = 110, LifeExpectancy = "50+ years",
+                    RecycledContent = 40, Region = "North America"
                 },
                 // STEEL
                 new Models.Material
@@ -175,7 +181,10 @@ namespace GreenChainz.Revit.Services
                     EmbodiedCarbon = 450, PricePerUnit = 1200m,
                     Certifications = new List<string> { "EPD", "Science Based Targets" },
                     Manufacturer = "SSAB",
-                    Description = "World's first fossil-free steel", Unit = "ton", IsVerified = true
+                    Description = "World's first fossil-free steel", Unit = "ton", IsVerified = true,
+                    CompressiveStrength = 250, Density = 7850, FireRating = "Non-Combustible",
+                    ThermalConductivity = 50, CostPerUnit = 1200, LifeExpectancy = "100+ years",
+                    RecycledContent = 0, Region = "Scandinavia"
                 },
                 new Models.Material
                 {
@@ -183,7 +192,10 @@ namespace GreenChainz.Revit.Services
                     EmbodiedCarbon = 750, PricePerUnit = 850m,
                     Certifications = new List<string> { "EPD", "ISO 14001", "Responsible Steel" },
                     Manufacturer = "Nucor Corporation",
-                    Description = "97% recycled EAF steel", Unit = "ton", IsVerified = true
+                    Description = "97% recycled EAF steel", Unit = "ton", IsVerified = true,
+                    CompressiveStrength = 345, Density = 7850, FireRating = "Non-Combustible",
+                    ThermalConductivity = 50, CostPerUnit = 850, LifeExpectancy = "100+ years",
+                    RecycledContent = 97, Region = "North America"
                 },
                 // WOOD
                 new Models.Material
@@ -192,7 +204,10 @@ namespace GreenChainz.Revit.Services
                     EmbodiedCarbon = -500, PricePerUnit = 450m,
                     Certifications = new List<string> { "FSC", "PEFC", "EPD" },
                     Manufacturer = "Structurlam",
-                    Description = "Carbon sequestering mass timber", Unit = "m³", IsVerified = true
+                    Description = "Carbon sequestering mass timber", Unit = "m³", IsVerified = true,
+                    CompressiveStrength = 24, Density = 500, FireRating = "2-Hour",
+                    ThermalConductivity = 0.13, CostPerUnit = 450, LifeExpectancy = "80+ years",
+                    RecycledContent = 0, Region = "North America"
                 },
                 new Models.Material
                 {
@@ -200,7 +215,10 @@ namespace GreenChainz.Revit.Services
                     EmbodiedCarbon = -400, PricePerUnit = 380m,
                     Certifications = new List<string> { "FSC", "EPD" },
                     Manufacturer = "Nordic Structures",
-                    Description = "Structural glued laminated timber", Unit = "m³", IsVerified = true
+                    Description = "Structural glued laminated timber", Unit = "m³", IsVerified = true,
+                    CompressiveStrength = 24, Density = 470, FireRating = "1-Hour",
+                    ThermalConductivity = 0.12, CostPerUnit = 380, LifeExpectancy = "70+ years",
+                    RecycledContent = 0, Region = "North America"
                 },
                 // INSULATION
                 new Models.Material
@@ -209,7 +227,10 @@ namespace GreenChainz.Revit.Services
                     EmbodiedCarbon = 1.2, PricePerUnit = 28m,
                     Certifications = new List<string> { "EPD", "GREENGUARD", "Cradle to Cradle" },
                     Manufacturer = "Rockwool",
-                    Description = "Stone wool rigid board insulation", Unit = "m²", IsVerified = true
+                    Description = "Stone wool rigid board insulation", Unit = "m²", IsVerified = true,
+                    CompressiveStrength = 0.08, Density = 128, FireRating = "Class A",
+                    ThermalConductivity = 0.036, CostPerUnit = 28, LifeExpectancy = "50+ years",
+                    RecycledContent = 70, Region = "North America"
                 },
                 new Models.Material
                 {
@@ -217,7 +238,10 @@ namespace GreenChainz.Revit.Services
                     EmbodiedCarbon = 1.5, PricePerUnit = 18m,
                     Certifications = new List<string> { "EPD", "GREENGUARD Gold" },
                     Manufacturer = "Owens Corning",
-                    Description = "50% recycled glass content", Unit = "m²", IsVerified = true
+                    Description = "50% recycled glass content", Unit = "m²", IsVerified = true,
+                    CompressiveStrength = 0, Density = 11, FireRating = "Class A",
+                    ThermalConductivity = 0.040, CostPerUnit = 18, LifeExpectancy = "30+ years",
+                    RecycledContent = 50, Region = "North America"
                 },
                 // GLASS
                 new Models.Material
@@ -226,7 +250,10 @@ namespace GreenChainz.Revit.Services
                     EmbodiedCarbon = 25, PricePerUnit = 85m,
                     Certifications = new List<string> { "EPD", "Cradle to Cradle" },
                     Manufacturer = "Guardian Glass",
-                    Description = "30% recycled cullet, high performance", Unit = "m²", IsVerified = true
+                    Description = "30% recycled cullet, high performance", Unit = "m²", IsVerified = true,
+                    CompressiveStrength = 0, Density = 2500, FireRating = "Non-Rated",
+                    ThermalConductivity = 1.0, CostPerUnit = 85, LifeExpectancy = "40+ years",
+                    RecycledContent = 30, Region = "North America"
                 },
                 // ALUMINUM
                 new Models.Material
@@ -235,7 +262,10 @@ namespace GreenChainz.Revit.Services
                     EmbodiedCarbon = 2.3, PricePerUnit = 4500m,
                     Certifications = new List<string> { "EPD", "ASI Certified" },
                     Manufacturer = "Hydro Aluminum",
-                    Description = "75% post-consumer recycled aluminum", Unit = "ton", IsVerified = true
+                    Description = "75% post-consumer recycled aluminum", Unit = "ton", IsVerified = true,
+                    CompressiveStrength = 270, Density = 2700, FireRating = "Non-Combustible",
+                    ThermalConductivity = 160, CostPerUnit = 4500, LifeExpectancy = "50+ years",
+                    RecycledContent = 75, Region = "Europe"
                 },
                 // GYPSUM
                 new Models.Material
@@ -244,7 +274,10 @@ namespace GreenChainz.Revit.Services
                     EmbodiedCarbon = 2.8, PricePerUnit = 12m,
                     Certifications = new List<string> { "EPD", "GREENGUARD Gold" },
                     Manufacturer = "USG Corporation",
-                    Description = "100% recycled paper, synthetic gypsum", Unit = "m²", IsVerified = true
+                    Description = "100% recycled paper, synthetic gypsum", Unit = "m²", IsVerified = true,
+                    CompressiveStrength = 0, Density = 700, FireRating = "1-Hour",
+                    ThermalConductivity = 0.25, CostPerUnit = 12, LifeExpectancy = "30+ years",
+                    RecycledContent = 95, Region = "North America"
                 }
             };
         }

@@ -5,143 +5,420 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:GreenChainz.Revit.UI"
              mc:Ignorable="d"
-             d:DesignHeight="600"
-        d:DesignWidth="400"
-             Background="White">
+             d:DesignHeight="700"
+             d:DesignWidth="420"
+             Background="#F5F5F5">
+
     <UserControl.Resources>
-        <!-- Simple styles -->
-        <Style TargetType="TextBlock"
-                x:Key="HeaderStyle">
-            <Setter Property="FontSize"
-                    Value="14"/>
-            <Setter Property="FontWeight"
-                    Value="Bold"/>
-            <Setter Property="Foreground"
-                    Value="#333"/>
+        <!-- Header label style -->
+        <Style TargetType="TextBlock" x:Key="HeaderStyle">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#222"/>
         </Style>
+
+        <!-- Category badge style -->
+        <Style TargetType="Border" x:Key="CategoryBadgeStyle">
+            <Setter Property="CornerRadius" Value="3"/>
+            <Setter Property="Padding" Value="5,2"/>
+            <Setter Property="Background" Value="#E3F2FD"/>
+        </Style>
+
+        <!-- Certification badge style -->
+        <Style TargetType="Border" x:Key="CertBadgeStyle">
+            <Setter Property="CornerRadius" Value="3"/>
+            <Setter Property="Padding" Value="4,1"/>
+            <Setter Property="Margin" Value="0,0,4,0"/>
+            <Setter Property="Background" Value="#E8F5E9"/>
+        </Style>
+
+        <!-- Spec label style -->
+        <Style TargetType="TextBlock" x:Key="SpecLabelStyle">
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="Foreground" Value="#888"/>
+        </Style>
+
+        <!-- Spec value style -->
+        <Style TargetType="TextBlock" x:Key="SpecValueStyle">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#333"/>
+        </Style>
+
+        <!-- Material card container style -->
+        <Style TargetType="ListViewItem" x:Key="MaterialCardStyle">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="0,0,0,6"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="Transparent"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="Transparent"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Carbon score color converter (inline via triggers on DataTrigger in template) -->
     </UserControl.Resources>
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <!-- Search & Filter -->
-            <RowDefinition Height="*"/>
-            <!-- DataGrid -->
-            <RowDefinition Height="Auto"/>
-            <!-- Details Panel -->
+            <RowDefinition Height="Auto"/>  <!-- Search &amp; Filter -->
+            <RowDefinition Height="*"/>     <!-- Material list -->
+            <RowDefinition Height="Auto"/>  <!-- Details / action panel -->
         </Grid.RowDefinitions>
 
-        <!-- Top Controls -->
-        <StackPanel Grid.Row="0"
-                Margin="0,0,0,10">
-            <TextBlock Text="Search Materials"
-                    FontWeight="SemiBold"
-                    Margin="0,0,0,5"/>
-            <TextBox x:Name="SearchBox"
-                    Height="25"
-                    TextChanged="SearchBox_TextChanged"
-                    Margin="0,0,0,10"
-                    VerticalContentAlignment="Center"/>
+        <!-- ═══════════════════════════════════════════ -->
+        <!--  Search &amp; Filter bar                    -->
+        <!-- ═══════════════════════════════════════════ -->
+        <Border Grid.Row="0" Background="White" CornerRadius="6"
+                Padding="10" Margin="0,0,0,8"
+                BorderBrush="#DDD" BorderThickness="1">
+            <StackPanel>
+                <Grid Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="120"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="SearchBox"
+                             Grid.Column="0"
+                             Height="28"
+                             Padding="6,4"
+                             VerticalContentAlignment="Center"
+                             TextChanged="SearchBox_TextChanged"
+                             Margin="0,0,8,0">
+                        <TextBox.Style>
+                            <Style TargetType="TextBox">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="TextBox">
+                                            <Border BorderBrush="#CCC" BorderThickness="1" CornerRadius="4"
+                                                    Background="{TemplateBinding Background}">
+                                                <ScrollViewer x:Name="PART_ContentHost" Margin="2"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                    <TextBlock Grid.Column="1" Text="Category:"
+                               VerticalAlignment="Center"
+                               FontWeight="SemiBold" Margin="0,0,6,0"/>
+                    <ComboBox x:Name="CategoryFilter"
+                              Grid.Column="2"
+                              Height="28"
+                              SelectionChanged="CategoryFilter_SelectionChanged">
+                        <ComboBoxItem Content="All" IsSelected="True"/>
+                        <ComboBoxItem Content="Concrete"/>
+                        <ComboBoxItem Content="Steel"/>
+                        <ComboBoxItem Content="Wood"/>
+                        <ComboBoxItem Content="Insulation"/>
+                        <ComboBoxItem Content="Glass"/>
+                        <ComboBoxItem Content="Metal"/>
+                        <ComboBoxItem Content="Gypsum"/>
+                    </ComboBox>
+                </Grid>
+            </StackPanel>
+        </Border>
 
-            <TextBlock Text="Category"
-                    FontWeight="SemiBold"
-                    Margin="0,0,0,5"/>
-            <ComboBox x:Name="CategoryFilter"
-                    Height="25"
-                    SelectionChanged="CategoryFilter_SelectionChanged">
-                <ComboBoxItem Content="All"
-                        IsSelected="True"/>
-                <ComboBoxItem Content="Concrete"/>
-                <ComboBoxItem Content="Steel"/>
-                <ComboBoxItem Content="Wood"/>
-                <ComboBoxItem Content="Insulation"/>
-                <ComboBoxItem Content="Metal"/>
-            </ComboBox>
-        </StackPanel>
+        <!-- ═══════════════════════════════════════════ -->
+        <!--  Material card list                         -->
+        <!-- ═══════════════════════════════════════════ -->
+        <ListView Grid.Row="1"
+                  x:Name="MaterialsGrid"
+                  SelectionMode="Single"
+                  SelectionChanged="MaterialsGrid_SelectionChanged"
+                  Background="Transparent"
+                  BorderThickness="0"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  ItemContainerStyle="{StaticResource MaterialCardStyle}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Border Background="White"
+                            CornerRadius="6"
+                            Padding="12,10"
+                            BorderBrush="#E0E0E0"
+                            BorderThickness="1">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListViewItem}, Path=IsSelected}" Value="True">
+                                        <Setter Property="BorderBrush" Value="#1976D2"/>
+                                        <Setter Property="BorderThickness" Value="2"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
 
-        <!-- Main List -->
-        <DataGrid Grid.Row="1"
-                x:Name="MaterialsGrid"
-                AutoGenerateColumns="False"
-                CanUserAddRows="False"
-                  IsReadOnly="True"
-                SelectionMode="Single"
-                SelectionChanged="MaterialsGrid_SelectionChanged">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Name"
-                        Binding="{Binding Name}"
-                        Width="*"/>
-                <DataGridTextColumn Header="Score"
-                        Binding="{Binding EmbodiedCarbon}"
-                        Width="50"/>
-                <DataGridTextColumn Header="Price"
-                        Binding="{Binding PricePerUnit, StringFormat=C}"
-                        Width="60"/>
-            </DataGrid.Columns>
-        </DataGrid>
+                        <StackPanel>
+                            <!-- Row 1: Name + Category badge + Price -->
+                            <Grid Margin="0,0,0,6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
 
-        <!-- Details Panel (Initially Hidden or shows selected item) -->
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <!-- Material name -->
+                                    <TextBlock Text="{Binding Name}"
+                                               FontSize="13"
+                                               FontWeight="Bold"
+                                               Foreground="#1A1A1A"
+                                               TextWrapping="Wrap"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,8,0"/>
+                                    <!-- Category badge -->
+                                    <Border Style="{StaticResource CategoryBadgeStyle}" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Category}"
+                                                   FontSize="10"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#1565C0"/>
+                                    </Border>
+                                </StackPanel>
+
+                                <!-- Price (right-aligned) -->
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                    <TextBlock Text="{Binding PricePerUnit, StringFormat='${0:N0}'}"
+                                               FontSize="12"
+                                               FontWeight="Bold"
+                                               Foreground="#444"
+                                               HorizontalAlignment="Right"/>
+                                    <TextBlock Text="{Binding Unit, StringFormat='per {0}'}"
+                                               FontSize="10"
+                                               Foreground="#999"
+                                               HorizontalAlignment="Right"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Row 2: Carbon score chip -->
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                <Border CornerRadius="4" Padding="7,3" Margin="0,0,0,0">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <!-- Default: moderate (yellow) -->
+                                            <Setter Property="Background" Value="#FFF8E1"/>
+                                            <Style.Triggers>
+                                                <!-- Carbon negative = green -->
+                                                <DataTrigger Binding="{Binding IsCarbonNegative}" Value="True">
+                                                    <Setter Property="Background" Value="#E8F5E9"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock FontSize="11" FontWeight="Bold" Margin="0,0,4,0">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Text" Value="⚠️ Carbon:"/>
+                                                    <Setter Property="Foreground" Value="#F57F17"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsCarbonNegative}" Value="True">
+                                                            <Setter Property="Text" Value="✅ Carbon:"/>
+                                                            <Setter Property="Foreground" Value="#2E7D32"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                        <TextBlock Text="{Binding EmbodiedCarbon, StringFormat='{}{0:N0} kgCO₂e'}"
+                                                   FontSize="11" FontWeight="SemiBold">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="#E65100"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsCarbonNegative}" Value="True">
+                                                            <Setter Property="Foreground" Value="#1B5E20"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                        <TextBlock Text="{Binding Unit, StringFormat='/{0}'}"
+                                                   FontSize="10" Foreground="#999" Margin="2,0,0,0"
+                                                   VerticalAlignment="Bottom"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+
+                            <!-- Row 3: Key specs compact row -->
+                            <Border Background="#FAFAFA" CornerRadius="4" Padding="8,5" Margin="0,0,0,6">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Strength -->
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="STRENGTH" Style="{StaticResource SpecLabelStyle}"/>
+                                        <TextBlock Text="{Binding CompressiveStrength, StringFormat='{}{0:N0} MPa'}"
+                                                   Style="{StaticResource SpecValueStyle}"/>
+                                    </StackPanel>
+
+                                    <!-- Density -->
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="DENSITY" Style="{StaticResource SpecLabelStyle}"/>
+                                        <TextBlock Text="{Binding Density, StringFormat='{}{0:N0} kg/m³'}"
+                                                   Style="{StaticResource SpecValueStyle}"/>
+                                    </StackPanel>
+
+                                    <!-- Fire rating -->
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="FIRE" Style="{StaticResource SpecLabelStyle}"/>
+                                        <TextBlock Text="{Binding FireRating}"
+                                                   Style="{StaticResource SpecValueStyle}"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                    </StackPanel>
+
+                                    <!-- Recycled content -->
+                                    <StackPanel Grid.Column="3">
+                                        <TextBlock Text="RECYCLED" Style="{StaticResource SpecLabelStyle}"/>
+                                        <TextBlock Text="{Binding RecycledContent, StringFormat='{}{0:N0}%'}"
+                                                   Style="{StaticResource SpecValueStyle}"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- Row 4: Certification badges -->
+                            <ItemsControl ItemsSource="{Binding Certifications}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Style="{StaticResource CertBadgeStyle}" Margin="0,2,4,2">
+                                            <TextBlock Text="{Binding}"
+                                                       FontSize="9"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="#2E7D32"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!--  Details / action panel                     -->
+        <!-- ═══════════════════════════════════════════ -->
         <Border Grid.Row="2"
-                Margin="0,10,0,0"
-                BorderBrush="#EEE"
+                Margin="0,8,0,0"
+                Background="White"
+                BorderBrush="#DDD"
                 BorderThickness="1"
-                CornerRadius="4"
-                Padding="10">
+                CornerRadius="6"
+                Padding="12,10">
             <StackPanel x:Name="DetailsPanel">
                 <TextBlock Text="Selected Material"
-                        Style="{StaticResource HeaderStyle}"
-                        Margin="0,0,0,10"/>
+                           Style="{StaticResource HeaderStyle}"
+                           Margin="0,0,0,8"/>
 
-                <Grid Margin="0,0,0,5">
+                <!-- Name & Manufacturer -->
+                <Grid Margin="0,0,0,4">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="90"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Name:"
-                            FontWeight="Bold"
-                            Margin="0,0,10,0"/>
+                    <TextBlock Text="Name:" FontWeight="Bold" FontSize="11" Foreground="#555"/>
                     <TextBlock Grid.Column="1"
-                            Text="{Binding SelectedItem.Name, ElementName=MaterialsGrid}"/>
+                               Text="{Binding SelectedItem.Name, ElementName=MaterialsGrid}"
+                               FontSize="11" TextWrapping="Wrap"/>
                 </Grid>
 
-                <Grid Margin="0,0,0,5">
+                <Grid Margin="0,0,0,4">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="90"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Manufacturer:"
-                            FontWeight="Bold"
-                            Margin="0,0,10,0"/>
+                    <TextBlock Text="Manufacturer:" FontWeight="Bold" FontSize="11" Foreground="#555"/>
                     <TextBlock Grid.Column="1"
-                            Text="{Binding SelectedItem.Manufacturer, ElementName=MaterialsGrid}"/>
+                               Text="{Binding SelectedItem.Manufacturer, ElementName=MaterialsGrid}"
+                               FontSize="11" TextWrapping="Wrap"/>
                 </Grid>
 
-                <Grid Margin="0,0,0,5">
+                <!-- Life expectancy & Region -->
+                <Grid Margin="0,0,0,4">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="90"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="60"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Certifications:"
-                            FontWeight="Bold"
-                            Margin="0,0,10,0"/>
+                    <TextBlock Text="Life Span:" FontWeight="Bold" FontSize="11" Foreground="#555"/>
                     <TextBlock Grid.Column="1"
-                            Text="{Binding SelectedItem.CertificationsDisplay, ElementName=MaterialsGrid}"
-                            TextWrapping="Wrap"/>
+                               Text="{Binding SelectedItem.LifeExpectancy, ElementName=MaterialsGrid}"
+                               FontSize="11"/>
+                    <TextBlock Grid.Column="2" Text="Region:" FontWeight="Bold" FontSize="11" Foreground="#555"/>
+                    <TextBlock Grid.Column="3"
+                               Text="{Binding SelectedItem.Region, ElementName=MaterialsGrid}"
+                               FontSize="11"/>
                 </Grid>
 
+                <!-- Description -->
                 <TextBlock Text="{Binding SelectedItem.Description, ElementName=MaterialsGrid}"
-                        TextWrapping="Wrap"
-                        Margin="0,5,0,10"
-                        FontStyle="Italic"/>
+                           TextWrapping="Wrap"
+                           Margin="0,4,0,8"
+                           FontSize="11"
+                           FontStyle="Italic"
+                           Foreground="#666"/>
 
+                <!-- Certifications -->
+                <Grid Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="90"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Certifications:" FontWeight="Bold" FontSize="11" Foreground="#555"
+                               VerticalAlignment="Top"/>
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding SelectedItem.CertificationsDisplay, ElementName=MaterialsGrid}"
+                               FontSize="11"
+                               TextWrapping="Wrap"
+                               Foreground="#2E7D32"/>
+                </Grid>
+
+                <!-- Add to Project button -->
                 <Button x:Name="AddToProjectBtn"
-                        Content="Add to Project"
-                        Height="30"
+                        Content="+ Add to Project"
+                        Height="32"
                         Click="AddToProjectBtn_Click"
-                        Background="#007ACC"
+                        Background="#1976D2"
                         Foreground="White"
                         FontWeight="Bold"
-                        IsEnabled="False"/>
+                        FontSize="12"
+                        IsEnabled="False"
+                        BorderThickness="0">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}"
+                                    CornerRadius="5"
+                                    Padding="10,4">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Background" Value="#BDBDBD"/>
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#1565C0"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
             </StackPanel>
         </Border>
     </Grid>

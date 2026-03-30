@@ -11,7 +11,7 @@ namespace GreenChainz.Revit.UI
     public partial class ScorecardWindow : Window
     {
         private readonly SustainabilityScorecard _scorecard;
-        private const string GREENCHAINZ_WEBSITE = "https://greenchainz-revit-plugin.vercel.app";
+        private const string GREENCHAINZ_WEBSITE = "https://greenchainz.com";
 
         public ScorecardWindow(SustainabilityScorecard scorecard)
         {
@@ -68,7 +68,7 @@ namespace GreenChainz.Revit.UI
             // GWP Score
             GwpGradeText.Text = _scorecard.GwpScore.Grade;
             GwpValueText.Text = $"{_scorecard.GwpScore.TotalGwp:N0} kgCO2e";
-            GwpIntensityText.Text = $"{_scorecard.GwpScore.GwpPerSqM:F1} kgCO2e/m²";
+            GwpIntensityText.Text = $"{_scorecard.GwpScore.GwpPerSqM:F1} kgCO2e/mï¿½";
             GwpReductionText.Text = _scorecard.GwpScore.ReductionDisplay;
             GwpReductionText.Foreground = _scorecard.GwpScore.ReductionPercent >= 0
                 ? new SolidColorBrush(Color.FromRgb(76, 175, 80))
@@ -114,7 +114,7 @@ namespace GreenChainz.Revit.UI
                     ? new SolidColorBrush(Color.FromRgb(76, 175, 80))
                     : new SolidColorBrush(Color.FromRgb(244, 67, 54));
 
-                ConcreteGwpText.Text = $"{_scorecard.BuyCleanInfo.ActualConcreteGwp:N0} / {_scorecard.BuyCleanInfo.ConcreteLimit:N0} kgCO2e/m³";
+                ConcreteGwpText.Text = $"{_scorecard.BuyCleanInfo.ActualConcreteGwp:N0} / {_scorecard.BuyCleanInfo.ConcreteLimit:N0} kgCO2e/mï¿½";
                 ConcreteGwpText.Foreground = _scorecard.BuyCleanInfo.ConcreteCompliant
                     ? new SolidColorBrush(Color.FromRgb(76, 175, 80))
                     : new SolidColorBrush(Color.FromRgb(244, 67, 54));
