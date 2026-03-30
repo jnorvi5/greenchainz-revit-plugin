@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import pool from '@/utils/db';
 import crypto from 'crypto';
-
-// Initialize Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 
 // Audit API Endpoint - Receives Carbon Audit results from Revit plugin
 export async function POST(request: NextRequest) {
@@ -65,27 +60,33 @@ export async function POST(request: NextRequest) {
       created_at: new Date().toISOString()
     };
 
-    // Save to Supabase if available
+    // Save to database
     let savedToDb = false;
     let dbId = null;
 
-    if (supabase) {
-      try {
-        const { data, error } = await supabase
-          .from('audits')
-          .insert(auditData)
-          .select('id')
-          .single();
+    try {
+      const result = await pool.query(
+        `INSERT INTO audits (project_name, overall_score, summary, data_source, date, materials, recommendations, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+         RETURNING id`,
+        [
+          auditData.project_name,
+          auditData.overall_score,
+          auditData.summary,
+          auditData.data_source,
+          auditData.date,
+          JSON.stringify(auditData.materials),
+          JSON.stringify(auditData.recommendations),
+          auditData.created_at
+        ]
+      );
 
-        if (!error && data) {
-          savedToDb = true;
-          dbId = data.id;
-        } else if (error) {
-          console.error('Supabase DB Error:', error);
-        }
-      } catch {
-        console.log('Supabase not configured or error connecting, continuing without DB');
+      if (result.rows[0]) {
+        savedToDb = true;
+        dbId = result.rows[0].id;
       }
+    } catch {
+      console.log('DB not configured or error connecting, continuing without DB');
     }
 
     return NextResponse.json({

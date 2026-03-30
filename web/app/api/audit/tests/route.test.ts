@@ -2,17 +2,14 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { POST } from '../route';
 import { NextRequest } from 'next/server';
 
-// Mock Supabase
-vi.mock('@supabase/supabase-js', () => ({
-  createClient: vi.fn(() => ({
-    from: vi.fn(() => ({
-      insert: vi.fn(() => ({
-        select: vi.fn(() => ({
-          single: vi.fn(() => ({ data: { id: 'mock-id' }, error: null })),
-        })),
-      })),
-    })),
-  })),
+// Mock pg pool
+vi.mock('@/utils/db', () => ({
+  default: {
+    query: vi.fn(() => Promise.resolve({ rows: [{ id: 'mock-id' }] })),
+  },
+  pool: {
+    query: vi.fn(() => Promise.resolve({ rows: [{ id: 'mock-id' }] })),
+  },
 }));
 
 describe('Audit API Endpoint Security', () => {

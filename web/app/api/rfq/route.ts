@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import pool from '@/utils/db';
 import crypto from 'crypto';
-
-// Initialize Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 
 interface Supplier {
     id: string;
@@ -93,26 +88,27 @@ export async function POST(request: NextRequest) {
       ? supplierMatches.filter((s: Supplier) => selectedSupplierIds.includes(s.id))
       : supplierMatches;
 
-    // Save to Supabase if available
+    // Save to database
     let savedToDb = false;
-    if (supabase) {
-      try {
-        const { error } = await supabase.from('rfqs').insert({
-          id: rfqId,
-          project_name: projectName,
-          project_address: projectAddress,
-          materials: materials,
-          delivery_date: deliveryDate,
-          special_instructions: specialInstructions,
-          selected_suppliers: notifySuppliers.map((s: Supplier) => s.id),
-          status: 'pending',
-          created_at: new Date().toISOString()
-        });
-        
-        if (!error) savedToDb = true;
-      } catch {
-        console.log('Supabase not configured, continuing without DB');
-      }
+    try {
+      await pool.query(
+        `INSERT INTO rfqs (id, project_name, project_address, materials, delivery_date, special_instructions, selected_suppliers, status, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+        [
+          rfqId,
+          projectName,
+          projectAddress,
+          JSON.stringify(materials),
+          deliveryDate,
+          specialInstructions,
+          JSON.stringify(notifySuppliers.map((s: Supplier) => s.id)),
+          'pending',
+          new Date().toISOString()
+        ]
+      );
+      savedToDb = true;
+    } catch {
+      console.log('DB not configured, continuing without DB');
     }
 
     return NextResponse.json({
@@ -146,17 +142,16 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const rfqId = searchParams.get('id');
 
-  if (rfqId && supabase) {
+  if (rfqId) {
     try {
-      const { data, error } = await supabase
-        .from('rfqs')
-        .select('*')
-        .eq('id', rfqId)
-        .single();
+      const result = await pool.query(
+        'SELECT * FROM rfqs WHERE id = $1',
+        [rfqId]
+      );
 
-      if (error) throw error;
+      if (!result.rows[0]) throw new Error('Not found');
 
-      return NextResponse.json(data);
+      return NextResponse.json(result.rows[0]);
     } catch {
       return NextResponse.json({ rfqId, status: 'not_found' }, { status: 404 });
     }
