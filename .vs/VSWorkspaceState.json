@@ -8,6 +8,6 @@
     "\\src\\GreenChainz.Revit\\UI",
     "\\src\\GreenChainz.Revit\\Utils"
   ],
-  "SelectedNode": "\\src\\GreenChainz.Revit\\Services\\ApiClient.cs",
+  "SelectedNode": "\\src\\GreenChainz.Revit\\Utils\\SharedParameterHelper.cs",
   "PreviewInSolutionExplorer": false
 }

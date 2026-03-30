@@ -3,8 +3,11 @@ using System.IO;
 using System.Reflection;
 using System.Windows.Media.Imaging;
 using Autodesk.Revit.UI;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Events;
 using GreenChainz.Revit.Services;
 using GreenChainz.Revit.UI;
+using GreenChainz.Revit.Utils;
 
 namespace GreenChainz.Revit
 {
@@ -19,15 +22,18 @@ namespace GreenChainz.Revit
         public static Ec3ApiService Ec3Service { get; private set; }
 
         // API Keys (can be overridden by environment variables)
-        private const string DEFAULT_EC3_API_KEY = "xIz4fqhAv5xEPMxKHxF5TnywFXha1t";
-        private const string DEFAULT_AUTODESK_CLIENT_ID = "a98gDGIomX5ArzWWwA2um3EPNMtW2PdXrc4tpNdMuBjeG0B9";
-        private const string DEFAULT_AUTODESK_SECRET = "Kn4Res0PC5hx5XvnGflIu3pe4GNNGUdG1cn4rPbB1gwS60XXPBsAVF7uOxFIhwDL";
+        private const string DEFAULT_EC3_API_KEY = ""; // Set via env var EC3_API_KEY
+        private const string DEFAULT_AUTODESK_CLIENT_ID = ""; // Set via env var AUTODESK_CLIENT_ID
+        private const string DEFAULT_AUTODESK_SECRET = ""; // Set via env var AUTODESK_CLIENT_SECRET
 
         public Result OnStartup(UIControlledApplication application)
         {
             try
             {
                 InitializeServices();
+
+                // Register document opened event to ensure GC_AgentTag parameter exists
+                application.ControlledApplication.DocumentOpened += OnDocumentOpened;
 
                 string tabName = "GreenChainz";
                 try { application.CreateRibbonTab(tabName); } catch { }
@@ -133,7 +139,25 @@ namespace GreenChainz.Revit
 
         public Result OnShutdown(UIControlledApplication application)
         {
+            // Unregister event handler
+            application.ControlledApplication.DocumentOpened -= OnDocumentOpened;
             return Result.Succeeded;
+        }
+
+        private void OnDocumentOpened(object sender, DocumentOpenedEventArgs e)
+        {
+            try
+            {
+                Document doc = e.Document;
+                if (doc == null) return;
+
+                Autodesk.Revit.ApplicationServices.Application app = doc.Application;
+                SharedParameterHelper.EnsureGcAgentTag(app, doc);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"GreenChainz: DocumentOpened handler error: {ex.Message}");
+            }
         }
 
         private void InitializeServices()

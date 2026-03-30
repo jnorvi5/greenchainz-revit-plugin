@@ -1,22 +1,89 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import crypto from 'crypto';
 
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 
+interface Supplier {
+    id: string;
+    name: string;
+    categories: string[];
+    certifications: string[];
+    region: string;
+    avgLeadTime: string;
+    sustainabilityScore: number;
+    contact: string;
+    website: string;
+    description: string;
+    matchedMaterial?: string;
+    quoteStatus?: string;
+}
+
+interface Material {
+  materialName?: string;
+  name?: string;
+  [key: string]: unknown;
+}
+
 // RFQ API Endpoint - Receives RFQ from Revit plugin and finds suppliers
 export async function POST(request: NextRequest) {
   try {
+    // 1. Security Check: Validate Authorization Header
+    const authHeader = request.headers.get('authorization');
+    const apiSecret = process.env.GREENCHAINZ_API_SECRET;
+
+    if (!apiSecret) {
+      console.error('GREENCHAINZ_API_SECRET is not configured on the server.');
+      return NextResponse.json(
+        { error: 'Server misconfiguration' },
+        { status: 500 }
+      );
+    }
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: 'Unauthorized: Missing or invalid Authorization header' },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.split(' ')[1];
+    const tokenBuffer = Buffer.from(token);
+    const secretBuffer = Buffer.from(apiSecret);
+
+    if (tokenBuffer.length !== secretBuffer.length || !crypto.timingSafeEqual(tokenBuffer, secretBuffer)) {
+      return NextResponse.json(
+        { error: 'Unauthorized: Invalid token' },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     
     const { projectName, projectAddress, materials, deliveryDate, specialInstructions, selectedSupplierIds } = body;
 
-    // Validate required fields
+    // 2. Security Check: Input Validation & DoS Protection
     if (!projectName || !materials || materials.length === 0) {
       return NextResponse.json(
         { error: 'Missing required fields: projectName and materials' },
+        { status: 400 }
+      );
+    }
+
+    // Security: Limit number of materials to prevent DoS
+    if (Array.isArray(materials) && materials.length > 100) {
+      return NextResponse.json(
+        { error: 'Too many materials. Maximum allowed is 100.' },
+        { status: 400 }
+      );
+    }
+
+    if (projectName.length > 200) {
+      return NextResponse.json(
+        { error: 'Project name too long. Limit is 200 characters.' },
         { status: 400 }
       );
     }
@@ -29,7 +96,7 @@ export async function POST(request: NextRequest) {
 
     // Filter to selected suppliers if provided
     const notifySuppliers = selectedSupplierIds && selectedSupplierIds.length > 0
-      ? supplierMatches.filter((s: any) => selectedSupplierIds.includes(s.id))
+      ? supplierMatches.filter((s: Supplier) => selectedSupplierIds.includes(s.id))
       : supplierMatches;
 
     // Save to Supabase if available
@@ -43,19 +110,16 @@ export async function POST(request: NextRequest) {
           materials: materials,
           delivery_date: deliveryDate,
           special_instructions: specialInstructions,
-          selected_suppliers: notifySuppliers.map((s: any) => s.id),
+          selected_suppliers: notifySuppliers.map((s: Supplier) => s.id),
           status: 'pending',
           created_at: new Date().toISOString()
         });
         
         if (!error) savedToDb = true;
-      } catch (dbError) {
+      } catch (_dbError) {
         console.log('Supabase not configured, continuing without DB');
       }
     }
-
-    // In production: Send emails to suppliers
-    // await sendSupplierNotifications(notifySuppliers, { rfqId, projectName, materials, deliveryDate });
 
     return NextResponse.json({
       success: true,
@@ -77,7 +141,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('RFQ API Error:', error);
     return NextResponse.json(
-      { error: 'Failed to process RFQ', details: String(error) },
+      { error: 'Failed to process RFQ' },
       { status: 500 }
     );
   }
@@ -117,11 +181,11 @@ export async function GET(request: NextRequest) {
 }
 
 // Supplier matching function with real sustainable suppliers
-async function findSuppliersForMaterials(materials: any[]) {
-  const suppliers: any[] = [];
+async function findSuppliersForMaterials(materials: Material[]): Promise<Supplier[]> {
+  const suppliers: Supplier[] = [];
 
   // Real sustainable material supplier database
-  const supplierDatabase = [
+  const supplierDatabase: Supplier[] = [
     // CONCRETE
     {
       id: 'carboncure',

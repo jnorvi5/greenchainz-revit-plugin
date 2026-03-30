@@ -1,11 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder', {
-  apiVersion: '2025-12-15.clover' as any,
-});
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const stripe = stripeSecretKey
+  ? new Stripe(stripeSecretKey, { apiVersion: '2025-01-27.acacia' as any })
+  : null;
 
 export async function POST(req: NextRequest) {
+  if (!stripe) {
+    console.error('STRIPE_SECRET_KEY is not set');
+    return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+  }
+
   try {
     const { customerId } = await req.json();
 
@@ -19,7 +26,8 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ url: session.url });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

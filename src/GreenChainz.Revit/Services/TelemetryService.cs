@@ -23,5 +23,10 @@ namespace GreenChainz.Revit.Services
         {
             try { File.AppendAllText(LogPath, $"[{DateTime.Now}] [INFO] {message}\n"); } catch { }
         }
+
+        public static void LogDebug(string message)
+        {
+            try { File.AppendAllText(LogPath, $"[{DateTime.Now}] [DEBUG] {message}\n"); } catch { }
+        }
     }
 }
