@@ -21,8 +21,6 @@ namespace GreenChainz.Revit.Services
         private static readonly string[] API_URLS = new[]
         {
             ApiConfig.BASE_URL,
-            "https://web-cj3efhrgf-greenchainz-vercel.vercel.app",
-            "https://greenchainz-revit-plugin.vercel.app",
             "http://localhost:3000"
         };
 

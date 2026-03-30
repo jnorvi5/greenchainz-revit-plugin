@@ -65,7 +65,7 @@ API Endpoints:
 ## Tech Stack
 
 - **Revit Plugin**: C#, .NET 8, WPF
-- **Web API**: Next.js, TypeScript, Supabase
+- **Web API**: Next.js, TypeScript, Azure PostgreSQL
 - **Carbon Data**: EC3 Building Transparency API
 - **PDF Generation**: iText7
 

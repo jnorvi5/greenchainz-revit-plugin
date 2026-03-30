@@ -6,7 +6,7 @@ import DashboardSkeleton from './loading';
 
 // Mock data fetcher
 const fetchUserData = async () => {
-  // In a real app, this would fetch from your API or Supabase
+  // In a real app, this would fetch from the GreenChainz API
   return new Promise<{ plan: string; credits: number; maxCredits: number }>((resolve) => {
     setTimeout(() => {
       resolve({

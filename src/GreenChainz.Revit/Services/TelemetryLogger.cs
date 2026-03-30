@@ -2,13 +2,11 @@ using System;
 
 namespace GreenChainz.Revit.Services
 {
-    public class FileLogger : ILogger
+    public class TelemetryLogger : ILogger
     {
         public void LogDebug(string message)
         {
-            // TelemetryService might not have LogDebug exposed publicly or it maps to LogInfo
-            // Assuming LogInfo is the safe fallback based on TelemetryLogger
-             TelemetryService.LogInfo($"[DEBUG] {message}");
+            TelemetryService.LogInfo($"[DEBUG] {message}");
         }
 
         public void LogInfo(string message)
@@ -16,9 +14,6 @@ namespace GreenChainz.Revit.Services
             TelemetryService.LogInfo(message);
         }
 
-<<<<<<< HEAD
-        public void LogError(Exception ex, string message)
-=======
         public void LogInformation(string message)
         {
             TelemetryService.LogInfo(message);
@@ -30,16 +25,11 @@ namespace GreenChainz.Revit.Services
         }
 
         public void LogError(string message, Exception ex = null)
->>>>>>> 039e306a47b2bc6544e95c271ca02a818ce678bf
         {
             if (ex != null)
-            {
                 TelemetryService.LogError(ex, message);
-            }
             else
-            {
-                TelemetryService.LogError(new Exception(message), "Error");
-            }
+                TelemetryService.LogInfo($"[ERROR] {message}");
         }
     }
 }

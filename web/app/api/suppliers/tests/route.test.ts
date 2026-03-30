@@ -2,17 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { POST } from '../route';
 import { NextRequest } from 'next/server';
 
-// Mock pg pool
-vi.mock('@/utils/db', () => ({
-  default: {
-    query: vi.fn(() => Promise.resolve({ rows: [{ id: 'mock-id' }] })),
-  },
-  pool: {
-    query: vi.fn(() => Promise.resolve({ rows: [{ id: 'mock-id' }] })),
-  },
-}));
-
-describe('Audit API Endpoint Security', () => {
+describe('Suppliers API Endpoint Security', () => {
   const originalEnv = process.env;
 
   beforeEach(() => {
@@ -25,9 +15,9 @@ describe('Audit API Endpoint Security', () => {
   });
 
   it('should return 401 if authorization header is missing', async () => {
-    const req = new NextRequest('http://localhost:3000/api/audit', {
+    const req = new NextRequest('http://localhost:3000/api/suppliers', {
       method: 'POST',
-      body: JSON.stringify({ ProjectName: 'Test Project' }),
+      body: JSON.stringify({ supplierIds: ['sup-1'] }),
     });
 
     const res = await POST(req);
@@ -37,12 +27,12 @@ describe('Audit API Endpoint Security', () => {
   });
 
   it('should return 401 if token is incorrect', async () => {
-    const req = new NextRequest('http://localhost:3000/api/audit', {
+    const req = new NextRequest('http://localhost:3000/api/suppliers', {
       method: 'POST',
       headers: {
         Authorization: 'Bearer wrong-token',
       },
-      body: JSON.stringify({ ProjectName: 'Test Project' }),
+      body: JSON.stringify({ supplierIds: ['sup-1'] }),
     });
 
     const res = await POST(req);
@@ -54,12 +44,12 @@ describe('Audit API Endpoint Security', () => {
   it('should return 500 if server secret is not configured', async () => {
     process.env.GREENCHAINZ_API_SECRET = ''; // Unset secret
 
-    const req = new NextRequest('http://localhost:3000/api/audit', {
+    const req = new NextRequest('http://localhost:3000/api/suppliers', {
       method: 'POST',
       headers: {
         Authorization: 'Bearer test-secret',
       },
-      body: JSON.stringify({ ProjectName: 'Test Project' }),
+      body: JSON.stringify({ supplierIds: ['sup-1'] }),
     });
 
     const res = await POST(req);
@@ -68,19 +58,34 @@ describe('Audit API Endpoint Security', () => {
     expect(data.error).toContain('Server configuration error');
   });
 
-  it('should return 200 if token is correct', async () => {
-    const req = new NextRequest('http://localhost:3000/api/audit', {
+  it('should return 200 if token is correct and payload is valid', async () => {
+    const req = new NextRequest('http://localhost:3000/api/suppliers', {
       method: 'POST',
       headers: {
         Authorization: 'Bearer test-secret',
       },
-      body: JSON.stringify({ ProjectName: 'Test Project' }),
+      body: JSON.stringify({ supplierIds: ['sup-1'] }),
     });
 
     const res = await POST(req);
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.success).toBe(true);
+  });
+
+  it('should return 400 if supplierIds is missing or empty', async () => {
+    const req = new NextRequest('http://localhost:3000/api/suppliers', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer test-secret',
+      },
+      body: JSON.stringify({ supplierIds: [] }),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(400);
+    const data = await res.json();
+    expect(data.error).toContain('No suppliers selected');
   });
 
   it('should not expose error details on unexpected failure', async () => {
@@ -96,7 +101,7 @@ describe('Audit API Endpoint Security', () => {
     expect(res.status).toBe(500);
     const data = await res.json();
 
-    expect(data.error).toBe('Failed to process Audit');
-    expect(data.details).toBeUndefined(); // Crucial security check
+    expect(data.error).toBe('Failed to send RFQ to suppliers');
+    // Ensure no stack trace or internal error message is leaked
   });
 });

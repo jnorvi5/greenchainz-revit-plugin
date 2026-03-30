@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Diagnostics;
 using Microsoft.Win32;
 using GreenChainz.Revit.Models;
 using GreenChainz.Revit.Services;
@@ -51,7 +52,30 @@ namespace GreenChainz.Revit.UI
             }
         }
 
+<<<<<<< HEAD
         private async void SwapMaterial_Click(object sender, RoutedEventArgs e)
+=======
+        private void ViewDashboard_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // Open the main app dashboard in the browser
+                // In a production scenario, we'd deep-link to the specific project ID
+                string dashboardUrl = $"{ApiConfig.BASE_URL}/dashboard";
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = dashboardUrl,
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Could not open dashboard: {ex.Message}", "Browser Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void SwapMaterial_Click(object sender, RoutedEventArgs e)
+>>>>>>> 039e306a47b2bc6544e95c271ca02a818ce678bf
         {
             if (sender is FrameworkElement element && element.DataContext is MaterialBreakdown item)
             {
@@ -252,7 +276,12 @@ namespace GreenChainz.Revit.UI
                     MessageBox.Show($"PDF exported successfully!\n\n{saveDialog.FileName}", 
                         "Export Complete", MessageBoxButton.OK, MessageBoxImage.Information);
                     
+<<<<<<< HEAD
                     System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+=======
+                    // Open the PDF
+                    Process.Start(new ProcessStartInfo
+>>>>>>> 039e306a47b2bc6544e95c271ca02a818ce678bf
                     {
                         FileName = saveDialog.FileName,
                         UseShellExecute = true

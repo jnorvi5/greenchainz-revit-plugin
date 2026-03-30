@@ -17,7 +17,7 @@ namespace GreenChainz.Revit.Services
         public string UserEmail { get; private set; }
         public int Credits { get; private set; }
 
-        private const string ApiBaseUrl = "https://api.greenchainz.com";
+        private const string ApiBaseUrl = "https://greenchainz.com";
         private readonly HttpClient _httpClient;
 
         private AuthService()

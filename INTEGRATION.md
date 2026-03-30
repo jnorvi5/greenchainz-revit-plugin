@@ -12,12 +12,12 @@ The Revit plugin connects to `https://greenchainz.com/api` (configurable via `Ap
 1.  **RFQ Submission**: `POST /api/rfq`
     *   **Payload**: `RFQRequest` (Project info, materials, supplier IDs).
     *   **Handler**: `web/app/api/rfq/route.ts`
-    *   **Function**: Stores RFQ in Supabase (if configured) and returns supplier matches.
+    *   **Function**: Stores RFQ in Azure PostgreSQL (if configured) and returns supplier matches.
 
 2.  **Carbon Audit**: `POST /api/audit`
     *   **Payload**: `AuditResult` (Carbon score, material breakdown).
     *   **Handler**: `web/app/api/audit/route.ts` (Newly created).
-    *   **Function**: Stores audit history in Supabase.
+    *   **Function**: Stores audit history in Azure PostgreSQL.
 
 ### Authentication
 *   The plugin supports Bearer token authentication.
@@ -49,5 +49,5 @@ The plugin includes `AutodeskAuthService` which implements 2-legged OAuth (Clien
 
 ## Next Steps for Developers
 1.  **Environment Variables**: Ensure all developer machines have the required API keys.
-2.  **Supabase**: Run migrations to ensure `rfqs` and `audits` tables exist.
+2.  **Database**: Ensure `rfqs` and `audits` tables exist in Azure PostgreSQL.
 3.  **Testing**: Use the "Send RFQ" command in Revit to test end-to-end connectivity.
