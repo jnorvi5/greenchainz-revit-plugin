@@ -1,0 +1,188 @@
+name: CI — Revit Plugin Build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - '*.sln'
+      - '.github/workflows/ci-plugin.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - '*.sln'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        configuration: [Release]
+        platform: [x64]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      # Create stub Revit API DLLs so dotnet build can resolve references
+      # In production, actual Revit 2026 DLLs are on the dev machine
+      - name: Create Revit API stubs
+        shell: pwsh
+        run: |
+          $revitPath = "C:\Program Files\Autodesk\Revit 2026"
+          New-Item -ItemType Directory -Force -Path $revitPath | Out-Null
+
+          # Minimal stub assemblies for RevitAPI and RevitAPIUI
+          $stubCode = @"
+          using System.Reflection;
+          [assembly: AssemblyTitle("RevitAPI")]
+          [assembly: AssemblyVersion("26.0.0.0")]
+          namespace Autodesk.Revit.DB {
+              public class Document {}
+              public class FilteredElementCollector {
+                  public FilteredElementCollector(Document doc) {}
+              }
+              public class Element {}
+              public class ElementId {
+                  public ElementId(int id) {}
+                  public static readonly ElementId InvalidElementId = new ElementId(-1);
+              }
+              public class Material : Element {
+                  public string Name { get; set; }
+              }
+              public class BuiltInCategory { }
+              public class Transaction : System.IDisposable {
+                  public Transaction(Document doc, string name) {}
+                  public int Start() { return 0; }
+                  public int Commit() { return 0; }
+                  public void Dispose() {}
+              }
+              public class TaskDialog {
+                  public TaskDialog(string title) {}
+                  public string MainContent { get; set; }
+                  public static void Show(string title, string msg) {}
+                  public void Show() {}
+              }
+              public class Category {}
+              public class Wall : Element {}
+              public class Floor : Element {}
+              public class FamilyInstance : Element {}
+              public class Parameter {
+                  public string AsString() { return ""; }
+                  public double AsDouble() { return 0; }
+              }
+              public class BuiltInParameter {
+                  public static readonly BuiltInParameter ALL_MODEL_MARK;
+              }
+          }
+          namespace Autodesk.Revit.Attributes {
+              [System.AttributeUsage(System.AttributeTargets.Class)]
+              public class TransactionAttribute : System.Attribute {
+                  public TransactionAttribute(TransactionMode mode) {}
+              }
+              [System.AttributeUsage(System.AttributeTargets.Class)]
+              public class RegenerationAttribute : System.Attribute {
+                  public RegenerationAttribute(RegenerationOption option) {}
+              }
+              public enum TransactionMode { Manual, ReadOnly, Automatic }
+              public enum RegenerationOption { Manual }
+          }
+          "@
+
+          $stubUICode = @"
+          using System.Reflection;
+          [assembly: AssemblyTitle("RevitAPIUI")]
+          [assembly: AssemblyVersion("26.0.0.0")]
+          namespace Autodesk.Revit.UI {
+              public interface IExternalApplication {
+                  Result OnStartup(UIControlledApplication application);
+                  Result OnShutdown(UIControlledApplication application);
+              }
+              public interface IExternalCommand {
+                  Result Execute(ExternalCommandData commandData, ref string message, Autodesk.Revit.DB.ElementSet elements);
+              }
+              public class UIControlledApplication {
+                  public void CreateRibbonTab(string tabName) {}
+                  public RibbonPanel CreateRibbonPanel(string tabName, string panelName) { return new RibbonPanel(); }
+              }
+              public class UIApplication {
+                  public Autodesk.Revit.DB.Document ActiveUIDocument { get { return null; } }
+              }
+              public class ExternalCommandData {
+                  public UIApplication Application { get { return new UIApplication(); } }
+              }
+              public class RibbonPanel {
+                  public void AddItem(RibbonItemData item) {}
+              }
+              public class RibbonItemData {}
+              public class PushButtonData : RibbonItemData {
+                  public PushButtonData(string name, string text, string assemblyName, string className) {}
+                  public System.Windows.Media.ImageSource LargeImage { get; set; }
+                  public System.Windows.Media.ImageSource Image { get; set; }
+                  public string ToolTip { get; set; }
+              }
+              public class PushButton {
+                  public System.Windows.Media.ImageSource LargeImage { get; set; }
+              }
+              public enum Result { Succeeded, Failed, Cancelled }
+              public class ExternalEvent {
+                  public static ExternalEvent Create(IExternalEventHandler handler) { return new ExternalEvent(); }
+                  public void Raise() {}
+              }
+              public interface IExternalEventHandler {
+                  void Execute(UIApplication app);
+                  string GetName();
+              }
+          }
+          namespace Autodesk.Revit.DB {
+              public class ElementSet {}
+          }
+          "@
+
+          # Compile stubs
+          Add-Type -TypeDefinition $stubCode -OutputAssembly "$revitPath\RevitAPI.dll" -OutputType Library -ReferencedAssemblies System.Runtime
+          Add-Type -TypeDefinition $stubUICode -OutputAssembly "$revitPath\RevitAPIUI.dll" -OutputType Library -ReferencedAssemblies System.Runtime,"$revitPath\RevitAPI.dll",PresentationCore
+
+      - name: Restore NuGet packages
+        run: dotnet restore GreenChainz.Revit.sln -p:Platform=x64
+
+      - name: Build solution
+        run: dotnet build GreenChainz.Revit.sln --configuration ${{ matrix.configuration }} -p:Platform=x64 --no-restore
+
+      # Tests reference main project which needs Revit stubs — build separately
+      - name: Build tests
+        run: dotnet build tests/GreenChainz.Revit.Tests/GreenChainz.Revit.Tests.csproj --configuration ${{ matrix.configuration }} -p:Platform=x64
+
+  web-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install dependencies
+        working-directory: web
+        run: npm ci
+
+      - name: Build Next.js
+        working-directory: web
+        run: npm run build
+
+      - name: Lint
+        working-directory: web
+        run: npm run lint --if-present

@@ -1,30 +1,28 @@
 using System;
 using System.Collections.Generic;
-// using NUnit.Framework; // Assuming NUnit or xUnit
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Threading.Tasks;
+using NUnit.Framework;
 using GreenChainz.Revit.Services;
 using GreenChainz.Revit.Models;
 
 namespace GreenChainz.Revit.Tests
 {
-    [TestClass]
+    [TestFixture]
     public class MaterialServiceTests
     {
-        [TestMethod]
-        public void GetMaterialsAsync_WithMockData_ReturnsExpectedMaterials()
+        [Test]
+        public async Task GetMaterialsAsync_WithMockData_ReturnsExpectedMaterials()
         {
             // Simple test to verify the mock data service
             var service = new MaterialService();
-            var task = service.GetMaterialsAsync();
-            task.Wait();
+            var results = await service.GetMaterialsAsync();
 
-            var results = task.Result;
             Assert.IsNotNull(results);
             Assert.IsTrue(results.Count > 0);
             Assert.AreEqual("Recycled Steel Beam", results[0].Name);
         }
 
-        [TestMethod]
+        [Test]
         public void Material_WhenPropertiesSet_ReturnsCorrectValues()
         {
             var mat = new Material
