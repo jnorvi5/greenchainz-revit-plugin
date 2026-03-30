@@ -6,35 +6,28 @@ using GreenChainz.Revit.Models;
 
 namespace GreenChainz.Revit.Services
 {
-    /// <summary>
-    /// Service for scanning Revit models for embodied carbon and syncing with the GreenChainz backend.
-    /// </summary>
     public class AuditService
     {
         private readonly Ec3ApiService _ec3Service;
-        private readonly ApiClient _apiClient;
         private Dictionary<string, Ec3CarbonFactor> _carbonFactorCache;
 
         public AuditService()
         {
             _ec3Service = App.Ec3Service;
-            _apiClient = new ApiClient();
             _carbonFactorCache = new Dictionary<string, Ec3CarbonFactor>();
         }
 
-        /// <summary>
-        /// Scans the project for materials, calculates carbon, and syncs to the dashboard.
-        /// </summary>
-        public async Task<AuditResult> ScanAndSyncProjectAsync(Document doc)
+        public AuditResult ScanProject(Document doc)
         {
             List<MaterialBreakdown> materials = ExtractMaterials(doc);
+
             double totalCarbon = 0;
             foreach (var mat in materials)
             {
                 totalCarbon += mat.TotalCarbon;
             }
 
-            var auditResult = new AuditResult
+            return new AuditResult
             {
                 ProjectName = doc.Title,
                 Date = DateTime.Now,
@@ -44,31 +37,6 @@ namespace GreenChainz.Revit.Services
                 Recommendations = GenerateRecommendations(materials),
                 DataSource = _ec3Service?.HasValidApiKey == true ? "EC3 Building Transparency" : "CLF v2021 Baseline"
             };
-
-            // Sync to GreenChainz Backend
-            try
-            {
-                var request = new AuditRequest
-                {
-                    ProjectName = auditResult.ProjectName,
-                    Timestamp = auditResult.Date,
-                    Materials = materials,
-                    TotalCarbon = totalCarbon,
-                    DataSource = auditResult.DataSource
-                };
-
-                var backendResult = await _apiClient.SubmitAuditAsync(request);
-                if (backendResult != null && backendResult.OverallScore >= 0)
-                {
-                    auditResult.Summary += "\n\n[SYNCED] This audit is now available on your GreenChainz Dashboard.";
-                }
-            }
-            catch (Exception ex)
-            {
-                auditResult.Summary += $"\n\n[OFFLINE] Could not sync with dashboard: {ex.Message}";
-            }
-
-            return auditResult;
         }
 
         private List<MaterialBreakdown> ExtractMaterials(Document doc)
@@ -76,6 +44,87 @@ namespace GreenChainz.Revit.Services
             Dictionary<string, MaterialBreakdown> materialMap = new Dictionary<string, MaterialBreakdown>();
 
             // Expanded list of categories architects care about
+            List<BuiltInCategory> categories = new List<BuiltInCategory>
+            {
+                // Structure
+                BuiltInCategory.OST_Walls,
+                BuiltInCategory.OST_Floors,
+                BuiltInCategory.OST_Roofs,
+                BuiltInCategory.OST_Ceilings,
+                BuiltInCategory.OST_StructuralColumns,
+                BuiltInCategory.OST_StructuralFraming,
+                BuiltInCategory.OST_StructuralFoundation,
+                
+                // Openings
+                BuiltInCategory.OST_Windows,
+                BuiltInCategory.OST_Doors,
+                BuiltInCategory.OST_CurtainWallPanels,
+                BuiltInCategory.OST_CurtainWallMullions,
+                
+                // Interior
+                BuiltInCategory.OST_Stairs,
+                BuiltInCategory.OST_StairsRailing,
+                BuiltInCategory.OST_Ramps,
+                BuiltInCategory.OST_Railings,
+                
+                // MEP (for enclosures)
+                BuiltInCategory.OST_MechanicalEquipment,
+                BuiltInCategory.OST_Casework,
+                BuiltInCategory.OST_Furniture,
+                BuiltInCategory.OST_Columns,
+                
+                // Site
+                BuiltInCategory.OST_Topography,
+                BuiltInCategory.OST_Parking,
+                BuiltInCategory.OST_Planting
+            };
+
+            ElementMulticategoryFilter categoryFilter = new ElementMulticategoryFilter(categories);
+            FilteredElementCollector collector = new FilteredElementCollector(doc);
+            IList<Element> elements = collector.WherePasses(categoryFilter).WhereElementIsNotElementType().ToElements();
+
+            foreach (Element elem in elements)
+            {
+                // Get Revit category for IFC mapping
+                string revitCategory = elem.Category?.Name ?? "";
+                string ifcCategory = MapRevitCategoryToIfc(revitCategory);
+
+                foreach (ElementId matId in elem.GetMaterialIds(false))
+                {
+                    Autodesk.Revit.DB.Material mat = doc.GetElement(matId) as Autodesk.Revit.DB.Material;
+                    if (mat == null) continue;
+
+                    string matName = mat.Name;
+                    double volume = elem.GetMaterialVolume(matId);
+
+                    if (volume > 0.0001)
+                    {
+                        if (!materialMap.ContainsKey(matName))
+                        {
+                            var carbonFactor = GetCarbonFactor(matName);
+                            
+                            materialMap[matName] = new MaterialBreakdown
+                            {
+                                MaterialName = matName,
+                                Quantity = "0 m3",
+                                CarbonFactor = carbonFactor.AverageGwp,
+                                TotalCarbon = 0,
+                                DataSource = carbonFactor.Source,
+                                Ec3Category = carbonFactor.Ec3Category,
+                                // IFC fields for openBIM interoperability
+                                IfcGuid = MaterialBreakdown.ConvertToIfcGuid(Guid.NewGuid()),
+                                IfcExportAs = "IfcMaterial",
+                                IfcCategory = ifcCategory,
+                                RevitElementId = elem.Id.ToString(),
+                                VolumeM3 = 0,
+                                MassKg = 0
+                            };
+                        }
+
+                        double volumeM3 = volume * 0.0283168;
+                        double currentQty = 0;
+                        string qtyStr = materialMap[matName].Quantity.Replace(" m3", "").Replace(" m³", "");
+                        if (double.TryParse(qtyStr, out currentQty))
                         {
                             materialMap[matName].Quantity = $"{(currentQty + volumeM3):F2} m3";
                         }
@@ -95,14 +144,18 @@ namespace GreenChainz.Revit.Services
 
         private Ec3CarbonFactor GetCarbonFactor(string materialName)
         {
+            // Check cache first
             if (_carbonFactorCache.ContainsKey(materialName))
                 return _carbonFactorCache[materialName];
 
             Ec3CarbonFactor factor;
+
+            // Try to get from EC3 API
             if (_ec3Service?.HasValidApiKey == true)
             {
                 try
                 {
+                    // Run synchronously for simplicity in Revit context
                     var task = Task.Run(() => _ec3Service.GetCarbonFactorAsync(materialName));
                     task.Wait(TimeSpan.FromSeconds(5));
                     factor = task.Result;
@@ -239,7 +292,7 @@ namespace GreenChainz.Revit.Services
                 Category = materialName,
                 Ec3Category = category,
                 AverageGwp = gwp,
-                Unit = "kgCO2e/m3",
+                Unit = "kgCO2e/m³",
                 Source = "CLF v2021 Baseline"
             };
         }
@@ -297,6 +350,7 @@ namespace GreenChainz.Revit.Services
         private List<Recommendation> GenerateRecommendations(List<MaterialBreakdown> materials)
         {
             var recommendations = new List<Recommendation>();
+
             foreach (var mat in materials)
             {
                 if (mat.MaterialName.ToLower().Contains("concrete") && mat.TotalCarbon > 10000)
@@ -329,6 +383,7 @@ namespace GreenChainz.Revit.Services
                     Ec3Link = "https://buildingtransparency.org/ec3"
                 });
             }
+
             return recommendations;
         }
     }
