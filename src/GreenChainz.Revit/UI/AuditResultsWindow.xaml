@@ -5,84 +5,404 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GreenChainz.Revit.UI"
         mc:Ignorable="d"
-        Title="Carbon Audit Results" Height="650" Width="850"
-        WindowStartupLocation="CenterScreen">
+        Title="Carbon Audit Results - GreenChainz" Height="800" Width="1100"
+        MinHeight="600" MinWidth="900"
+        WindowStartupLocation="CenterScreen"
+        Background="#F8F9FA" FontFamily="Segoe UI">
 
     <Window.Resources>
-        <local:ScoreToBrushConverter x:Key="ScoreToBrushConverter"/>
-        <Style TargetType="TextBlock" x:Key="HeaderStyle">
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Margin" Value="0,10,0,5"/>
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/GreenChainz.Revit;component/Themes/GreenChainzTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <local:ScoreToBrushConverter x:Key="ScoreToBrushConverter"/>
+            <local:BoolToVisibilityConverter x:Key="BoolToVisConverter"/>
+            <local:BestSwapBorderConverter x:Key="BestSwapBorderConverter"/>
+            <local:EpdStatusColorConverter x:Key="EpdStatusColorConverter"/>
+            <local:CostDeltaColorConverter x:Key="CostDeltaColorConverter"/>
+        </ResourceDictionary>
     </Window.Resources>
 
-    <Grid Margin="20">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Header and Overall Score -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
-            <TextBlock Text="Total Carbon:" FontSize="24" VerticalAlignment="Center" Margin="0,0,10,0"/>
-            <TextBlock x:Name="ScoreText" Text="Loading..." FontSize="24" FontWeight="Bold" VerticalAlignment="Center"/>
-        </StackPanel>
+        <!-- Green Header Bar -->
+        <Border Grid.Row="0" Background="#2D6A4F" Padding="20,14">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="Carbon Audit Results" FontSize="20" FontWeight="SemiBold" Foreground="White"/>
+                    <TextBlock x:Name="ProjectNameText" Text="Project" FontSize="11" Foreground="#B7E4C7" Margin="0,2,0,0"/>
+                </StackPanel>
+                <TextBlock Grid.Column="1" Text="GreenChainz" FontSize="14" FontWeight="Bold" Foreground="#B7E4C7" VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
 
-        <!-- Summary -->
-        <StackPanel Grid.Row="1" Margin="0,0,0,20">
-            <TextBlock Text="Audit Summary" Style="{StaticResource HeaderStyle}"/>
-            <TextBlock Text="{Binding Summary}" TextWrapping="Wrap" FontSize="14"/>
-        </StackPanel>
+        <!-- Main Content -->
+        <Grid Grid.Row="1" Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-        <!-- Material Breakdown -->
-        <DockPanel Grid.Row="2" Margin="0,0,0,20">
-            <TextBlock Text="Material Breakdown" DockPanel.Dock="Top" Style="{StaticResource HeaderStyle}"/>
-            <DataGrid x:Name="MaterialsDataGrid" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Material Name" Binding="{Binding MaterialName}" Width="*"/>
-                    <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" Width="100"/>
-                    <DataGridTextColumn Header="Carbon Factor" Binding="{Binding CarbonFactor, StringFormat=N2}" Width="120"/>
-                    <DataGridTextColumn Header="Total Carbon (kgCO2e)" Binding="{Binding TotalCarbon, StringFormat=N0}" Width="150"/>
-                    <DataGridTemplateColumn Header="Action" Width="120">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <Button Content="Swap Material" Click="SwapMaterial_Click" Margin="2" Padding="5,2"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                </DataGrid.Columns>
-            </DataGrid>
-        </DockPanel>
+            <!-- Summary Header: Total Carbon, Element Count, Top Categories -->
+            <Border Grid.Row="0" Background="White" BorderBrush="#DEE2E6" BorderThickness="1" CornerRadius="6" Padding="16" Margin="0,0,0,12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-        <!-- Recommendations -->
-        <DockPanel Grid.Row="3" Margin="0,0,0,20" MaxHeight="150">
-            <TextBlock Text="Recommendations" DockPanel.Dock="Top" Style="{StaticResource HeaderStyle}"/>
-            <ListView x:Name="RecommendationsList">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal" Margin="0,2">
-                            <TextBlock Text="• " FontWeight="Bold" Foreground="Green"/>
-                            <TextBlock Text="{Binding Description}" Margin="0,0,10,0"/>
-                            <TextBlock Text="Potential Savings: " FontStyle="Italic"/>
-                            <TextBlock Text="{Binding PotentialSavings, StringFormat='{}{0:N0} kgCO2e'}" FontWeight="Bold" Foreground="Green"/>
+                    <!-- Total Carbon -->
+                    <Border Grid.Column="0" Background="#D8F3DC" CornerRadius="6" Padding="16,10" Margin="0,0,16,0">
+                        <StackPanel>
+                            <TextBlock Text="TOTAL CARBON" FontSize="11" Foreground="#6C757D"/>
+                            <TextBlock x:Name="ScoreText" Text="0" FontSize="28" FontWeight="Bold" Foreground="#2D6A4F"/>
+                            <TextBlock Text="kgCO2e" FontSize="11" Foreground="#6C757D"/>
                         </StackPanel>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-        </DockPanel>
+                    </Border>
 
-        <!-- Action Buttons -->
-        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Export IFC" Click="ExportIFC_Click" Padding="15,8" Margin="0,0,10,0" Background="#FF5722" Foreground="White" ToolTip="Export to IFC format (openBIM)"/>
-            <Button Content="Export BCF" Click="ExportBCF_Click" Padding="15,8" Margin="0,0,10,0" Background="#9C27B0" Foreground="White" ToolTip="Flag high-carbon issues (BCF)"/>
-            <Button Content="Send RFQ" Click="SendRFQ_Click" Padding="15,8" Margin="0,0,10,0" Background="#007ACC" Foreground="White"/>
-            <Button Content="Export PDF" Click="ExportPDF_Click" Padding="15,8" Margin="0,0,10,0"/>
-            <Button Content="Close" Click="Close_Click" Padding="15,8"/>
-        </StackPanel>
+                    <!-- Element Count -->
+                    <Border Grid.Column="1" Background="#D8F3DC" CornerRadius="6" Padding="16,10" Margin="0,0,16,0">
+                        <StackPanel>
+                            <TextBlock Text="ELEMENTS" FontSize="11" Foreground="#6C757D"/>
+                            <TextBlock x:Name="ElementCountText" Text="0" FontSize="28" FontWeight="Bold" Foreground="#2D6A4F"/>
+                            <TextBlock Text="scanned" FontSize="11" Foreground="#6C757D"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Top Categories -->
+                    <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                        <TextBlock Text="TOP CATEGORIES BY IMPACT" FontSize="11" Foreground="#6C757D" Margin="0,0,0,6"/>
+                        <ItemsControl x:Name="TopCategoriesList">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="120"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding Category}" FontSize="12" FontWeight="SemiBold" Foreground="#1B1B1B"/>
+                                        <ProgressBar Grid.Column="1" Value="{Binding Percentage}" Maximum="100" Height="8"
+                                                     Foreground="#40916C" Background="#DEE2E6" Margin="8,0"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding CarbonDisplay}" FontSize="12" Foreground="#6C757D" MinWidth="80" TextAlignment="Right"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Main TabControl: Elements / Swap Recommendations -->
+            <TabControl Grid.Row="1" x:Name="MainTabControl" Margin="0,0,0,12" Background="Transparent" BorderThickness="0">
+                <TabControl.Resources>
+                    <Style TargetType="TabItem">
+                        <Setter Property="FontFamily" Value="Segoe UI"/>
+                        <Setter Property="FontSize" Value="13"/>
+                        <Setter Property="Padding" Value="16,8"/>
+                    </Style>
+                </TabControl.Resources>
+
+                <!-- Tab 1: Per-Element Breakdown with Category Groups -->
+                <TabItem Header="Element Breakdown">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Sort Controls -->
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,8">
+                            <TextBlock Text="Sort by:" FontSize="12" VerticalAlignment="Center" Foreground="#6C757D" Margin="0,0,8,0"/>
+                            <ComboBox x:Name="SortComboBox" Width="180" SelectionChanged="SortComboBox_SelectionChanged" FontSize="12">
+                                <ComboBoxItem Content="Carbon Impact (Highest)" IsSelected="True"/>
+                                <ComboBoxItem Content="Carbon Impact (Lowest)"/>
+                                <ComboBoxItem Content="Category"/>
+                                <ComboBoxItem Content="Material Name"/>
+                                <ComboBoxItem Content="Volume"/>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <!-- Collapsible Category Groups with Elements -->
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl x:Name="CategoryGroupsList">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Expander IsExpanded="True" Margin="0,0,0,4">
+                                            <Expander.Header>
+                                                <Grid Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Expander}, Converter={x:Static local:WidthMinusConverter.Instance}}">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="{Binding CategoryName}" FontSize="14" FontWeight="SemiBold" Foreground="#2D6A4F" VerticalAlignment="Center"/>
+                                                    <TextBlock Grid.Column="1" Text="{Binding ElementCountDisplay}" FontSize="12" Foreground="#6C757D" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                                                    <Border Grid.Column="2" Background="#D8F3DC" CornerRadius="4" Padding="8,4">
+                                                        <TextBlock Text="{Binding SubtotalDisplay}" FontSize="12" FontWeight="SemiBold" Foreground="#2D6A4F"/>
+                                                    </Border>
+                                                </Grid>
+                                            </Expander.Header>
+                                            <DataGrid ItemsSource="{Binding Elements}" AutoGenerateColumns="False"
+                                                      CanUserAddRows="False" IsReadOnly="True"
+                                                      RowBackground="White" AlternatingRowBackground="#F0F7F4"
+                                                      GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#DEE2E6"
+                                                      HeadersVisibility="Column" BorderThickness="1" BorderBrush="#DEE2E6"
+                                                      FontSize="12" SelectionMode="Single">
+                                                <DataGrid.ColumnHeaderStyle>
+                                                    <Style TargetType="DataGridColumnHeader">
+                                                        <Setter Property="Background" Value="#2D6A4F"/>
+                                                        <Setter Property="Foreground" Value="White"/>
+                                                        <Setter Property="FontSize" Value="12"/>
+                                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                                        <Setter Property="Padding" Value="8,6"/>
+                                                        <Setter Property="BorderBrush" Value="#1B4332"/>
+                                                        <Setter Property="BorderThickness" Value="0,0,1,0"/>
+                                                    </Style>
+                                                </DataGrid.ColumnHeaderStyle>
+                                                <DataGrid.Columns>
+                                                    <DataGridTextColumn Header="Element ID" Binding="{Binding ElementId}" Width="80"/>
+                                                    <DataGridTextColumn Header="Name" Binding="{Binding ElementName}" Width="*"/>
+                                                    <DataGridTextColumn Header="Material" Binding="{Binding MaterialName}" Width="150"/>
+                                                    <DataGridTextColumn Header="Volume" Binding="{Binding VolumeDisplay}" Width="90"/>
+                                                    <DataGridTextColumn Header="Area" Binding="{Binding AreaDisplay}" Width="80"/>
+                                                    <DataGridTextColumn Header="kgCO2e/m3" Binding="{Binding CarbonPerUnitDisplay}" Width="90"/>
+                                                    <DataGridTextColumn Header="Carbon (kgCO2e)" Binding="{Binding CarbonImpactDisplay}" Width="110">
+                                                        <DataGridTextColumn.ElementStyle>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                                            </Style>
+                                                        </DataGridTextColumn.ElementStyle>
+                                                    </DataGridTextColumn>
+                                                    <DataGridTemplateColumn Header="Swap" Width="70">
+                                                        <DataGridTemplateColumn.CellTemplate>
+                                                            <DataTemplate>
+                                                                <Button Content="Swap" Click="SwapElement_Click"
+                                                                        Visibility="{Binding HasAlternatives, Converter={StaticResource BoolToVisConverter}}"
+                                                                        Background="#40916C" Foreground="White" FontSize="11"
+                                                                        Padding="8,3" Cursor="Hand" BorderThickness="0">
+                                                                    <Button.Template>
+                                                                        <ControlTemplate TargetType="Button">
+                                                                            <Border x:Name="bd" Background="{TemplateBinding Background}" CornerRadius="3" Padding="{TemplateBinding Padding}">
+                                                                                <ContentPresenter HorizontalAlignment="Center"/>
+                                                                            </Border>
+                                                                            <ControlTemplate.Triggers>
+                                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                                    <Setter TargetName="bd" Property="Background" Value="#2D6A4F"/>
+                                                                                </Trigger>
+                                                                            </ControlTemplate.Triggers>
+                                                                        </ControlTemplate>
+                                                                    </Button.Template>
+                                                                </Button>
+                                                            </DataTemplate>
+                                                        </DataGridTemplateColumn.CellTemplate>
+                                                    </DataGridTemplateColumn>
+                                                </DataGrid.Columns>
+                                            </DataGrid>
+                                        </Expander>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+                </TabItem>
+
+                <!-- Tab 2: Swap Recommendations -->
+                <TabItem Header="Swap Recommendations">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Lower-carbon alternatives for high-impact materials" FontSize="13" Foreground="#6C757D" Margin="0,8,0,8"/>
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl x:Name="SwapRecommendationsList">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="White" BorderBrush="#DEE2E6" BorderThickness="1" CornerRadius="6" Padding="16" Margin="0,0,0,12">
+                                            <Expander IsExpanded="False">
+                                                <Expander.Header>
+                                                    <Grid Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Expander}, Converter={x:Static local:WidthMinusConverter.Instance}}">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <StackPanel>
+                                                            <TextBlock Text="{Binding MaterialName}" FontSize="14" FontWeight="SemiBold" Foreground="#1B1B1B"/>
+                                                            <TextBlock Text="{Binding CategoryDisplay}" FontSize="11" Foreground="#6C757D"/>
+                                                        </StackPanel>
+                                                        <TextBlock Grid.Column="1" Text="{Binding CurrentCarbonDisplay}" FontSize="13" Foreground="#D62828" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                                                        <Border Grid.Column="2" Background="#D8F3DC" CornerRadius="4" Padding="8,4">
+                                                            <TextBlock Text="{Binding AlternativeCountDisplay}" FontSize="12" Foreground="#2D6A4F"/>
+                                                        </Border>
+                                                    </Grid>
+                                                </Expander.Header>
+                                                <!-- Alternatives List -->
+                                                <ItemsControl ItemsSource="{Binding Alternatives}" Margin="0,12,0,0">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Border Margin="0,0,0,8" Padding="12"
+                                                                    BorderThickness="{Binding IsBestSwap, Converter={StaticResource BestSwapBorderConverter}}"
+                                                                    BorderBrush="#2D6A4F" CornerRadius="6"
+                                                                    Background="{Binding IsBestSwap, Converter={StaticResource BestSwapBorderConverter}, ConverterParameter=bg}">
+                                                                <Grid>
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="*"/>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <Grid.RowDefinitions>
+                                                                        <RowDefinition Height="Auto"/>
+                                                                        <RowDefinition Height="Auto"/>
+                                                                        <RowDefinition Height="Auto"/>
+                                                                    </Grid.RowDefinitions>
+
+                                                                    <!-- Name + Manufacturer -->
+                                                                    <StackPanel>
+                                                                        <StackPanel Orientation="Horizontal">
+                                                                            <TextBlock Text="{Binding MaterialName}" FontSize="13" FontWeight="SemiBold" Foreground="#1B1B1B"/>
+                                                                            <Border Background="#2D6A4F" CornerRadius="3" Padding="6,2" Margin="8,0,0,0"
+                                                                                    Visibility="{Binding IsBestSwap, Converter={StaticResource BoolToVisConverter}}">
+                                                                                <TextBlock Text="BEST SWAP" FontSize="9" Foreground="White" FontWeight="Bold"/>
+                                                                            </Border>
+                                                                        </StackPanel>
+                                                                        <TextBlock Text="{Binding Manufacturer}" FontSize="11" Foreground="#6C757D"/>
+                                                                    </StackPanel>
+
+                                                                    <!-- Carbon Savings Badge -->
+                                                                    <Border Grid.Column="1" Background="#D8F3DC" CornerRadius="4" Padding="10,6" VerticalAlignment="Top">
+                                                                        <StackPanel HorizontalAlignment="Center">
+                                                                            <TextBlock Text="{Binding CarbonSavingsDisplay}" FontSize="16" FontWeight="Bold" Foreground="#2D6A4F" HorizontalAlignment="Center"/>
+                                                                            <TextBlock Text="less carbon" FontSize="10" Foreground="#6C757D" HorizontalAlignment="Center"/>
+                                                                        </StackPanel>
+                                                                    </Border>
+
+                                                                    <!-- Specs Grid -->
+                                                                    <Grid Grid.Row="1" Grid.ColumnSpan="2" Margin="0,10,0,0">
+                                                                        <Grid.ColumnDefinitions>
+                                                                            <ColumnDefinition Width="*"/>
+                                                                            <ColumnDefinition Width="*"/>
+                                                                            <ColumnDefinition Width="*"/>
+                                                                            <ColumnDefinition Width="*"/>
+                                                                            <ColumnDefinition Width="*"/>
+                                                                        </Grid.ColumnDefinitions>
+                                                                        <StackPanel Grid.Column="0">
+                                                                            <TextBlock Text="Carbon" FontSize="10" Foreground="#6C757D"/>
+                                                                            <TextBlock Text="{Binding CarbonPerUnitDisplay}" FontSize="12" FontWeight="SemiBold"/>
+                                                                        </StackPanel>
+                                                                        <StackPanel Grid.Column="1">
+                                                                            <TextBlock Text="Strength" FontSize="10" Foreground="#6C757D"/>
+                                                                            <TextBlock Text="{Binding CompressiveStrength}" FontSize="12"/>
+                                                                        </StackPanel>
+                                                                        <StackPanel Grid.Column="2">
+                                                                            <TextBlock Text="Fire Rating" FontSize="10" Foreground="#6C757D"/>
+                                                                            <TextBlock Text="{Binding FireRating}" FontSize="12"/>
+                                                                        </StackPanel>
+                                                                        <StackPanel Grid.Column="3">
+                                                                            <TextBlock Text="Cost Delta" FontSize="10" Foreground="#6C757D"/>
+                                                                            <TextBlock Text="{Binding CostDeltaDisplay}" FontSize="12"
+                                                                                       Foreground="{Binding CostDeltaPercent, Converter={StaticResource CostDeltaColorConverter}}"/>
+                                                                        </StackPanel>
+                                                                        <StackPanel Grid.Column="4">
+                                                                            <TextBlock Text="EPD" FontSize="10" Foreground="#6C757D"/>
+                                                                            <TextBlock Text="{Binding EpdStatusDisplay}" FontSize="12" FontWeight="SemiBold"
+                                                                                       Foreground="{Binding EpdVerified, Converter={StaticResource EpdStatusColorConverter}}"/>
+                                                                        </StackPanel>
+                                                                    </Grid>
+
+                                                                    <!-- Add to RFQ Button -->
+                                                                    <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+                                                                        <Button Content="Add to RFQ" Click="AddToRfq_Click" Tag="{Binding}"
+                                                                                Background="#2D6A4F" Foreground="White" FontSize="12" Padding="12,6"
+                                                                                Cursor="Hand" BorderThickness="0">
+                                                                            <Button.Template>
+                                                                                <ControlTemplate TargetType="Button">
+                                                                                    <Border x:Name="bd" Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                                                                                        <ContentPresenter HorizontalAlignment="Center"/>
+                                                                                    </Border>
+                                                                                    <ControlTemplate.Triggers>
+                                                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                                                            <Setter TargetName="bd" Property="Background" Value="#40916C"/>
+                                                                                        </Trigger>
+                                                                                    </ControlTemplate.Triggers>
+                                                                                </ControlTemplate>
+                                                                            </Button.Template>
+                                                                        </Button>
+                                                                    </StackPanel>
+                                                                </Grid>
+                                                            </Border>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </Expander>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+
+                        <!-- Loading overlay -->
+                        <Border x:Name="SwapLoadingOverlay" Grid.Row="1" Background="#80F8F9FA" Visibility="Collapsed">
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <ProgressBar IsIndeterminate="True" Width="200" Height="4" Foreground="#2D6A4F"/>
+                                <TextBlock Text="Fetching swap recommendations..." FontSize="13" Foreground="#6C757D" HorizontalAlignment="Center" Margin="0,12,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </TabItem>
+
+                <!-- Tab 3: Recommendations -->
+                <TabItem Header="Recommendations">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,8,0,0">
+                        <StackPanel>
+                            <TextBlock Text="Carbon Reduction Recommendations" Style="{StaticResource GcSectionHeader}"/>
+                            <ItemsControl x:Name="RecommendationsList">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="White" BorderBrush="#DEE2E6" BorderThickness="1" CornerRadius="6" Padding="12" Margin="0,0,0,8">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel>
+                                                    <TextBlock Text="{Binding Description}" FontSize="13" TextWrapping="Wrap" Foreground="#1B1B1B"/>
+                                                </StackPanel>
+                                                <Border Grid.Column="1" Background="#D8F3DC" CornerRadius="4" Padding="8,4" VerticalAlignment="Center" Margin="12,0,0,0"
+                                                        Visibility="{Binding HasSavings, Converter={StaticResource BoolToVisConverter}}">
+                                                    <TextBlock Text="{Binding SavingsDisplay}" FontSize="12" FontWeight="SemiBold" Foreground="#2D6A4F"/>
+                                                </Border>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+            </TabControl>
+
+            <!-- Action Buttons -->
+            <Border Grid.Row="2" Background="White" BorderBrush="#DEE2E6" BorderThickness="1" CornerRadius="6" Padding="12">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Export IFC" Click="ExportIFC_Click" Style="{StaticResource GcSecondaryButton}" Margin="0,0,8,0"/>
+                    <Button Content="Export BCF" Click="ExportBCF_Click" Style="{StaticResource GcSecondaryButton}" Margin="0,0,8,0"/>
+                    <Button Content="Export PDF" Click="ExportPDF_Click" Style="{StaticResource GcSecondaryButton}" Margin="0,0,8,0"/>
+                    <Button Content="Send RFQ" Click="SendRFQ_Click" Style="{StaticResource GcPrimaryButton}" Margin="0,0,8,0" FontWeight="Bold"/>
+                    <Button Content="Close" Click="Close_Click" Style="{StaticResource GcSecondaryButton}"/>
+                </StackPanel>
+            </Border>
+        </Grid>
     </Grid>
 </Window>

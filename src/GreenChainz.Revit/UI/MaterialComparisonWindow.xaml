@@ -1,133 +1,151 @@
 <Window x:Class="GreenChainz.Revit.UI.MaterialComparisonWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Material Swap - GreenChainz" Height="500" Width="700"
-        WindowStartupLocation="CenterScreen" Background="#FAFAFA">
-    
-    <Grid Margin="25">
+        Title="Material Swap - GreenChainz" Height="550" Width="750"
+        MinHeight="450" MinWidth="650"
+        WindowStartupLocation="CenterScreen"
+        Background="#F8F9FA" FontFamily="Segoe UI">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/GreenChainz.Revit;component/Themes/GreenChainzTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Header -->
-        <StackPanel Grid.Row="0" Margin="0,0,0,20">
-            <TextBlock Text="MATERIAL SWAP RECOMMENDATION" FontSize="20" FontWeight="Bold" Foreground="#1B5E20"/>
-            <TextBlock x:Name="SubtitleText" Text="Compare your current material with a lower-carbon alternative" FontSize="12" Foreground="#666"/>
-        </StackPanel>
-
-        <!-- Side by Side Comparison -->
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <!-- CURRENT MATERIAL (Left) -->
-            <Border Grid.Column="0" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="8" Padding="20" Background="White">
-                <StackPanel>
-                    <TextBlock Text="CURRENT SPEC" FontSize="10" FontWeight="Bold" Foreground="#999" Margin="0,0,0,10"/>
-                    <TextBlock x:Name="OriginalMaterialName" Text="Concrete 4000psi" FontSize="18" FontWeight="Bold" TextWrapping="Wrap"/>
-                    <TextBlock x:Name="OriginalSupplier" Text="Standard Specification" FontSize="12" Foreground="#666" Margin="0,5,0,0"/>
-                    
-                    <Border Background="#FFEBEE" CornerRadius="4" Padding="10" Margin="0,15,0,0">
-                        <StackPanel>
-                            <TextBlock Text="Embodied Carbon" FontSize="10" Foreground="#666"/>
-                            <TextBlock x:Name="OriginalGwp" Text="45,000 kgCO2e" FontSize="24" FontWeight="Bold" Foreground="#D32F2F"/>
-                        </StackPanel>
-                    </Border>
-
-                    <StackPanel Margin="0,15,0,0">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="EPD: " FontSize="11" Foreground="#666"/>
-                            <TextBlock x:Name="OriginalEpdStatus" Text="Not Available" FontSize="11" Foreground="#FF9800" FontWeight="Bold"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
-                            <TextBlock Text="LEED Impact: " FontSize="11" Foreground="#666"/>
-                            <TextBlock x:Name="OriginalLeedImpact" Text="Baseline" FontSize="11"/>
-                        </StackPanel>
-                    </StackPanel>
-                </StackPanel>
-            </Border>
-
-            <!-- ARROW -->
-            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="15,0">
-                <TextBlock Text="-->" FontSize="36" FontWeight="Bold" Foreground="#4CAF50"/>
-                <TextBlock x:Name="SavingsText" Text="30% Less Carbon" FontSize="12" FontWeight="Bold" Foreground="#4CAF50" HorizontalAlignment="Center"/>
+        <!-- Green Header Bar -->
+        <Border Grid.Row="0" Background="#2D6A4F" Padding="20,14">
+            <StackPanel>
+                <TextBlock Text="Material Swap Recommendation" FontSize="20" FontWeight="SemiBold" Foreground="White"/>
+                <TextBlock x:Name="SubtitleText" Text="Compare your current material with a lower-carbon alternative" FontSize="11" Foreground="#B7E4C7" Margin="0,2,0,0"/>
             </StackPanel>
-
-            <!-- RECOMMENDED MATERIAL (Right) -->
-            <Border Grid.Column="2" BorderBrush="#4CAF50" BorderThickness="2" CornerRadius="8" Padding="20" Background="#F1F8E9">
-                <StackPanel>
-                    <TextBlock Text="GREENCHAINZ RECOMMENDED" FontSize="10" FontWeight="Bold" Foreground="#1B5E20" Margin="0,0,0,10"/>
-                    <TextBlock x:Name="AltMaterialName" Text="CarbonCure Ready-Mix" FontSize="18" FontWeight="Bold" Foreground="#1B5E20" TextWrapping="Wrap"/>
-                    <TextBlock x:Name="AltSupplier" Text="CarbonCure Technologies" FontSize="12" Foreground="#666" Margin="0,5,0,0"/>
-                    
-                    <Border Background="#C8E6C9" CornerRadius="4" Padding="10" Margin="0,15,0,0">
-                        <StackPanel>
-                            <TextBlock Text="Embodied Carbon" FontSize="10" Foreground="#666"/>
-                            <TextBlock x:Name="AltGwp" Text="31,500 kgCO2e" FontSize="24" FontWeight="Bold" Foreground="#2E7D32"/>
-                        </StackPanel>
-                    </Border>
-
-                    <StackPanel Margin="0,15,0,0">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="EPD: " FontSize="11" Foreground="#666"/>
-                            <TextBlock x:Name="AltEpdStatus" Text="Available" FontSize="11" Foreground="#4CAF50" FontWeight="Bold"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
-                            <TextBlock Text="LEED Impact: " FontSize="11" Foreground="#666"/>
-                            <TextBlock x:Name="AltLeedImpact" Text="+2 LEED Points" FontSize="11" FontWeight="Bold" Foreground="#4CAF50"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
-                            <TextBlock Text="Certifications: " FontSize="11" Foreground="#666"/>
-                            <TextBlock x:Name="AltCertifications" Text="EPD, Carbon Negative" FontSize="11" Foreground="#1565C0"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
-                            <TextBlock Text="Distance: " FontSize="11" Foreground="#666"/>
-                            <TextBlock x:Name="AltDistance" Text="150 miles" FontSize="11"/>
-                        </StackPanel>
-                    </StackPanel>
-                </StackPanel>
-            </Border>
-        </Grid>
-
-        <!-- Total Savings Summary -->
-        <Border Grid.Row="2" Background="#E3F2FD" CornerRadius="8" Padding="20" Margin="0,20,0,0">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="0" HorizontalAlignment="Center">
-                    <TextBlock Text="CARBON SAVED" FontSize="10" Foreground="#666" HorizontalAlignment="Center"/>
-                    <TextBlock x:Name="TotalSavingsText" Text="13,500 kgCO2e" FontSize="18" FontWeight="Bold" Foreground="#1565C0" HorizontalAlignment="Center"/>
-                </StackPanel>
-                <StackPanel Grid.Column="1" HorizontalAlignment="Center">
-                    <TextBlock Text="EQUIVALENT TO" FontSize="10" Foreground="#666" HorizontalAlignment="Center"/>
-                    <TextBlock x:Name="EquivalentText" Text="3 cars off road for 1 year" FontSize="14" FontWeight="Bold" Foreground="#1565C0" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"/>
-                </StackPanel>
-                <StackPanel Grid.Column="2" HorizontalAlignment="Center">
-                    <TextBlock Text="COST IMPACT" FontSize="10" Foreground="#666" HorizontalAlignment="Center"/>
-                    <TextBlock x:Name="CostImpactText" Text="~Same Cost" FontSize="14" FontWeight="Bold" Foreground="#4CAF50" HorizontalAlignment="Center"/>
-                </StackPanel>
-            </Grid>
         </Border>
 
-        <!-- Data Source -->
-        <TextBlock Grid.Row="3" x:Name="DataSourceText" Text="Data: EC3 Building Transparency + CLF v2021" 
-                   FontSize="10" Foreground="#999" FontStyle="Italic" Margin="0,15,0,0"/>
+        <Grid Grid.Row="1" Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-        <!-- Action Buttons -->
-        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
-            <Button Content="View in EC3" Click="ViewInEC3_Click" Padding="15,10" Margin="0,0,10,0" Background="#FF5722" Foreground="White"/>
-            <Button x:Name="SwapButton" Content="Swap Material in Revit" Click="SwapMaterial_Click" Padding="20,10" Background="#4CAF50" Foreground="White" FontWeight="Bold" FontSize="14"/>
-            <Button Content="Cancel" Click="Cancel_Click" Padding="15,10" Margin="10,0,0,0"/>
-        </StackPanel>
+            <!-- Side by Side Comparison -->
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- CURRENT MATERIAL -->
+                <Border Grid.Column="0" Background="White" BorderBrush="#DEE2E6" BorderThickness="1" CornerRadius="6" Padding="16">
+                    <StackPanel>
+                        <TextBlock Text="CURRENT SPEC" FontSize="10" FontWeight="Bold" Foreground="#6C757D" Margin="0,0,0,8"/>
+                        <TextBlock x:Name="OriginalMaterialName" Text="Concrete 4000psi" FontSize="16" FontWeight="Bold" TextWrapping="Wrap" Foreground="#1B1B1B"/>
+                        <TextBlock x:Name="OriginalSupplier" Text="Standard Specification" FontSize="12" Foreground="#6C757D" Margin="0,4,0,0"/>
+
+                        <Border Background="#FFEBEE" CornerRadius="4" Padding="10" Margin="0,12,0,0">
+                            <StackPanel>
+                                <TextBlock Text="Embodied Carbon" FontSize="10" Foreground="#6C757D"/>
+                                <TextBlock x:Name="OriginalGwp" Text="45,000 kgCO2e" FontSize="22" FontWeight="Bold" Foreground="#D62828"/>
+                            </StackPanel>
+                        </Border>
+
+                        <StackPanel Margin="0,12,0,0">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="EPD: " FontSize="11" Foreground="#6C757D"/>
+                                <TextBlock x:Name="OriginalEpdStatus" Text="Not Available" FontSize="11" Foreground="#FF9800" FontWeight="SemiBold"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                                <TextBlock Text="LEED Impact: " FontSize="11" Foreground="#6C757D"/>
+                                <TextBlock x:Name="OriginalLeedImpact" Text="Baseline" FontSize="11"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- ARROW -->
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0">
+                    <TextBlock Text="&#x2192;" FontSize="32" FontWeight="Bold" Foreground="#2D6A4F" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="SavingsText" Text="30% Less" FontSize="12" FontWeight="Bold" Foreground="#2D6A4F" HorizontalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- RECOMMENDED MATERIAL -->
+                <Border Grid.Column="2" BorderBrush="#2D6A4F" BorderThickness="2" CornerRadius="6" Padding="16" Background="#F0F7F4">
+                    <StackPanel>
+                        <TextBlock Text="GREENCHAINZ RECOMMENDED" FontSize="10" FontWeight="Bold" Foreground="#2D6A4F" Margin="0,0,0,8"/>
+                        <TextBlock x:Name="AltMaterialName" Text="CarbonCure Ready-Mix" FontSize="16" FontWeight="Bold" Foreground="#2D6A4F" TextWrapping="Wrap"/>
+                        <TextBlock x:Name="AltSupplier" Text="CarbonCure Technologies" FontSize="12" Foreground="#6C757D" Margin="0,4,0,0"/>
+
+                        <Border Background="#D8F3DC" CornerRadius="4" Padding="10" Margin="0,12,0,0">
+                            <StackPanel>
+                                <TextBlock Text="Embodied Carbon" FontSize="10" Foreground="#6C757D"/>
+                                <TextBlock x:Name="AltGwp" Text="31,500 kgCO2e" FontSize="22" FontWeight="Bold" Foreground="#2D6A4F"/>
+                            </StackPanel>
+                        </Border>
+
+                        <StackPanel Margin="0,12,0,0">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="EPD: " FontSize="11" Foreground="#6C757D"/>
+                                <TextBlock x:Name="AltEpdStatus" Text="Available" FontSize="11" Foreground="#2D6A4F" FontWeight="SemiBold"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                                <TextBlock Text="LEED Impact: " FontSize="11" Foreground="#6C757D"/>
+                                <TextBlock x:Name="AltLeedImpact" Text="+2 LEED Points" FontSize="11" FontWeight="Bold" Foreground="#2D6A4F"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                                <TextBlock Text="Certifications: " FontSize="11" Foreground="#6C757D"/>
+                                <TextBlock x:Name="AltCertifications" Text="EPD, Carbon Negative" FontSize="11" Foreground="#1565C0"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                                <TextBlock Text="Distance: " FontSize="11" Foreground="#6C757D"/>
+                                <TextBlock x:Name="AltDistance" Text="150 miles" FontSize="11"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Total Savings Summary -->
+            <Border Grid.Row="1" Background="#D8F3DC" CornerRadius="6" Padding="16" Margin="0,12,0,0" VerticalAlignment="Top">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" HorizontalAlignment="Center">
+                        <TextBlock Text="CARBON SAVED" FontSize="10" Foreground="#6C757D" HorizontalAlignment="Center"/>
+                        <TextBlock x:Name="TotalSavingsText" Text="13,500 kgCO2e" FontSize="18" FontWeight="Bold" Foreground="#2D6A4F" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+                        <TextBlock Text="EQUIVALENT TO" FontSize="10" Foreground="#6C757D" HorizontalAlignment="Center"/>
+                        <TextBlock x:Name="EquivalentText" Text="3 cars off road for 1 year" FontSize="13" FontWeight="Bold" Foreground="#2D6A4F" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" HorizontalAlignment="Center">
+                        <TextBlock Text="COST IMPACT" FontSize="10" Foreground="#6C757D" HorizontalAlignment="Center"/>
+                        <TextBlock x:Name="CostImpactText" Text="~Same Cost" FontSize="13" FontWeight="Bold" Foreground="#2D6A4F" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Data Source -->
+            <TextBlock Grid.Row="2" x:Name="DataSourceText" Text="Data: EC3 Building Transparency + CLF v2021"
+                       FontSize="10" Foreground="#6C757D" FontStyle="Italic" Margin="0,12,0,0"/>
+
+            <!-- Action Buttons -->
+            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+                <Button Content="View in EC3" Click="ViewInEC3_Click" Style="{StaticResource GcSecondaryButton}" Margin="0,0,8,0"/>
+                <Button x:Name="SwapButton" Content="Swap Material in Revit" Click="SwapMaterial_Click" Style="{StaticResource GcPrimaryButton}" FontWeight="Bold" FontSize="14"/>
+                <Button Content="Cancel" Click="Cancel_Click" Style="{StaticResource GcSecondaryButton}" Margin="8,0,0,0"/>
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>
