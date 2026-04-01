@@ -1,56 +1,88 @@
 <Window x:Class="GreenChainz.Revit.UI.RfqStatusWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="RFQ Status &amp; Messaging - GreenChainz" Height="600" Width="800" WindowStartupLocation="CenterScreen">
-    <Grid Margin="15">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="300"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+        Title="RFQ Status &amp; Messaging - GreenChainz" Height="650" Width="850"
+        MinHeight="500" MinWidth="700"
+        WindowStartupLocation="CenterScreen"
+        Background="#F8F9FA" FontFamily="Segoe UI">
 
-        <!-- RFQ List -->
-        <DockPanel Grid.Column="0" Margin="0,0,10,0">
-            <TextBlock DockPanel.Dock="Top" Text="Your RFQs" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
-            <ListBox Name="RfqListBox" DisplayMemberPath="ProjectName" SelectionChanged="RfqListBox_SelectionChanged"/>
-        </DockPanel>
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/GreenChainz.Revit;component/Themes/GreenChainzTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
 
-        <!-- Messaging Area -->
-        <Grid Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="0" Margin="0,0,0,10">
-                <TextBlock Name="ActiveRfqTitle" FontSize="16" FontWeight="Bold" Text="Select an RFQ to view messages"/>
-                <TextBlock Name="SupplierName" FontSize="12" Foreground="Gray" Text=""/>
-            </StackPanel>
+        <Border Grid.Row="0" Background="#2D6A4F" Padding="20,14">
+            <TextBlock Text="RFQ Status &amp; Messaging" FontSize="20" FontWeight="SemiBold" Foreground="White"/>
+        </Border>
 
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Background="#F9F9F9" Padding="10">
-                <ItemsControl Name="MessagesItemsControl">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border Margin="0,5" Padding="10" CornerRadius="5" 
-                                    Background="{Binding IsUser, Converter={StaticResource BooleanToColorConverter}}"
-                                    HorizontalAlignment="{Binding IsUser, Converter={StaticResource BooleanToAlignmentConverter}}">
-                                <StackPanel>
-                                    <TextBlock Text="{Binding Content}" TextWrapping="Wrap"/>
-                                    <TextBlock Text="{Binding Timestamp}" FontSize="10" Foreground="Gray" Margin="0,5,0,0"/>
-                                </StackPanel>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
+        <Grid Grid.Row="1" Margin="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="280"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-            <Grid Grid.Row="2" Margin="0,10,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <TextBox Name="MessageInput" Height="60" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Margin="0,0,10,0"/>
-                <Button Name="SendButton" Grid.Column="1" Content="Send" Click="SendButton_Click" Padding="20,10" Background="#4CAF50" Foreground="White"/>
+            <!-- RFQ List -->
+            <DockPanel Grid.Column="0" Margin="0,0,12,0">
+                <TextBlock DockPanel.Dock="Top" Text="Your RFQs" Style="{StaticResource GcSectionHeader}"/>
+                <Border Background="White" BorderBrush="#DEE2E6" BorderThickness="1" CornerRadius="6">
+                    <ListBox Name="RfqListBox" DisplayMemberPath="ProjectName" SelectionChanged="RfqListBox_SelectionChanged"
+                             BorderThickness="0" FontSize="13" Padding="4"/>
+                </Border>
+            </DockPanel>
+
+            <!-- Messaging Area -->
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0" Background="White" CornerRadius="6" Padding="12" BorderBrush="#DEE2E6" BorderThickness="1" Margin="0,0,0,8">
+                    <StackPanel>
+                        <TextBlock Name="ActiveRfqTitle" FontSize="16" FontWeight="SemiBold" Text="Select an RFQ to view messages" Foreground="#1B1B1B"/>
+                        <TextBlock Name="SupplierName" FontSize="12" Foreground="#6C757D" Text=""/>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Row="1" Background="White" CornerRadius="6" BorderBrush="#DEE2E6" BorderThickness="1">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="10">
+                        <ItemsControl Name="MessagesItemsControl">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="0,4" Padding="10" CornerRadius="6"
+                                            Background="{Binding IsUser, Converter={StaticResource BooleanToColorConverter}}"
+                                            HorizontalAlignment="{Binding IsUser, Converter={StaticResource BooleanToAlignmentConverter}}">
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Content}" TextWrapping="Wrap" FontSize="13"/>
+                                            <TextBlock Text="{Binding Timestamp}" FontSize="10" Foreground="#6C757D" Margin="0,4,0,0"/>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Border>
+
+                <Grid Grid.Row="2" Margin="0,8,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Name="MessageInput" Height="50" TextWrapping="Wrap" AcceptsReturn="True"
+                             VerticalScrollBarVisibility="Auto" Style="{StaticResource GcTextBox}" Margin="0,0,8,0"/>
+                    <Button Name="SendButton" Grid.Column="1" Content="Send" Click="SendButton_Click"
+                            Style="{StaticResource GcPrimaryButton}"/>
+                </Grid>
             </Grid>
         </Grid>
     </Grid>

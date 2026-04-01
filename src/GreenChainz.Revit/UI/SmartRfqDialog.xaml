@@ -1,0 +1,148 @@
+<Window x:Class="GreenChainz.Revit.UI.SmartRfqDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:GreenChainz.Revit.UI"
+        Title="Send RFQ - GreenChainz" Height="720" Width="800"
+        MinHeight="550" MinWidth="650"
+        WindowStartupLocation="CenterScreen"
+        Background="#F8F9FA" FontFamily="Segoe UI">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/GreenChainz.Revit;component/Themes/GreenChainzTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <local:BoolToVisibilityConverter x:Key="BoolToVisConverter"/>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Green Header Bar -->
+        <Border Grid.Row="0" Background="#2D6A4F" Padding="20,14">
+            <StackPanel>
+                <TextBlock Text="Request for Quote" FontSize="20" FontWeight="SemiBold" Foreground="White"/>
+                <TextBlock Text="Pre-populated from carbon audit - select materials for sustainable sourcing" FontSize="11" Foreground="#B7E4C7" Margin="0,2,0,0"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Content -->
+        <Grid Grid.Row="1" Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Project Metadata -->
+            <Border Grid.Row="0" Style="{StaticResource GcCard}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                        <TextBlock Text="Project Name" Style="{StaticResource GcCaptionText}"/>
+                        <TextBox x:Name="ProjectNameBox" Style="{StaticResource GcTextBox}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Margin="0,0,12,0">
+                        <TextBlock Text="Location" Style="{StaticResource GcCaptionText}"/>
+                        <TextBox x:Name="ProjectLocationBox" Style="{StaticResource GcTextBox}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="Architect" Style="{StaticResource GcCaptionText}"/>
+                        <TextBox x:Name="ArchitectNameBox" Style="{StaticResource GcTextBox}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Carbon Summary -->
+            <Border Grid.Row="1" Background="#D8F3DC" CornerRadius="6" Padding="16,10" Margin="0,0,0,12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="TOTAL CURRENT CARBON" FontSize="11" Foreground="#6C757D"/>
+                        <TextBlock x:Name="TotalCarbonText" Text="0 kgCO2e" FontSize="18" FontWeight="Bold" Foreground="#2D6A4F"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Margin="0,0,24,0">
+                        <TextBlock Text="POTENTIAL SAVINGS" FontSize="11" Foreground="#6C757D"/>
+                        <TextBlock x:Name="TotalSavingsText" Text="0 kgCO2e" FontSize="18" FontWeight="Bold" Foreground="#2D6A4F"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="MATERIALS" FontSize="11" Foreground="#6C757D"/>
+                        <TextBlock x:Name="MaterialCountText" Text="0 selected" FontSize="18" FontWeight="Bold" Foreground="#2D6A4F"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Materials Checklist Label -->
+            <TextBlock Grid.Row="2" Text="Materials to Include in RFQ" Style="{StaticResource GcSectionHeader}"/>
+
+            <!-- Materials Checklist -->
+            <Border Grid.Row="3" Background="White" BorderBrush="#DEE2E6" BorderThickness="1" CornerRadius="6" Margin="0,0,0,12">
+                <DataGrid x:Name="MaterialsGrid" AutoGenerateColumns="False" CanUserAddRows="False"
+                          RowBackground="White" AlternatingRowBackground="#F0F7F4"
+                          GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#DEE2E6"
+                          HeadersVisibility="Column" BorderThickness="0" FontSize="12"
+                          SelectionMode="Single">
+                    <DataGrid.ColumnHeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#2D6A4F"/>
+                            <Setter Property="Foreground" Value="White"/>
+                            <Setter Property="FontSize" Value="12"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter Property="Padding" Value="8,6"/>
+                            <Setter Property="BorderBrush" Value="#1B4332"/>
+                            <Setter Property="BorderThickness" Value="0,0,1,0"/>
+                        </Style>
+                    </DataGrid.ColumnHeaderStyle>
+                    <DataGrid.Columns>
+                        <DataGridCheckBoxColumn Header="" Binding="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="35"/>
+                        <DataGridTextColumn Header="Current Material" Binding="{Binding CurrentMaterialName}" Width="*" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Swap To" Binding="{Binding SwapMaterialName}" Width="*" IsReadOnly="True">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="#2D6A4F"/>
+                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Quantity" Binding="{Binding QuantityDisplay}" Width="90" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Carbon Impact" Binding="{Binding CarbonImpactDisplay}" Width="110" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Savings" Binding="{Binding SavingsDisplay}" Width="110" IsReadOnly="True">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="#2D6A4F"/>
+                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
+
+            <!-- Status -->
+            <TextBlock Grid.Row="4" x:Name="StatusText" Style="{StaticResource GcStatusText}" Margin="0,0,0,8"/>
+
+            <!-- Actions -->
+            <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Select All" Click="SelectAll_Click" Style="{StaticResource GcSecondaryButton}" Margin="0,0,8,0"/>
+                <Button Content="Deselect All" Click="DeselectAll_Click" Style="{StaticResource GcSecondaryButton}" Margin="0,0,8,0"/>
+                <Button x:Name="SubmitButton" Content="Submit RFQ" Click="SubmitRfq_Click" Style="{StaticResource GcPrimaryButton}" Margin="0,0,8,0" FontWeight="Bold"/>
+                <Button Content="Cancel" Click="Cancel_Click" Style="{StaticResource GcSecondaryButton}"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

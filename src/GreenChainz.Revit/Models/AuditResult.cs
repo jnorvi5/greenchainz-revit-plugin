@@ -116,8 +116,10 @@ namespace GreenChainz.Revit.Models
         public double PotentialSavings { get; set; }
         public string Ec3Link { get; set; }
         
-        public string SavingsDisplay => PotentialSavings > 0 
-            ? $"Potential Savings: {PotentialSavings:N0} kgCO2e" 
+        public bool HasSavings => PotentialSavings > 0;
+
+        public string SavingsDisplay => PotentialSavings > 0
+            ? $"Potential Savings: {PotentialSavings:N0} kgCO2e"
             : "";
     }
 
